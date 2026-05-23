@@ -1318,8 +1318,8 @@
             }
             await addToInventory(cleanVal, "❓ غير معروف", cleanVal);
             playBeep(false); flashCard('red');
-            showToast(`⚠️ غير مسجل: ${cleanVal}`, true, 2000);
-            setScanStatus('idle', `⚠️ منتج غير معروف`);
+            showToast(`⚠️ غير مسجل — تم تسجيله: ${cleanVal}`, true, 2000);
+            setScanStatus('idle', `⚠️ غير معروف: ${cleanVal}`);
             updateAllUI();
         } catch (err) {
             console.error(err);
@@ -1522,16 +1522,6 @@
                             <span style="color:var(--text-dim);">${timeStr}</span>
                         </div>
                     </div>
-
-                    <!-- الكمية المجمّعة -->
-                    <div style="min-width:36px; height:36px; border-radius:9px; flex-shrink:0;
-                        background:linear-gradient(145deg,rgba(0,212,170,0.14),rgba(0,212,170,0.05));
-                        border:1px solid rgba(0,212,170,0.22);
-                        display:flex; align-items:center; justify-content:center;
-                        font-size:1.1rem; font-weight:900; color:var(--accent);
-                        font-family:'Tajawal',sans-serif; text-shadow:0 0 10px rgba(0,212,170,0.35);">
-                        ${currentQty}
-                    </div>
                 </div>
 
                 <!-- شريط الأزرار السفلي -->
@@ -1591,8 +1581,9 @@
 
         // ── تبويب الجرد: مجمّع كما هو ──
         document.getElementById('inventoryFullTable').innerHTML = `<table class="data-table">
-            <thead><th>رقم الصنف</th><th>الاسم</th><th>الكمية</th><th>آخر مسح</th></thead>
+            <thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th>الكمية</th><th>آخر مسح</th></thead>
             <tbody>${inventory.map(i => `<tr>
+                <td style="font-size:0.72rem; color:var(--text-muted);">${escapeHtml(i.barcode && i.barcode !== i.key ? i.barcode : '')}</td>
                 <td>${escapeHtml(i.key)}</td>
                 <td>${escapeHtml(i.name)}</td>
                 <td><strong style="color:var(--accent)">${i.qty}</strong></td>
@@ -1605,7 +1596,11 @@
         let cmpRows = [...allCodes].map(k => {
             let i = inventory.find(x => x.key === k), s = stock.find(x => x.key === k);
             let qi = i ? i.qty : 0, qs = s ? s.qty : 0, diff = qi - qs;
-            return { itemNo: (i||s)?.item_no||k, name: (i||s)?.name||'', qs, qi, diff };
+            // الباركود: من inventory أو من products (أيهما يجد قيمة مختلفة عن رقم الصنف)
+            const fromInv  = i?.barcode && i.barcode !== k ? i.barcode : '';
+            const fromProd = prods.find(p => p.item_no === k || p.barcode === k);
+            const bc = fromInv || (fromProd?.barcode && fromProd.barcode !== k ? fromProd.barcode : '');
+            return { itemNo: (i||s)?.item_no||k, barcode: bc, name: (i||s)?.name||'', qs, qi, diff };
         });
         let filter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
         let filtered = cmpRows;
@@ -1621,13 +1616,19 @@
         document.getElementById('statsScannedCount').innerText = inventory.length;
         document.getElementById('statsTotalDiff').innerText = filtered.reduce((a, b) => a + b.diff, 0);
 
-        document.getElementById('comparisonTableDiv').innerHTML = `<table class="data-table"><thead><th>رقم الصنف</th><th>الاسم</th><th>الفعلي</th><th>المجرد</th><th>الفرق</th></thead><tbody>${filtered.map(r => {
+        document.getElementById('comparisonTableDiv').innerHTML = `<table class="data-table"><thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th>الفعلي</th><th>المجرد</th><th>الفرق</th></thead><tbody>${filtered.map(r => {
             let cls = r.diff > 0 ? 'diff-positive' : (r.diff < 0 ? 'diff-negative' : 'diff-zero');
             let icon = r.diff > 0 ? '⬆️' : (r.diff < 0 ? '⬇️' : '✅');
-            return `<tr><td>${escapeHtml(r.itemNo)}</td><td>${escapeHtml(r.name)}</td><td>${r.qs}</td><td>${r.qi}</td><td class="${cls}">${icon} ${r.diff>0?'+':''}${r.diff}</td></tr>`;
+            return `<tr>
+                <td style="font-size:0.7rem; color:var(--text-muted);">${escapeHtml(r.barcode)}</td>
+                <td>${escapeHtml(r.itemNo)}</td>
+                <td>${escapeHtml(r.name)}</td>
+                <td>${r.qs}</td><td>${r.qi}</td>
+                <td class="${cls}">${icon} ${r.diff>0?'+':''}${r.diff}</td>
+            </tr>`;
         }).join('')}</tbody></table>`;
 
-        document.getElementById('productsTableContainer').innerHTML = `<table class="data-table"><thead><th>رقم الصنف</th><th>الاسم</th><th>الباركود</th><th></th></thead><tbody>${prods.map(p => `<tr><td>${escapeHtml(p.item_no||'-')}</td><td>${escapeHtml(p.name||'-')}</td><td>${escapeHtml(p.barcode||'-')}</td><td><button class="icon-btn" onclick="window.deleteProductById(${p.id})">حذف</button></td></tr>`).join('')}</tbody></table>`;
+        document.getElementById('productsTableContainer').innerHTML = `<table class="data-table"><thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th></th></thead><tbody>${prods.map(p => `<tr><td style="font-size:0.72rem; color:var(--text-muted);">${escapeHtml(p.barcode||'-')}</td><td>${escapeHtml(p.item_no||'-')}</td><td>${escapeHtml(p.name||'-')}</td><td><button class="icon-btn" onclick="window.deleteProductById(${p.id})">حذف</button></td></tr>`).join('')}</tbody></table>`;
     }
 
     // دوال التعديل
@@ -1664,6 +1665,34 @@
     };
 
     // ── أزرار بطاقة السجل التفصيلي ──
+    // ── حذف الصنف من inventory وscanLog إذا وصلت الكمية صفر ──
+    async function removeIfZero(itemCode) {
+        const item = await new Promise(r => {
+            const tx = db.transaction("inventory", "readonly");
+            tx.objectStore("inventory").get(itemCode).onsuccess = e => r(e.target.result);
+        });
+        if (!item || item.qty > 0) return; // لا تحذف إذا الكمية أكبر من صفر
+        // احذف من inventory
+        await new Promise(r => {
+            const tx = db.transaction("inventory", "readwrite");
+            tx.objectStore("inventory").delete(itemCode);
+            tx.oncomplete = r;
+        });
+        // احذف كل سطوره من scanLog
+        const allLogs = await new Promise(r => {
+            const tx = db.transaction("scanLog", "readonly");
+            tx.objectStore("scanLog").getAll().onsuccess = e => r(e.target.result);
+        });
+        const toDelete = allLogs.filter(l => l.itemCode === itemCode);
+        if (toDelete.length) {
+            await new Promise(r => {
+                const tx = db.transaction("scanLog", "readwrite");
+                toDelete.forEach(l => tx.objectStore("scanLog").delete(l.id));
+                tx.oncomplete = r;
+            });
+        }
+    }
+
     // ── أزرار السجل التفصيلي ──
     window.logRowAction = async function(action, itemCode, logId, name, barcode, currentQty) {
 
@@ -1717,6 +1746,7 @@
                     tx.oncomplete = r;
                 };
             });
+            await removeIfZero(itemCode);
             playBeep(false);
             updateAllUI(); return;
         }
@@ -1738,6 +1768,7 @@
                     tx.oncomplete = r;
                 };
             });
+            await removeIfZero(itemCode);
             updateAllUI(); return;
         }
 
@@ -1783,6 +1814,7 @@
                     tx.oncomplete = r;
                 };
             });
+            await removeIfZero(itemCode);
             updateAllUI(); return;
         }
     };
