@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>نظام الجرد الذكي | ترتيب تنازلي وتأخير</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -784,7 +784,43 @@
         <button id="exportInventoryBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> تصدير Excel</button>
         <div id="inventoryFullTable" class="data-wrapper"></div>
     </div></div>
-    <div id="tab-stock" class="panel"><div class="card"><div style="font-weight:700; margin-bottom:12px;"><i class="fas fa-file-excel"></i> رفع ملف الرصيد الفعلي (مرجع)</div><div class="file-label" id="stockUploadArea"><i class="fas fa-upload"></i> اختر ملف Excel <input type="file" id="stockFileInput" style="display:none;" accept=".xlsx,.xlsm,.xlsb"></div><div style="display:flex; gap:8px; margin-bottom:12px;"><select id="stockModeSelect" style="flex:1; padding:10px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'Cairo',sans-serif;"><option value="replace">استبدال</option><option value="merge">دمج</option></select><button id="processStockBtn" class="btn-primary" style="width:auto; padding:10px 18px;"><i class="fas fa-play"></i> معالجة</button></div><button id="exportStockBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> تصدير المرجع</button><div id="stockTableContainer" class="data-wrapper"></div></div></div>
+    <div id="tab-stock" class="panel"><div class="card">
+        <div style="font-weight:700; margin-bottom:12px; font-size:0.9rem; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-file-excel" style="color:var(--accent);"></i> رفع ملف الرصيد الفعلي (مرجع)
+        </div>
+
+        <!-- شرح طريقة الرفع -->
+        <div style="background:linear-gradient(135deg,rgba(0,150,255,0.07),rgba(0,212,170,0.05)); border:1px solid rgba(0,150,255,0.18); border-radius:13px; padding:13px 14px; margin-bottom:14px; font-size:0.76rem; line-height:1.8; color:var(--text-muted);">
+            <div style="font-weight:800; color:var(--accent2); margin-bottom:8px; font-size:0.8rem; display:flex; align-items:center; gap:6px;">
+                <i class="fas fa-info-circle"></i> كيف يعمل ملف المرجع؟
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; gap:8px; align-items:flex-start;">
+                    <span style="color:var(--accent); font-weight:800; min-width:18px;">1</span>
+                    <span>ارفع ملف <strong>Excel</strong> (ملف اكسيل الارصدة) يحتوي على أعمدة: <span style="background:rgba(0,212,170,0.12); padding:1px 7px; border-radius:5px; color:var(--accent); font-weight:700;">رقم الصنف</span> + <span style="background:rgba(0,212,170,0.12); padding:1px 7px; border-radius:5px; color:var(--accent); font-weight:700;">الاسم</span> + <span style="background:rgba(0,212,170,0.12); padding:1px 7px; border-radius:5px; color:var(--accent); font-weight:700;">الكمية</span></span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:flex-start;">
+                    <span style="color:var(--accent); font-weight:800; min-width:18px;">2</span>
+                    <span><strong style="color:var(--text);">استبدال</strong> — يمسح المرجع القديم ويضع الجديد مكانه</span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:flex-start;">
+                    <span style="color:var(--accent); font-weight:800; min-width:18px;">3</span>
+                    <span><strong style="color:var(--text);">دمج</strong> — يضيف الكميات الجديدة على الأصناف الموجودة ويضيف الأصناف غير الموجودة</span>
+                </div>
+            </div>
+            <div style="margin-top:10px; padding:8px 10px; background:rgba(255,209,102,0.08); border-radius:8px; border:1px solid rgba(255,209,102,0.15); color:var(--gold); font-size:0.72rem;">
+                <i class="fas fa-lightbulb" style="margin-left:4px;"></i> يُستخدم المرجع في صفحة المقارنة لحساب الفروقات بين الكمية الفعلية والمجردة
+            </div>
+        </div>
+
+        <div class="file-label" id="stockUploadArea"><i class="fas fa-upload"></i> اختر ملف Excel <input type="file" id="stockFileInput" style="display:none;" accept=".xlsx,.xlsm,.xlsb"></div>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <select id="stockModeSelect" style="flex:1; padding:10px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'Cairo',sans-serif;"><option value="replace">استبدال</option><option value="merge">دمج</option></select>
+            <button id="processStockBtn" class="btn-primary" style="width:auto; padding:10px 18px;"><i class="fas fa-play"></i> معالجة</button>
+        </div>
+        <button id="exportStockBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> تصدير المرجع</button>
+        <div id="stockTableContainer" class="data-wrapper"></div>
+    </div></div>
     <div id="tab-cmp" class="panel"><div class="card"><input type="text" id="searchCompare" class="search-input" placeholder="🔍 بحث في المقارنة">
 
         <!-- بطاقات الإحصائيات المجسّمة -->
@@ -945,7 +981,45 @@
         .filter-btn[data-filter="match"].active   { background:linear-gradient(145deg,#0f243d,#081420) !important; border-color:rgba(0,150,255,0.5) !important; box-shadow:0 5px 0 rgba(0,50,100,0.7), 0 0 20px rgba(0,150,255,0.2) !important; color:#7dd3fc !important; }
         .filter-btn[data-filter="scanned"].active { background:linear-gradient(145deg,#3d2c0f,#201608) !important; border-color:rgba(255,200,50,0.5) !important; box-shadow:0 5px 0 rgba(100,70,0,0.7), 0 0 20px rgba(255,200,50,0.2) !important; color:#ffe599 !important; }
         </style><button id="exportCompareBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> تصدير المقارنة</button><div id="comparisonTableDiv" class="data-wrapper"></div></div></div>
-    <div id="tab-products" class="panel"><div class="card"><div class="file-label" id="dbUploadArea"><i class="fas fa-upload"></i> رفع ملف المنتجات <input type="file" id="dbFileInput" style="display:none;" multiple></div><div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;"><button id="processDbBtn" class="btn-primary">معالجة عادي</button><button id="processDbNoFilterBtn" class="btn-secondary">بدون فلتر</button></div><button id="exportProductsBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> تصدير المنتجات</button><div id="productsTableContainer" class="data-wrapper"></div><button id="clearProductsBtn" class="btn-secondary" style="margin-top:12px;">مسح كل المنتجات</button></div></div>
+    <div id="tab-products" class="panel"><div class="card">
+
+        <!-- شرح طريقة الرفع -->
+        <div style="background:linear-gradient(135deg,rgba(168,85,247,0.07),rgba(0,212,170,0.04)); border:1px solid rgba(168,85,247,0.18); border-radius:13px; padding:13px 14px; margin-bottom:14px; font-size:0.76rem; line-height:1.8; color:var(--text-muted);">
+            <div style="font-weight:800; color:#a855f7; margin-bottom:8px; font-size:0.8rem; display:flex; align-items:center; gap:6px;">
+                <i class="fas fa-info-circle"></i> كيف يعمل ملف المنتجات؟
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; gap:8px; align-items:flex-start;">
+                    <span style="color:#a855f7; font-weight:800; min-width:18px;">1</span>
+                    <span>ارفع ملف <strong>Excel</strong> (ملف التسعير) يحتوي على أعمدة: <span style="background:rgba(168,85,247,0.12); padding:1px 7px; border-radius:5px; color:#a855f7; font-weight:700;">الباركود</span> + <span style="background:rgba(168,85,247,0.12); padding:1px 7px; border-radius:5px; color:#a855f7; font-weight:700;">رقم الصنف</span> + <span style="background:rgba(168,85,247,0.12); padding:1px 7px; border-radius:5px; color:#a855f7; font-weight:700;">اسم الصنف</span></span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:flex-start;">
+                    <span style="color:#a855f7; font-weight:800; min-width:18px;">2</span>
+                    <span>يمكن رفع <strong>أكثر من ملف</strong> دفعة واحدة — سيتم دمجها تلقائياً</span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:flex-start;">
+                    <span style="color:#a855f7; font-weight:800; min-width:18px;">3</span>
+                    <span><strong style="color:var(--text);">معالجة عادي</strong> — يفلتر الصفوف ويزيل المكرر والفاضي تلقائياً</span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:flex-start;">
+                    <span style="color:#a855f7; font-weight:800; min-width:18px;">4</span>
+                    <span><strong style="color:var(--text);">بدون فلتر</strong> — يرفع الملف كما هو دون حذف أي صف</span>
+                </div>
+            </div>
+            <div style="margin-top:10px; padding:8px 10px; background:rgba(255,209,102,0.08); border-radius:8px; border:1px solid rgba(255,209,102,0.15); color:var(--gold); font-size:0.72rem;">
+                <i class="fas fa-lightbulb" style="margin-left:4px;"></i> المنتجات تُستخدم للتعرف التلقائي على الباركود أثناء المسح وفي صفحة المقارنة
+            </div>
+        </div>
+
+        <div class="file-label" id="dbUploadArea"><i class="fas fa-upload"></i> رفع ملف المنتجات <input type="file" id="dbFileInput" style="display:none;" multiple></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+            <button id="processDbBtn" class="btn-primary">معالجة عادي</button>
+            <button id="processDbNoFilterBtn" class="btn-secondary">بدون فلتر</button>
+        </div>
+        <button id="exportProductsBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> تصدير المنتجات</button>
+        <div id="productsTableContainer" class="data-wrapper"></div>
+        <button id="clearProductsBtn" class="btn-secondary" style="margin-top:12px;">مسح كل المنتجات</button>
+    </div></div>
 </div>
 <div id="productModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); justify-content:center; align-items:center; z-index:3000;">
     <div style="background:#13161e; border-radius:20px; padding:24px; width:90%; max-width:380px; border:1px solid rgba(0,212,170,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.6);">
