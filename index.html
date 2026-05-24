@@ -2254,11 +2254,6 @@
             Promise.all([new Promise(r=>{ tx1.oncomplete=r; }), new Promise(r=>{ tx2.oncomplete=r; })]).then(()=>{ updateAllUI(); showToast("تم مسح المنتجات"); });
         }
     };
-    // ── Google Drive Upload ──
-    const DRIVE_CLIENT_ID = '91655886848-mjhb50l2r4tqlqt4hkh8ihaoib64pnal.apps.googleusercontent.com';
-    // Origin المرخّص: https://alansary20.github.io
-    let driveToken = null;
-
     // ── Google Drive - نظام Token يدوي يعمل في أي WebView ──
     let driveToken = null;
     const DRIVE_CLIENT_ID = '91655886848-mjhb50l2r4tqlqt4hkh8ihaoib64pnal.apps.googleusercontent.com';
