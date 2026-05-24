@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>نظام الجرد الذكي | ترتيب تنازلي وتأخير</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-    <!-- Median.co Native Bridge -->
-    <script src="https://accounts.google.com/gsi/client" async></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2004,16 +2001,20 @@
             const date = new Date().toLocaleDateString('ar-SA');
             const time = new Date().toLocaleTimeString('ar-SA', {hour:'2-digit',minute:'2-digit'});
             const headers = rows[0] || [];
-            let shareText = `📊 *${fileName.replace('.xlsx','')}*\n`;
+            const colWidths = headers.map((h, ci) =>
+                Math.max(String(h).length, ...rows.slice(1).map(r => String(r[ci]||'').length))
+            );
+            const pad = (str, len) => String(str||'').padEnd(len, ' ');
+            let shareText = `📊 *${fileName.replace(/\.[^.]+$/,'')}*\n`;
             shareText += `📅 ${date}  🕐 ${time}\n`;
-            shareText += `━━━━━━━━━━━━━━━━━━\n`;
-            shareText += `*${headers.join('  |  ')}*\n`;
-            shareText += `━━━━━━━━━━━━━━━━━━\n`;
-            rows.slice(1).forEach((row, i) => {
-                shareText += row.map(c => String(c||'—')).join('  |  ') + '\n';
+            shareText += `📦 عدد الأصناف: ${rows.length - 1}\n`;
+            shareText += `\`\`\`\n`;
+            shareText += headers.map((h,i) => pad(h, colWidths[i])).join(' | ') + '\n';
+            shareText += colWidths.map(w => '─'.repeat(w)).join('─┼─') + '\n';
+            rows.slice(1).forEach(row => {
+                shareText += headers.map((h,i) => pad(row[i], colWidths[i])).join(' | ') + '\n';
             });
-            shareText += `━━━━━━━━━━━━━━━━━━\n`;
-            shareText += `📦 المجموع: ${rows.length - 1} صنف`;
+            shareText += `\`\`\``;
 
             const overlay = document.createElement('div');
             overlay.id = '__exportOverlay';
@@ -2049,16 +2050,6 @@
                         font-weight:800; font-size:0.8rem; font-family:'Cairo',sans-serif;">
                         💬 واتساب
                     </button>
-                    <button id="__btnTg" style="flex:1; padding:10px 8px; border:none; border-radius:10px; cursor:pointer;
-                        background:#229ed9; color:#fff;
-                        font-weight:800; font-size:0.8rem; font-family:'Cairo',sans-serif;">
-                        ✈️ تيليغرام
-                    </button>
-                    <button id="__btnDrive" style="flex:1; padding:10px 8px; border:none; border-radius:10px; cursor:pointer;
-                        background:linear-gradient(135deg,#4285f4,#34a853);
-                        color:#fff; font-weight:800; font-size:0.8rem; font-family:'Cairo',sans-serif;">
-                        ☁️ Drive
-                    </button>
                 </div>
 
                 <!-- الجدول -->
@@ -2090,14 +2081,9 @@
             };
 
             document.getElementById('__btnWa').onclick = () => {
-                window.open('https://wa.me/?text=' + encodeURIComponent(_name + '\n\n' + _txt.slice(0,3000)), '_blank');
+                window.open('https://wa.me/?text=' + encodeURIComponent(_txt), '_blank') ||
+                (location.href = 'https://wa.me/?text=' + encodeURIComponent(_txt));
             };
-
-            document.getElementById('__btnTg').onclick = () => {
-                window.open('https://t.me/share/url?text=' + encodeURIComponent(_name + '\n\n' + _txt.slice(0,3000)), '_blank');
-            };
-
-            document.getElementById('__btnDrive').onclick = () => uploadToDrive(_blob, _name, mimeType);
 
         } catch(e) {
             console.error('downloadFile:', e);
@@ -2254,176 +2240,6 @@
             Promise.all([new Promise(r=>{ tx1.oncomplete=r; }), new Promise(r=>{ tx2.oncomplete=r; })]).then(()=>{ updateAllUI(); showToast("تم مسح المنتجات"); });
         }
     };
-    // ── Google Drive - نظام Token يدوي يعمل في أي WebView ──
-    let driveToken = null;
-    const DRIVE_CLIENT_ID = '91655886848-mjhb50l2r4tqlqt4hkh8ihaoib64pnal.apps.googleusercontent.com';
-    // Origin المرخّص: https://alansary20.github.io
-
-    function getDriveToken(callback) {
-        if (driveToken) { callback(driveToken); return; }
-
-        // عرض overlay لإدخال Token
-        const old = document.getElementById('__tokenOverlay');
-        if (old) old.remove();
-
-        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${DRIVE_CLIENT_ID}&redirect_uri=https://alansary20.github.io/Aly.alansary/&response_type=token&scope=https://www.googleapis.com/auth/drive.file&prompt=select_account`;
-
-        const ol = document.createElement('div');
-        ol.id = '__tokenOverlay';
-        ol.style.cssText = `position:fixed;inset:0;z-index:99999;background:#0d0f14;
-            display:flex;flex-direction:column;align-items:center;justify-content:center;
-            padding:24px;font-family:'Cairo','Tajawal',sans-serif;`;
-        ol.innerHTML = `
-            <div style="font-size:2.5rem;margin-bottom:12px;">☁️</div>
-            <div style="font-size:0.95rem;font-weight:800;color:#00d4aa;margin-bottom:8px;">ربط Google Drive</div>
-            <div style="font-size:0.75rem;color:#6b7a9a;margin-bottom:20px;text-align:center;line-height:1.7;">
-                اضغط الزر أدناه لفتح صفحة تسجيل الدخول<br>
-                ثم انسخ الرابط الكامل بعد التسجيل والصقه هنا
-            </div>
-
-            <button id="__openAuthBtn" style="width:100%;padding:13px;border:none;border-radius:12px;
-                background:linear-gradient(135deg,#4285f4,#34a853);
-                color:#fff;font-weight:800;font-size:0.88rem;
-                font-family:'Cairo',sans-serif;cursor:pointer;margin-bottom:16px;">
-                🔗 فتح صفحة تسجيل الدخول
-            </button>
-
-            <div style="width:100%;margin-bottom:8px;">
-                <div style="font-size:0.72rem;color:#6b7a9a;margin-bottom:6px;">
-                    بعد التسجيل، انسخ الرابط من المتصفح والصقه هنا:
-                </div>
-                <textarea id="__tokenInput" placeholder="الصق الرابط الكامل هنا..."
-                    style="width:100%;height:80px;padding:10px;border-radius:10px;
-                        background:#1a1e2a;border:1px solid rgba(0,212,170,0.2);
-                        color:#e8edf5;font-size:0.72rem;font-family:'Cairo',sans-serif;
-                        resize:none;"></textarea>
-            </div>
-
-            <button id="__submitTokenBtn" style="width:100%;padding:13px;border:none;border-radius:12px;
-                background:linear-gradient(135deg,#00b894,#00d4aa);
-                color:#021a14;font-weight:800;font-size:0.88rem;
-                font-family:'Cairo',sans-serif;cursor:pointer;margin-bottom:10px;">
-                ✓ تأكيد ورفع الملف
-            </button>
-
-            <button onclick="document.getElementById('__tokenOverlay').remove()"
-                style="background:none;border:none;color:#475569;
-                    font-family:'Cairo',sans-serif;font-size:0.8rem;cursor:pointer;">
-                إلغاء
-            </button>
-        `;
-        document.body.appendChild(ol);
-
-        document.getElementById('__openAuthBtn').onclick = () => {
-            window.open(authUrl, '_blank') || (location.href = authUrl);
-        };
-
-        document.getElementById('__submitTokenBtn').onclick = () => {
-            const input = document.getElementById('__tokenInput').value.trim();
-            // استخراج الـ token من الرابط أو من النص مباشرة
-            let token = null;
-            try {
-                const url = new URL(input.includes('://') ? input : 'https://x.com/#' + input);
-                const hash = url.hash.slice(1);
-                const params = new URLSearchParams(hash);
-                token = params.get('access_token') || input;
-            } catch(e) {
-                token = input;
-            }
-            if (!token || token.length < 20) {
-                showToast('الرابط غير صحيح — الصق الرابط الكامل', true);
-                return;
-            }
-            driveToken = token;
-            ol.remove();
-            callback(driveToken);
-        };
-    }
-
-    async function uploadToDrive(blob, fileName, mimeType) {
-        showProgress('رفع على Google Drive...', 'جاري تسجيل الدخول', 10);
-        getDriveToken(async (token) => {
-            try {
-                updateProgress(30, 'جاري الرفع...');
-                const metadata = { name: fileName, mimeType };
-                const form = new FormData();
-                form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-                form.append('file', blob);
-                const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink,webContentLink', {
-                    method: 'POST',
-                    headers: { Authorization: 'Bearer ' + token },
-                    body: form
-                });
-                if (!res.ok) throw new Error('فشل الرفع: ' + res.status);
-                const data = await res.json();
-
-                // اجعل الملف عاماً حتى يفتحه أي شخص
-                updateProgress(80, 'ضبط الصلاحيات...');
-                await fetch(`https://www.googleapis.com/drive/v3/files/${data.id}/permissions`, {
-                    method: 'POST',
-                    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ role: 'reader', type: 'anyone' })
-                });
-
-                updateProgress(100, 'اكتمل!');
-                hideProgress();
-
-                const link = data.webViewLink || `https://drive.google.com/file/d/${data.id}/view`;
-
-                // إزالة الـ overlay وعرض خيارات المشاركة
-                const old = document.getElementById('__exportOverlay');
-                if (old) old.remove();
-
-                // overlay جديد مع الرابط وخيارات المشاركة
-                const ol = document.createElement('div');
-                ol.style.cssText = `position:fixed;inset:0;z-index:99999;background:#0d0f14;
-                    display:flex;flex-direction:column;align-items:center;justify-content:center;
-                    padding:30px;text-align:center;font-family:'Cairo','Tajawal',sans-serif;`;
-                ol.innerHTML = `
-                    <div style="font-size:3rem;margin-bottom:16px;">☁️</div>
-                    <div style="font-size:1rem;font-weight:800;color:#00d4aa;margin-bottom:8px;">تم الرفع بنجاح!</div>
-                    <div style="font-size:0.78rem;color:#6b7a9a;margin-bottom:20px;">${fileName}</div>
-                    <div style="background:#1a1e2a;border:1px solid rgba(0,212,170,0.2);border-radius:12px;
-                        padding:12px;margin-bottom:20px;width:100%;word-break:break-all;
-                        font-size:0.7rem;color:#38bdf8;">${link}</div>
-                    <div style="display:flex;gap:8px;width:100%;flex-wrap:wrap;">
-                        <button onclick="
-                            const wa='https://wa.me/?text='+encodeURIComponent('📊 ${fileName}\\n\\n🔗 ' + '${link}');
-                            window.open(wa,'_blank') || (location.href=wa);
-                        " style="flex:1;padding:12px;border:none;border-radius:12px;cursor:pointer;
-                            background:#25d366;color:#fff;font-weight:800;font-size:0.85rem;font-family:'Cairo',sans-serif;">
-                            💬 إرسال واتساب
-                        </button>
-                        <button onclick="
-                            const tg='https://t.me/share/url?url='+encodeURIComponent('${link}')+'&text='+encodeURIComponent('📊 ${fileName}');
-                            window.open(tg,'_blank') || (location.href=tg);
-                        " style="flex:1;padding:12px;border:none;border-radius:12px;cursor:pointer;
-                            background:#229ed9;color:#fff;font-weight:800;font-size:0.85rem;font-family:'Cairo',sans-serif;">
-                            ✈️ تيليغرام
-                        </button>
-                    </div>
-                    <button onclick="
-                        navigator.clipboard?.writeText('${link}').then(()=>alert('تم نسخ الرابط!'));
-                    " style="width:100%;margin-top:8px;padding:12px;border:1px solid rgba(255,255,255,0.1);
-                        border-radius:12px;cursor:pointer;background:none;color:#6b7a9a;
-                        font-family:'Cairo',sans-serif;font-size:0.82rem;">
-                        📋 نسخ الرابط
-                    </button>
-                    <button onclick="this.parentElement.remove()"
-                        style="margin-top:12px;background:none;border:none;color:#475569;
-                            font-family:'Cairo',sans-serif;font-size:0.8rem;cursor:pointer;">
-                        ← رجوع للتطبيق
-                    </button>
-                `;
-                document.body.appendChild(ol);
-
-            } catch(e) {
-                hideProgress();
-                showToast('خطأ في الرفع: ' + e.message, true);
-            }
-        });
-    }
-
     // ── شريط التقدم ──
     function showProgress(title, sub, pct) {
         document.getElementById('progressOverlay').classList.add('show');
