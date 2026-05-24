@@ -1956,36 +1956,27 @@
     // ── تصدير متوافق مع Apps Geyser WebView ──
     // Apps Geyser لا يدعم: Blob URL, Share API, JS Interface
     // الحل: عرض الملف كصفحة HTML داخل WebView مع زر نسخ البيانات
-    async function downloadFile(blobOrBuffer, fileName, mimeType) {
-        try {
-            const blob = blobOrBuffer instanceof Blob
-                ? blobOrBuffer
-                : new Blob([blobOrBuffer], { type: mimeType });
-
-            // تحويل إلى base64 data URL
-            const base64 = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
-            });
-
-            // ── الطريقة الوحيدة الموثوقة في Apps Geyser WebView ──
-            // نوجّه المتصفح مباشرة إلى data URL للملف
-            // Android WebView يفتحه تلقائياً عبر Download Manager
-            window.location.href = base64;
-
-        } catch(e) {
-            console.error('downloadFile:', e);
-            showToast('خطأ في التصدير', true);
-        }
+    // ── تصدير CSV — الطريقة الوحيدة التي تعمل في Apps Geyser ──
+    // xlsx ثقيل جداً ويجمّد WebView، CSV نص خفيف يعمل بدون مشاكل
+    function exportToExcel(data, sheetName, fileName) {
+        if (!data || !data.length) { showToast('لا توجد بيانات للتصدير', true); return; }
+        const headers = Object.keys(data[0]);
+        const escape  = v => {
+            const s = String(v == null ? '' : v);
+            return s.includes(',') || s.includes('"') || s.includes('\n')
+                ? '"' + s.replace(/"/g, '""') + '"' : s;
+        };
+        const bom = '\uFEFF';
+        const csv = bom + [headers, ...data.map(r => headers.map(h => escape(r[h])))].map(r => r.join(',')).join('\r\n');
+        const uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+        showDownloadPage(uri, fileName + '.csv');
     }
 
-    function exportToExcel(data, sheetName, fileName) {
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, sheetName);
-        const buf = XLSX.write(wb, { bookType:'xlsx', type:'array' });
-        downloadFile(buf, `${fileName}.xlsx`, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    function showDownloadPage(dataUri, fileName) {
+        const html = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + fileName + '</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;background:#0d0f14;color:#e8edf5;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:28px;text-align:center}.icon{font-size:5rem;margin-bottom:20px}h2{font-size:1rem;color:#00d4aa;word-break:break-all;margin-bottom:8px}p{color:#6b7a9a;font-size:0.85rem;margin-bottom:32px;line-height:1.7}.btn{display:block;width:100%;max-width:320px;background:linear-gradient(135deg,#00b894,#00d4aa);color:#021a14;font-weight:800;font-size:1.05rem;padding:16px 24px;border-radius:16px;text-decoration:none;box-shadow:0 4px 24px rgba(0,212,170,0.4);margin-bottom:20px}.back{color:#00d4aa;font-size:0.85rem;background:none;border:none;text-decoration:underline;cursor:pointer;padding:8px}</style></head><body><div class="icon">📊</div><h2>' + fileName + '</h2><p>الملف جاهز<br>اضغط الزر لتنزيله</p><a class="btn" href="' + dataUri + '" download="' + fileName + '">⬇ تنزيل الملف</a><button class="back" onclick="history.back()">← رجوع للتطبيق</button></body></html>';
+        document.open();
+        document.write(html);
+        document.close();
     }
     document.getElementById('exportInventoryBtn').onclick = () => {
         showProgress('تصدير الجرد...', 'جاري تجميع البيانات', 20);
@@ -2034,67 +2025,22 @@
                 return { bc, k, name: (i||s)?.name||'', qs, qi, diff };
             });
 
-            updateProgress(50, 'إنشاء ورقة العمل...');
-            const wb  = new ExcelJS.Workbook();
-            const ws  = wb.addWorksheet('المقارنة', { views:[{ rightToLeft: true }] });
-
-            // رؤوس الأعمدة
-            ws.columns = [
-                { header:'الباركود',  key:'bc',   width:20 },
-                { header:'رقم الصنف', key:'k',    width:18 },
-                { header:'الاسم',     key:'name',  width:40 },
-                { header:'الفعلي',    key:'qs',    width:12 },
-                { header:'المجرود',   key:'qi',    width:12 },
-                { header:'الفرق',     key:'diff',  width:12 },
-                { header:'الحالة',    key:'status',width:12 },
-            ];
-
-            // تنسيق رأس الجدول
-            const headerRow = ws.getRow(1);
-            headerRow.height = 22;
-            headerRow.eachCell(cell => {
-                cell.font      = { bold:true, color:{ argb:'FFFFFFFF' }, size:11, name:'Cairo' };
-                cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF1E2A3E' } };
-                cell.alignment = { horizontal:'center', vertical:'middle', wrapText:true, readingOrder:'rtl' };
-                cell.border    = { bottom:{ style:'medium', color:{ argb:'FF00D4AA' } } };
-            });
-
-            // إضافة الصفوف بالألوان
-            const colorMap = {
-                increase: { fill:'FF0D3B2A', font:'FF00D4AA', label:'زيادة' },
-                decrease: { fill:'FF3B0D0D', font:'FFFF6B6B', label:'نقص'   },
-                match:    { fill:'FF0D1E3B', font:'FF38BDF8', label:'مطابق' },
-                none:     { fill:'FF1A1A2E', font:'FF9CA3AF', label:'—'     },
-            };
-
-            rows.forEach(r => {
-                const type = r.diff > 0 ? 'increase' : r.diff < 0 ? 'decrease' : r.qi > 0 ? 'match' : 'none';
-                const c    = colorMap[type];
-                const icon = r.diff > 0 ? '⬆' : r.diff < 0 ? '⬇' : r.qi > 0 ? '✓' : '—';
-                const dataRow = ws.addRow({
-                    bc: r.bc, k: r.k, name: r.name,
-                    qs: r.qs, qi: r.qi,
-                    diff: (r.diff > 0 ? '+' : '') + r.diff,
-                    status: icon + ' ' + c.label
-                });
-                dataRow.height = 18;
-                dataRow.eachCell({ includeEmpty:true }, cell => {
-                    cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb: c.fill } };
-                    cell.font      = { color:{ argb: c.font }, name:'Cairo', bold: ['diff','status'].includes(cell._column.key) };
-                    cell.alignment = { horizontal:'center', vertical:'middle', readingOrder:'rtl' };
-                    cell.border    = { bottom:{ style:'thin', color:{ argb:'FF2A2A3E' } } };
-                });
-            });
-
-            // تجميد الصف الأول
-            ws.views = [{ state:'frozen', ySplit:1, rightToLeft:true }];
-
-            updateProgress(85, 'كتابة الملف...');
-            const buf  = await wb.xlsx.writeBuffer();
-            const fileName = 'مقارنة_الجرد_' + new Date().toLocaleDateString('ar-SA').replace(/\//g,'-') + '.xlsx';
-            downloadFile(buf, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            updateProgress(50, 'إنشاء ملف CSV...');
+            const statusLabel = r => r.diff > 0 ? 'زيادة' : r.diff < 0 ? 'نقص' : r.qi > 0 ? 'مطابق' : '—';
+            const csvData = rows.map(r => ({
+                'الباركود':  r.bc,
+                'رقم الصنف': r.k,
+                'الاسم':     r.name,
+                'الفعلي':    r.qs,
+                'المجرود':   r.qi,
+                'الفرق':     (r.diff > 0 ? '+' : '') + r.diff,
+                'الحالة':    statusLabel(r)
+            }));
+            const fileName = 'مقارنة_الجرد_' + new Date().toLocaleDateString('ar-SA').replace(/\//g,'-');
+            updateProgress(85, 'جاهز...');
             hideProgress();
-            showToast('✓ تم تصدير المقارنة بالألوان');
+            exportToExcel(csvData, 'المقارنة', fileName);
+            showToast('✓ تم تصدير المقارنة');
         });
     };
 
