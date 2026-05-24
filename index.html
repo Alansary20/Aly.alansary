@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>نظام الجرد الذكي | ترتيب تنازلي وتأخير</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1952,142 +1953,30 @@
         this.classList.add('active'); updateAllUI();
     }));
 
-    // ── تصدير بديل يعمل في كل WebView بدون اشتراك ──
-    // يعرض البيانات كجدول HTML داخل التطبيق مع خيار المشاركة كنص
-    async function downloadFile(blobOrBuffer, fileName, mimeType) {
+    // ── دالة تنزيل تعمل في WebView و Android APK ──
+    function downloadFile(blobOrBuffer, fileName, mimeType) {
         try {
-            const blob = blobOrBuffer instanceof Blob
-                ? blobOrBuffer
-                : new Blob([blobOrBuffer], { type: mimeType });
-
-            // ── جرّب Web Share API أولاً (يعمل في Chrome Android) ──
-            if (navigator.share) {
-                try {
-                    const file = new File([blob], fileName, { type: mimeType });
-                    if (!navigator.canShare || navigator.canShare({ files: [file] })) {
-                        await navigator.share({ files: [file], title: fileName });
-                        return;
-                    }
-                } catch(e) { /* نكمل للبديل */ }
-            }
-
-            // ── قراءة البيانات من الـ blob لعرضها كنص ──
-            const arrayBuf = await blob.arrayBuffer();
-            const wb = XLSX.read(arrayBuf, { type: 'array' });
-            const ws = wb.Sheets[wb.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-
-            // ── بناء overlay بجدول HTML + زر مشاركة نصية ──
-            const old = document.getElementById('__exportOverlay');
-            if (old) old.remove();
-
-            // بناء جدول HTML
-            let tableHtml = '<table style="width:100%;border-collapse:collapse;font-size:0.72rem;">';
-            rows.forEach((row, ri) => {
-                const isHeader = ri === 0;
-                tableHtml += `<tr style="background:${isHeader ? '#1a2a3a' : ri%2===0 ? '#13161e' : '#1a1e2a'}">`;
-                row.forEach(cell => {
-                    const tag = isHeader ? 'th' : 'td';
-                    tableHtml += `<${tag} style="padding:6px 8px;border:1px solid rgba(255,255,255,0.06);
-                        color:${isHeader ? '#00d4aa' : '#e8edf5'};text-align:center;white-space:nowrap;">
-                        ${String(cell||'')}
-                    </${tag}>`;
-                });
-                tableHtml += '</tr>';
-            });
-            tableHtml += '</table>';
-
-            // بناء نص منسّق لواتساب
-            const date = new Date().toLocaleDateString('ar-SA');
-            const time = new Date().toLocaleTimeString('ar-SA', {hour:'2-digit',minute:'2-digit'});
-            const headers = rows[0] || [];
-            const colWidths = headers.map((h, ci) =>
-                Math.max(String(h).length, ...rows.slice(1).map(r => String(r[ci]||'').length))
-            );
-            const pad = (str, len) => String(str||'').padEnd(len, ' ');
-            let shareText = `📊 *${fileName.replace(/\.[^.]+$/,'')}*\n`;
-            shareText += `📅 ${date}  🕐 ${time}\n`;
-            shareText += `📦 عدد الأصناف: ${rows.length - 1}\n`;
-            shareText += `\`\`\`\n`;
-            shareText += headers.map((h,i) => pad(h, colWidths[i])).join(' | ') + '\n';
-            shareText += colWidths.map(w => '─'.repeat(w)).join('─┼─') + '\n';
-            rows.slice(1).forEach(row => {
-                shareText += headers.map((h,i) => pad(row[i], colWidths[i])).join(' | ') + '\n';
-            });
-            shareText += `\`\`\``;
-
-            const overlay = document.createElement('div');
-            overlay.id = '__exportOverlay';
-            overlay.style.cssText = `
-                position:fixed; inset:0; z-index:99999;
-                background:#0d0f14; display:flex; flex-direction:column;
-                font-family:'Cairo','Tajawal',sans-serif; overflow:hidden;
-            `;
-            overlay.innerHTML = `
-                <!-- شريط العنوان -->
-                <div style="display:flex; align-items:center; justify-content:space-between;
-                    padding:14px 16px; background:#13161e;
-                    border-bottom:1px solid rgba(0,212,170,0.2); flex-shrink:0;">
-                    <div style="font-size:0.88rem; font-weight:800; color:#00d4aa;">
-                        📊 ${fileName}
-                    </div>
-                    <button onclick="document.getElementById('__exportOverlay').remove()"
-                        style="background:rgba(255,255,255,0.08); border:none; color:#e8edf5;
-                            width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:1rem;">
-                        ✕
-                    </button>
-                </div>
-
-                <!-- أزرار المشاركة -->
-                <div style="display:flex; gap:8px; padding:12px 14px; flex-shrink:0; flex-wrap:wrap;">
-                    <button id="__btnShare" style="flex:1; padding:10px 8px; border:none; border-radius:10px; cursor:pointer;
-                        background:linear-gradient(135deg,#00b894,#00d4aa);
-                        color:#021a14; font-weight:800; font-size:0.8rem; font-family:'Cairo',sans-serif;">
-                        📤 مشاركة / نسخ
-                    </button>
-                    <button id="__btnWa" style="flex:1; padding:10px 8px; border:none; border-radius:10px; cursor:pointer;
-                        background:#25d366; color:#fff;
-                        font-weight:800; font-size:0.8rem; font-family:'Cairo',sans-serif;">
-                        💬 واتساب
-                    </button>
-                </div>
-
-                <!-- الجدول -->
-                <div style="flex:1; overflow:auto; padding:0 14px 14px;">
-                    ${tableHtml}
-                </div>
-            `;
-            document.body.appendChild(overlay);
-
-            // ── ربط الأزرار بعد إضافة الـ overlay ──
-            const _txt  = shareText;
-            const _name = fileName;
-            const _blob = blob;
-
-            document.getElementById('__btnShare').onclick = async () => {
-                if (navigator.share) {
-                    try {
-                        const f = new File([_blob], _name, { type: mimeType });
-                        if (!navigator.canShare || navigator.canShare({ files:[f] })) {
-                            await navigator.share({ files:[f], title:_name }); return;
-                        }
-                    } catch(e) {}
-                    try { await navigator.share({ text: _txt, title: _name }); return; } catch(e) {}
+            const blob = blobOrBuffer instanceof Blob ? blobOrBuffer : new Blob([blobOrBuffer], { type: mimeType });
+            const reader = new FileReader();
+            reader.onload = function() {
+                const dataUrl = reader.result; // base64 data URL
+                // محاولة 1: Android WebView interface
+                if (window.Android && window.Android.downloadFile) {
+                    window.Android.downloadFile(dataUrl, fileName);
+                    return;
                 }
-                try {
-                    await navigator.clipboard.writeText(_txt);
-                    showToast('✓ تم نسخ البيانات');
-                } catch(e) { showToast('لا يتوفر نسخ في هذه البيئة', true); }
+                // محاولة 2: رابط عادي مع data URL (يعمل في WebView بدون Blob URL)
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => document.body.removeChild(a), 500);
             };
-
-            document.getElementById('__btnWa').onclick = () => {
-                window.open('https://wa.me/?text=' + encodeURIComponent(_txt), '_blank') ||
-                (location.href = 'https://wa.me/?text=' + encodeURIComponent(_txt));
-            };
-
+            reader.readAsDataURL(blob);
         } catch(e) {
-            console.error('downloadFile:', e);
-            showToast('خطأ في التصدير', true);
+            console.error('downloadFile error:', e);
+            showToast('خطأ في التنزيل', true);
         }
     }
 
