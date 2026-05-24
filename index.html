@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <!-- Median.co Native Bridge -->
-    <script src="https://cdn.median.co/median.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1955,49 +1955,15 @@
         this.classList.add('active'); updateAllUI();
     }));
 
-    // ── تصدير متوافق مع Median.co (GoNative) ──
+    // ── تصدير بديل يعمل في كل WebView بدون اشتراك ──
+    // يعرض البيانات كجدول HTML داخل التطبيق مع خيار المشاركة كنص
     async function downloadFile(blobOrBuffer, fileName, mimeType) {
         try {
             const blob = blobOrBuffer instanceof Blob
                 ? blobOrBuffer
                 : new Blob([blobOrBuffer], { type: mimeType });
 
-            // تحويل إلى base64
-            const dataUrl = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
-            });
-
-            // ── Median.co / GoNative: Native Share ──
-            if (window.gonative_share_file || window.webkit?.messageHandlers?.gonative) {
-                // Android Median
-                if (typeof gonative !== 'undefined' && gonative.share) {
-                    gonative.share.file({
-                        url: dataUrl,
-                        filename: fileName,
-                        mimeType: mimeType
-                    });
-                    return;
-                }
-                // iOS Median
-                if (window.webkit?.messageHandlers?.gonative) {
-                    window.webkit.messageHandlers.gonative.postMessage({
-                        action: 'share',
-                        url: dataUrl,
-                        filename: fileName
-                    });
-                    return;
-                }
-            }
-
-            // ── Median.co: Download مباشر ──
-            if (window.gonative?.downloads?.downloadFile) {
-                gonative.downloads.downloadFile({ url: dataUrl, filename: fileName });
-                return;
-            }
-
-            // ── Web Share API (Median يدعمها) ──
+            // ── جرّب Web Share API أولاً (يعمل في Chrome Android) ──
             if (navigator.share) {
                 try {
                     const file = new File([blob], fileName, { type: mimeType });
@@ -2005,16 +1971,121 @@
                         await navigator.share({ files: [file], title: fileName });
                         return;
                     }
-                } catch(e) { /* تجاهل */ }
+                } catch(e) { /* نكمل للبديل */ }
             }
 
-            // ── Fallback: متصفح عادي ──
-            const a = document.createElement('a');
-            a.href = dataUrl;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => document.body.removeChild(a), 300);
+            // ── قراءة البيانات من الـ blob لعرضها كنص ──
+            const arrayBuf = await blob.arrayBuffer();
+            const wb = XLSX.read(arrayBuf, { type: 'array' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+            // ── بناء overlay بجدول HTML + زر مشاركة نصية ──
+            const old = document.getElementById('__exportOverlay');
+            if (old) old.remove();
+
+            // بناء جدول HTML
+            let tableHtml = '<table style="width:100%;border-collapse:collapse;font-size:0.72rem;">';
+            rows.forEach((row, ri) => {
+                const isHeader = ri === 0;
+                tableHtml += `<tr style="background:${isHeader ? '#1a2a3a' : ri%2===0 ? '#13161e' : '#1a1e2a'}">`;
+                row.forEach(cell => {
+                    const tag = isHeader ? 'th' : 'td';
+                    tableHtml += `<${tag} style="padding:6px 8px;border:1px solid rgba(255,255,255,0.06);
+                        color:${isHeader ? '#00d4aa' : '#e8edf5'};text-align:center;white-space:nowrap;">
+                        ${String(cell||'')}
+                    </${tag}>`;
+                });
+                tableHtml += '</tr>';
+            });
+            tableHtml += '</table>';
+
+            // بناء نص للمشاركة
+            const shareText = rows.map(r => r.join('\t')).join('\n');
+
+            const overlay = document.createElement('div');
+            overlay.id = '__exportOverlay';
+            overlay.style.cssText = `
+                position:fixed; inset:0; z-index:99999;
+                background:#0d0f14; display:flex; flex-direction:column;
+                font-family:'Cairo','Tajawal',sans-serif; overflow:hidden;
+            `;
+            overlay.innerHTML = `
+                <!-- شريط العنوان -->
+                <div style="display:flex; align-items:center; justify-content:space-between;
+                    padding:14px 16px; background:#13161e;
+                    border-bottom:1px solid rgba(0,212,170,0.2); flex-shrink:0;">
+                    <div style="font-size:0.88rem; font-weight:800; color:#00d4aa;">
+                        📊 ${fileName}
+                    </div>
+                    <button onclick="document.getElementById('__exportOverlay').remove()"
+                        style="background:rgba(255,255,255,0.08); border:none; color:#e8edf5;
+                            width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:1rem;">
+                        ✕
+                    </button>
+                </div>
+
+                <!-- أزرار المشاركة -->
+                <div style="display:flex; gap:8px; padding:12px 14px; flex-shrink:0; flex-wrap:wrap;">
+                    <button id="__btnShare" style="flex:1; padding:10px 8px; border:none; border-radius:10px; cursor:pointer;
+                        background:linear-gradient(135deg,#00b894,#00d4aa);
+                        color:#021a14; font-weight:800; font-size:0.8rem; font-family:'Cairo',sans-serif;">
+                        📤 مشاركة / نسخ
+                    </button>
+                    <button id="__btnWa" style="flex:1; padding:10px 8px; border:none; border-radius:10px; cursor:pointer;
+                        background:#25d366; color:#fff;
+                        font-weight:800; font-size:0.8rem; font-family:'Cairo',sans-serif;">
+                        💬 واتساب
+                    </button>
+                    <button id="__btnTg" style="flex:1; padding:10px 8px; border:none; border-radius:10px; cursor:pointer;
+                        background:#229ed9; color:#fff;
+                        font-weight:800; font-size:0.8rem; font-family:'Cairo',sans-serif;">
+                        ✈️ تيليغرام
+                    </button>
+                    <button id="__btnDrive" style="flex:1; padding:10px 8px; border:none; border-radius:10px; cursor:pointer;
+                        background:linear-gradient(135deg,#4285f4,#34a853);
+                        color:#fff; font-weight:800; font-size:0.8rem; font-family:'Cairo',sans-serif;">
+                        ☁️ Drive
+                    </button>
+                </div>
+
+                <!-- الجدول -->
+                <div style="flex:1; overflow:auto; padding:0 14px 14px;">
+                    ${tableHtml}
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            // ── ربط الأزرار بعد إضافة الـ overlay ──
+            const _txt  = shareText;
+            const _name = fileName;
+            const _blob = blob;
+
+            document.getElementById('__btnShare').onclick = async () => {
+                if (navigator.share) {
+                    try {
+                        const f = new File([_blob], _name, { type: mimeType });
+                        if (!navigator.canShare || navigator.canShare({ files:[f] })) {
+                            await navigator.share({ files:[f], title:_name }); return;
+                        }
+                    } catch(e) {}
+                    try { await navigator.share({ text: _txt, title: _name }); return; } catch(e) {}
+                }
+                try {
+                    await navigator.clipboard.writeText(_txt);
+                    showToast('✓ تم نسخ البيانات');
+                } catch(e) { showToast('لا يتوفر نسخ في هذه البيئة', true); }
+            };
+
+            document.getElementById('__btnWa').onclick = () => {
+                window.open('https://wa.me/?text=' + encodeURIComponent(_name + '\n\n' + _txt.slice(0,3000)), '_blank');
+            };
+
+            document.getElementById('__btnTg').onclick = () => {
+                window.open('https://t.me/share/url?text=' + encodeURIComponent(_name + '\n\n' + _txt.slice(0,3000)), '_blank');
+            };
+
+            document.getElementById('__btnDrive').onclick = () => uploadToDrive(_blob, _name, mimeType);
 
         } catch(e) {
             console.error('downloadFile:', e);
@@ -2171,6 +2242,52 @@
             Promise.all([new Promise(r=>{ tx1.oncomplete=r; }), new Promise(r=>{ tx2.oncomplete=r; })]).then(()=>{ updateAllUI(); showToast("تم مسح المنتجات"); });
         }
     };
+    // ── Google Drive Upload ──
+    const DRIVE_CLIENT_ID = 'YOUR_CLIENT_ID_HERE'; // ← ضع Client ID هنا
+    let driveToken = null;
+
+    function getDriveToken(callback) {
+        if (driveToken) { callback(driveToken); return; }
+        const client = google.accounts.oauth2.initTokenClient({
+            client_id: DRIVE_CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/drive.file',
+            callback: (resp) => {
+                if (resp.error) { showToast('خطأ في تسجيل الدخول لـ Google', true); return; }
+                driveToken = resp.access_token;
+                callback(driveToken);
+            }
+        });
+        client.requestAccessToken();
+    }
+
+    async function uploadToDrive(blob, fileName, mimeType) {
+        showProgress('رفع على Google Drive...', 'جاري تسجيل الدخول', 10);
+        getDriveToken(async (token) => {
+            try {
+                updateProgress(30, 'جاري الرفع...');
+                const metadata = { name: fileName, mimeType };
+                const form = new FormData();
+                form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                form.append('file', blob);
+                const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink', {
+                    method: 'POST',
+                    headers: { Authorization: 'Bearer ' + token },
+                    body: form
+                });
+                if (!res.ok) throw new Error('فشل الرفع: ' + res.status);
+                const data = await res.json();
+                updateProgress(100, 'اكتمل!');
+                hideProgress();
+                showToast('✓ تم الرفع على Drive: ' + data.name, false, 4000);
+                // فتح الملف في Drive
+                if (data.webViewLink) setTimeout(() => window.open(data.webViewLink, '_blank'), 1000);
+            } catch(e) {
+                hideProgress();
+                showToast('خطأ في الرفع: ' + e.message, true);
+            }
+        });
+    }
+
     // ── شريط التقدم ──
     function showProgress(title, sub, pct) {
         document.getElementById('progressOverlay').classList.add('show');
