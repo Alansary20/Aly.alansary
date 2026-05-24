@@ -1953,7 +1953,40 @@
         this.classList.add('active'); updateAllUI();
     }));
 
-    function exportToExcel(data, sheetName, fileName) { const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sheetName); XLSX.writeFile(wb, `${fileName}.xlsx`); }
+    // ── دالة تنزيل تعمل في WebView و Android APK ──
+    function downloadFile(blobOrBuffer, fileName, mimeType) {
+        try {
+            const blob = blobOrBuffer instanceof Blob ? blobOrBuffer : new Blob([blobOrBuffer], { type: mimeType });
+            const reader = new FileReader();
+            reader.onload = function() {
+                const dataUrl = reader.result; // base64 data URL
+                // محاولة 1: Android WebView interface
+                if (window.Android && window.Android.downloadFile) {
+                    window.Android.downloadFile(dataUrl, fileName);
+                    return;
+                }
+                // محاولة 2: رابط عادي مع data URL (يعمل في WebView بدون Blob URL)
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => document.body.removeChild(a), 500);
+            };
+            reader.readAsDataURL(blob);
+        } catch(e) {
+            console.error('downloadFile error:', e);
+            showToast('خطأ في التنزيل', true);
+        }
+    }
+
+    function exportToExcel(data, sheetName, fileName) {
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        const buf = XLSX.write(wb, { bookType:'xlsx', type:'array' });
+        downloadFile(buf, `${fileName}.xlsx`, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
     document.getElementById('exportInventoryBtn').onclick = () => {
         showProgress('تصدير الجرد...', 'جاري تجميع البيانات', 20);
         const tx = db.transaction("inventory", "readonly");
@@ -2057,14 +2090,9 @@
             ws.views = [{ state:'frozen', ySplit:1, rightToLeft:true }];
 
             updateProgress(85, 'كتابة الملف...');
-            const buf      = await wb.xlsx.writeBuffer();
-            const blob     = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const url      = URL.createObjectURL(blob);
-            const a        = document.createElement('a');
-            a.href         = url;
-            a.download     = 'مقارنة_الجرد_' + new Date().toLocaleDateString('ar-SA').replace(/\//g,'-') + '.xlsx';
-            a.click();
-            URL.revokeObjectURL(url);
+            const buf  = await wb.xlsx.writeBuffer();
+            const fileName = 'مقارنة_الجرد_' + new Date().toLocaleDateString('ar-SA').replace(/\//g,'-') + '.xlsx';
+            downloadFile(buf, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             hideProgress();
             showToast('✓ تم تصدير المقارنة بالألوان');
         });
