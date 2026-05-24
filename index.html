@@ -1953,69 +1953,71 @@
         this.classList.add('active'); updateAllUI();
     }));
 
-    // ── تصدير متوافق مع Apps Geyser WebView ──
-    // Apps Geyser لا يدعم: Blob URL, Share API, JS Interface
-    // الحل: عرض الملف كصفحة HTML داخل WebView مع زر نسخ البيانات
+    // ── تصدير متوافق مع Apps Geyser ──
+    // يعرض صفحة تنزيل مباشرة فوق التطبيق بدون window.open أو Blob URL
     async function downloadFile(blobOrBuffer, fileName, mimeType) {
         try {
             const blob = blobOrBuffer instanceof Blob
                 ? blobOrBuffer
                 : new Blob([blobOrBuffer], { type: mimeType });
 
-            // تحويل إلى base64
-            const base64 = await new Promise(resolve => {
+            // تحويل إلى base64 data URL
+            const dataUrl = await new Promise(resolve => {
                 const reader = new FileReader();
-                reader.onload = () => resolve(reader.result); // data:...;base64,...
+                reader.onload = () => resolve(reader.result);
                 reader.readAsDataURL(blob);
             });
 
-            // محاولة Web Share API أولاً (يعمل أحياناً في بعض إصدارات Apps Geyser)
-            if (navigator.share) {
-                try {
-                    const file = new File([blob], fileName, { type: mimeType });
-                    await navigator.share({ files: [file], title: fileName });
-                    return;
-                } catch(e) { /* لم ينجح، نكمل */ }
-            }
+            // إزالة أي صفحة تنزيل سابقة
+            const old = document.getElementById('__dlOverlay');
+            if (old) old.remove();
 
-            // فتح صفحة داخلية مع رابط تنزيل مباشر
-            const html = `<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${fileName}</title>
-<style>
-  body { font-family: Arial, sans-serif; background:#0d0f14; color:#e8edf5;
-         display:flex; flex-direction:column; align-items:center;
-         justify-content:center; min-height:100vh; margin:0; padding:20px; text-align:center; }
-  .icon { font-size:4rem; margin-bottom:16px; }
-  h2 { margin:0 0 8px; font-size:1.1rem; color:#00d4aa; }
-  p  { color:#6b7a9a; font-size:0.85rem; margin:0 0 28px; line-height:1.6; }
-  a.btn {
-    display:inline-block; background:linear-gradient(135deg,#00b894,#00d4aa);
-    color:#021a14; font-weight:800; font-size:1rem;
-    padding:14px 32px; border-radius:14px; text-decoration:none;
-    box-shadow:0 4px 20px rgba(0,212,170,0.35); margin-bottom:12px;
-  }
-  .back { color:#6b7a9a; font-size:0.82rem; cursor:pointer; margin-top:16px;
-          background:none; border:none; text-decoration:underline; }
-</style>
-</head>
-<body>
-  <div class="icon">📊</div>
-  <h2>${fileName}</h2>
-  <p>الملف جاهز للتنزيل<br>اضغط الزر أدناه</p>
-  <a class="btn" href="${base64}" download="${fileName}">⬇ تنزيل الملف</a>
-  <br>
-  <button class="back" onclick="history.back()">← رجوع للتطبيق</button>
-</body>
-</html>`;
+            // إنشاء overlay فوق كل شيء
+            const overlay = document.createElement('div');
+            overlay.id = '__dlOverlay';
+            overlay.style.cssText = `
+                position:fixed; inset:0; z-index:99999;
+                background:#0d0f14;
+                display:flex; flex-direction:column;
+                align-items:center; justify-content:center;
+                padding:30px; text-align:center;
+                font-family:'Cairo','Tajawal',sans-serif;
+            `;
 
-            // فتح في نافذة جديدة داخل WebView
-            const pageBlob = new Blob([html], { type: 'text/html' });
-            const pageUrl  = URL.createObjectURL(pageBlob);
-            window.open(pageUrl, '_blank') || (window.location.href = pageUrl);
+            overlay.innerHTML = `
+                <div style="font-size:3.5rem; margin-bottom:20px;">📊</div>
+                <div style="font-size:0.85rem; color:#00d4aa; font-weight:700;
+                    word-break:break-all; margin-bottom:8px; max-width:300px;">
+                    ${fileName}
+                </div>
+                <div style="font-size:0.78rem; color:#6b7a9a; margin-bottom:32px; line-height:1.6;">
+                    الملف جاهز<br>اضغط زر التنزيل
+                </div>
+
+                <a id="__dlBtn" href="${dataUrl}" download="${fileName}"
+                    style="
+                        display:block; width:100%; max-width:280px;
+                        background:linear-gradient(135deg,#00b894,#00d4aa);
+                        color:#021a14; font-weight:900; font-size:1.05rem;
+                        padding:16px; border-radius:16px; text-decoration:none;
+                        box-shadow:0 6px 24px rgba(0,212,170,0.4);
+                        margin-bottom:14px;
+                    ">
+                    ⬇ تنزيل الملف
+                </a>
+
+                <button onclick="document.getElementById('__dlOverlay').remove()"
+                    style="
+                        background:none; border:1px solid rgba(255,255,255,0.1);
+                        color:#6b7a9a; padding:12px 28px; border-radius:12px;
+                        font-family:'Cairo',sans-serif; font-size:0.85rem;
+                        cursor:pointer; margin-top:8px;
+                    ">
+                    ← رجوع للتطبيق
+                </button>
+            `;
+
+            document.body.appendChild(overlay);
 
         } catch(e) {
             console.error('downloadFile:', e);
