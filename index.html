@@ -2000,8 +2000,20 @@
             });
             tableHtml += '</table>';
 
-            // بناء نص للمشاركة
-            const shareText = rows.map(r => r.join('\t')).join('\n');
+            // بناء نص منسّق لواتساب
+            const date = new Date().toLocaleDateString('ar-SA');
+            const time = new Date().toLocaleTimeString('ar-SA', {hour:'2-digit',minute:'2-digit'});
+            const headers = rows[0] || [];
+            let shareText = `📊 *${fileName.replace('.xlsx','')}*\n`;
+            shareText += `📅 ${date}  🕐 ${time}\n`;
+            shareText += `━━━━━━━━━━━━━━━━━━\n`;
+            shareText += `*${headers.join('  |  ')}*\n`;
+            shareText += `━━━━━━━━━━━━━━━━━━\n`;
+            rows.slice(1).forEach((row, i) => {
+                shareText += row.map(c => String(c||'—')).join('  |  ') + '\n';
+            });
+            shareText += `━━━━━━━━━━━━━━━━━━\n`;
+            shareText += `📦 المجموع: ${rows.length - 1} صنف`;
 
             const overlay = document.createElement('div');
             overlay.id = '__exportOverlay';
