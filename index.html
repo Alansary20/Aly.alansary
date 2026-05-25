@@ -796,10 +796,14 @@
             <div style="font-size:0.82rem; font-weight:700; color:var(--text-muted); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
                 <i class="fas fa-file-import" style="color:var(--accent);"></i> استيراد الجرد من Excel
             </div>
-            <label style="display:block; padding:12px; border-radius:10px; border:1px dashed rgba(0,212,170,0.3); text-align:center; cursor:pointer; color:var(--text-muted); font-size:0.82rem; margin-bottom:10px; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(0,212,170,0.3)'">
+            <input type="file" id="invImportFile" style="display:none;">
+            <button onclick="document.getElementById('invImportFile').click()"
+                style="display:block; width:100%; padding:12px; border-radius:10px;
+                    border:1px dashed rgba(0,212,170,0.3); text-align:center; cursor:pointer;
+                    color:var(--text-muted); font-size:0.82rem; margin-bottom:10px;
+                    background:transparent; font-family:'Cairo',sans-serif; transition:all 0.2s;">
                 <i class="fas fa-upload" style="color:var(--accent); margin-left:6px;"></i> اختر ملف Excel للجرد
-                <input type="file" id="invImportFile" style="display:none;" accept=".xlsx,.xlsm,.xlsb,.csv">
-            </label>
+            </button>
             <div style="display:flex; gap:8px;">
                 <button id="invImportReplaceBtn" class="btn-primary" style="flex:1; gap:6px; font-size:0.8rem; padding:10px;">
                     <i class="fas fa-sync-alt"></i> تحديث (يمسح الجرد القديم)
@@ -2197,6 +2201,13 @@
     };
     document.getElementById('stockUploadArea').addEventListener('click',()=>document.getElementById('stockFileInput').click());
     document.getElementById('dbUploadArea').addEventListener('click',()=>document.getElementById('dbFileInput').click());
+    // تحديث اسم الملف عند اختياره في الجرد
+    document.getElementById('invImportFile').addEventListener('change', e => {
+        const btn = document.querySelector('button[onclick*="invImportFile"]');
+        if (btn && e.target.files[0]) {
+            btn.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent); margin-left:6px;"></i> ${e.target.files[0].name}`;
+        }
+    });
     document.getElementById('clearProductsBtn').onclick = () => {
         if(confirm("مسح كل المنتجات؟")){
             const tx1=db.transaction("products","readwrite"); tx1.objectStore("products").clear();
