@@ -823,30 +823,6 @@
             <i class="fas fa-file-excel" style="color:var(--accent);"></i> رفع ملف الرصيد الفعلي (مرجع)
         </div>
 
-        <!-- شرح طريقة الرفع -->
-        <div style="background:linear-gradient(135deg,rgba(0,150,255,0.07),rgba(0,212,170,0.05)); border:1px solid rgba(0,150,255,0.18); border-radius:13px; padding:13px 14px; margin-bottom:14px; font-size:0.76rem; line-height:1.8; color:var(--text-muted);">
-            <div style="font-weight:800; color:var(--accent2); margin-bottom:8px; font-size:0.8rem; display:flex; align-items:center; gap:6px;">
-                <i class="fas fa-info-circle"></i> كيف يعمل ملف المرجع؟
-            </div>
-            <div style="display:flex; flex-direction:column; gap:6px;">
-                <div style="display:flex; gap:8px; align-items:flex-start;">
-                    <span style="color:var(--accent); font-weight:800; min-width:18px;">1</span>
-                    <span>ارفع ملف <strong>Excel</strong> (ملف اكسيل الارصدة) يحتوي على أعمدة: <span style="background:rgba(0,212,170,0.12); padding:1px 7px; border-radius:5px; color:var(--accent); font-weight:700;">رقم الصنف</span> + <span style="background:rgba(0,212,170,0.12); padding:1px 7px; border-radius:5px; color:var(--accent); font-weight:700;">الاسم</span> + <span style="background:rgba(0,212,170,0.12); padding:1px 7px; border-radius:5px; color:var(--accent); font-weight:700;">الفعلي النهائي</span> — وإن لم يوجد يبحث عن عمود <span style="background:rgba(0,212,170,0.12); padding:1px 7px; border-radius:5px; color:var(--accent); font-weight:700;">كمية التحويل</span> حصراً</span>
-                </div>
-                <div style="display:flex; gap:8px; align-items:flex-start;">
-                    <span style="color:var(--accent); font-weight:800; min-width:18px;">2</span>
-                    <span><strong style="color:var(--text);">استبدال</strong> — يمسح المرجع القديم ويضع الجديد مكانه</span>
-                </div>
-                <div style="display:flex; gap:8px; align-items:flex-start;">
-                    <span style="color:var(--accent); font-weight:800; min-width:18px;">3</span>
-                    <span><strong style="color:var(--text);">دمج</strong> — يضيف الكميات الجديدة على الأصناف الموجودة ويضيف الأصناف غير الموجودة</span>
-                </div>
-            </div>
-            <div style="margin-top:10px; padding:8px 10px; background:rgba(255,209,102,0.08); border-radius:8px; border:1px solid rgba(255,209,102,0.15); color:var(--gold); font-size:0.72rem;">
-                <i class="fas fa-lightbulb" style="margin-left:4px;"></i> يُستخدم المرجع في صفحة المقارنة لحساب الفروقات بين الكمية الفعلية والمجردة
-            </div>
-        </div>
-
         <div class="file-label" id="stockUploadArea"><i class="fas fa-upload"></i> اختر ملف Excel <input type="file" id="stockFileInput" style="display:none;"></div>
         <div style="display:flex; gap:8px; margin-bottom:12px;">
             <select id="stockModeSelect" style="flex:1; padding:10px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'Cairo',sans-serif;"><option value="replace">استبدال</option><option value="merge">دمج</option></select>
@@ -1017,34 +993,6 @@
         </style><button id="exportCompareBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> تصدير المقارنة</button><div id="comparisonTableDiv" class="data-wrapper"></div></div></div>
     <div id="tab-products" class="panel"><div class="card">
 
-        <!-- شرح طريقة الرفع -->
-        <div style="background:linear-gradient(135deg,rgba(168,85,247,0.07),rgba(0,212,170,0.04)); border:1px solid rgba(168,85,247,0.18); border-radius:13px; padding:13px 14px; margin-bottom:14px; font-size:0.76rem; line-height:1.8; color:var(--text-muted);">
-            <div style="font-weight:800; color:#a855f7; margin-bottom:8px; font-size:0.8rem; display:flex; align-items:center; gap:6px;">
-                <i class="fas fa-info-circle"></i> كيف يعمل ملف المنتجات؟
-            </div>
-            <div style="display:flex; flex-direction:column; gap:6px;">
-                <div style="display:flex; gap:8px; align-items:flex-start;">
-                    <span style="color:#a855f7; font-weight:800; min-width:18px;">1</span>
-                    <span>ارفع ملف <strong>Excel</strong> (ملف التسعير) يحتوي على أعمدة: <span style="background:rgba(168,85,247,0.12); padding:1px 7px; border-radius:5px; color:#a855f7; font-weight:700;">الباركود</span> + <span style="background:rgba(168,85,247,0.12); padding:1px 7px; border-radius:5px; color:#a855f7; font-weight:700;">رقم الصنف</span> + <span style="background:rgba(168,85,247,0.12); padding:1px 7px; border-radius:5px; color:#a855f7; font-weight:700;">اسم الصنف</span></span>
-                </div>
-                <div style="display:flex; gap:8px; align-items:flex-start;">
-                    <span style="color:#a855f7; font-weight:800; min-width:18px;">2</span>
-                    <span>يمكن رفع <strong>أكثر من ملف</strong> دفعة واحدة — سيتم دمجها تلقائياً</span>
-                </div>
-                <div style="display:flex; gap:8px; align-items:flex-start;">
-                    <span style="color:#a855f7; font-weight:800; min-width:18px;">3</span>
-                    <span><strong style="color:var(--text);">معالجة عادي</strong> — يفلتر الصفوف ويزيل المكرر والفاضي تلقائياً</span>
-                </div>
-                <div style="display:flex; gap:8px; align-items:flex-start;">
-                    <span style="color:#a855f7; font-weight:800; min-width:18px;">4</span>
-                    <span><strong style="color:var(--text);">بدون فلتر</strong> — يرفع الملف كما هو دون حذف أي صف</span>
-                </div>
-            </div>
-            <div style="margin-top:10px; padding:8px 10px; background:rgba(255,209,102,0.08); border-radius:8px; border:1px solid rgba(255,209,102,0.15); color:var(--gold); font-size:0.72rem;">
-                <i class="fas fa-lightbulb" style="margin-left:4px;"></i> المنتجات تُستخدم للتعرف التلقائي على الباركود أثناء المسح وفي صفحة المقارنة
-            </div>
-        </div>
-
         <div class="file-label" id="dbUploadArea"><i class="fas fa-upload"></i> رفع ملف المنتجات <input type="file" id="dbFileInput" style="display:none;" multiple></div>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
             <button id="processDbBtn" class="btn-primary">معالجة عادي</button>
@@ -1055,6 +1003,30 @@
         <button id="clearProductsBtn" class="btn-secondary" style="margin-top:12px;">مسح كل المنتجات</button>
     </div></div>
 </div>
+<!-- نافذة تعيين الأعمدة -->
+<div id="colMapModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);justify-content:center;align-items:center;z-index:5000;padding:14px;">
+  <div style="background:var(--surface);border-radius:22px;padding:22px 18px 18px;width:100%;max-width:420px;border:1px solid rgba(0,212,170,0.25);box-shadow:0 24px 70px rgba(0,0,0,0.7);position:relative;max-height:92vh;overflow-y:auto;">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:22px 22px 0 0;"></div>
+    <h3 id="colMapTitle" style="color:var(--accent);margin-bottom:4px;font-family:'Tajawal',sans-serif;font-size:1rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-table-columns"></i> تعيين الأعمدة</h3>
+    <p id="colMapFileName" style="font-size:0.7rem;color:var(--text-muted);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);"></p>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);"><i class="fas fa-eye" style="color:var(--accent2);margin-left:5px;"></i>رؤوس الأعمدة</div>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.7rem;color:var(--text-muted);">
+          <span>بدون رؤوس</span>
+          <input type="checkbox" id="colMapNoHeader" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer;">
+        </label>
+      </div>
+      <div id="colMapPreview" style="display:flex;flex-wrap:wrap;gap:4px;padding:9px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);max-height:72px;overflow-y:auto;"></div>
+    </div>
+    <div id="colMapFields" style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px;"></div>
+    <div style="display:flex;gap:9px;">
+      <button id="colMapConfirmBtn" class="btn-primary" style="flex:2;font-size:0.86rem;"><i class="fas fa-check-circle"></i> تأكيد ومعالجة</button>
+      <button id="colMapCancelBtn" class="btn-secondary" style="flex:1;font-size:0.86rem;">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <div id="productModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); justify-content:center; align-items:center; z-index:3000;">
     <div style="background:#13161e; border-radius:20px; padding:24px; width:90%; max-width:380px; border:1px solid rgba(0,212,170,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.6);">
         <h3 style="color:#00d4aa; margin-bottom:16px; font-family:'Tajawal',sans-serif;">➕ إضافة منتج</h3>
@@ -1064,7 +1036,9 @@
 </div>
 <script>
     let db;
-    const DB_NAME = "InvSmartDB_Timed";
+    // اسم قاعدة بيانات فريد لكل ملف بناءً على مساره الكامل
+    const _rawPath = (location.href || location.pathname || '').replace(/[^a-zA-Z0-9]/g, '_').slice(-40);
+    const DB_NAME = "InvSmartDB_" + (_rawPath || "default");
     const DB_VERSION = 2;
     let inventory = [];
     let html5QrScanner = null;
@@ -1276,111 +1250,213 @@
 
     let pendingProductFiles = [];
     document.getElementById('dbFileInput').addEventListener('change', (e) => { pendingProductFiles = Array.from(e.target.files); });
-    async function processProductFiles(skipBlacklist = false) {
+    async function processProductFiles() {
         if (!pendingProductFiles.length) { showToast("اختر ملفات أولاً", true); return; }
-        showProgress('رفع المنتجات...', 'جاري قراءة الملفات', 5);
-        const sourceId = Date.now();
-        let totalAdded = 0;
-        for (let fi = 0; fi < pendingProductFiles.length; fi++) {
-            const file = pendingProductFiles[fi];
-            try {
-                updateProgress(5 + (fi / pendingProductFiles.length) * 20, `قراءة: ${file.name}`);
-                const rows = await readExcelFile(file);
-                if (!rows || rows.length < 2) throw new Error("لا توجد بيانات كافية");
-                const blacklist = skipBlacklist ? [] : getCommonBlacklist(rows);
-                const dataRows = rows.slice(1);
-                const BATCH_SIZE = 150;
-                for (let start = 0; start < dataRows.length; start += BATCH_SIZE) {
-                    const pct = 25 + ((fi / pendingProductFiles.length) + ((start / dataRows.length) / pendingProductFiles.length)) * 70;
-                    updateProgress(pct, `معالجة ${Math.min(start + BATCH_SIZE, dataRows.length)} / ${dataRows.length}`);
-                    const batch = dataRows.slice(start, Math.min(start + BATCH_SIZE, dataRows.length));
-                    const tx = db.transaction(["products"], "readwrite");
-                    const store = tx.objectStore("products");
-                    for (const row of batch) {
-                        let d = parseProductRow(row, blacklist);
-                        if (d.item_no || d.barcode) {
-                            store.add({ id: generateUniqueId(), barcode: d.barcode || "", item_no: d.item_no || "", name: d.name || "بدون اسم", sourceId });
-                            totalAdded++;
-                        }
-                    }
-                    await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); });
-                    await new Promise(r => setTimeout(r, 10));
+        showColMapModal(
+            'تعيين أعمدة المنتجات',
+            pendingProductFiles.map(f => f.name).join(', '),
+            pendingProductFiles[0],
+            [
+                { id: 'barcode', label: 'الباركود',   icon: 'fas fa-barcode',     color: 'var(--accent2)',    required: false, keywords: ['باركود','barcode','بار','كود'] },
+                { id: 'itemno',  label: 'رقم الصنف',  icon: 'fas fa-hashtag',     color: 'var(--accent)',     required: false, keywords: ['رقم الصنف','رقم','item','صنف'] },
+                { id: 'name',    label: 'الاسم',       icon: 'fas fa-tag',         color: 'var(--text-muted)', required: false, keywords: ['اسم','name','وصف','desc','المادة'] },
+            ],
+            async function(colMap) {
+                if (colMap.barcode === null && colMap.itemno === null) {
+                    showToast('يرجى تحديد عمود الباركود أو رقم الصنف على الأقل', true); return;
                 }
-            } catch (err) { hideProgress(); showToast(`خطأ في ${file.name}: ${err.message}`, true); return; }
-        }
-        const ftx = db.transaction("uploadedFiles", "readwrite");
-        ftx.objectStore("uploadedFiles").add({ names: pendingProductFiles.map(f => f.name).join(', '), count: totalAdded, sourceId });
-        await new Promise(r => { ftx.oncomplete = r; });
-        hideProgress();
-        showToast(`✅ تم رفع ${totalAdded} منتج`);
-        pendingProductFiles = [];
-        updateAllUI();
+                showProgress('رفع المنتجات...', 'جاري قراءة الملفات', 5);
+                const sourceId = Date.now();
+                let totalAdded = 0;
+                for (let fi = 0; fi < pendingProductFiles.length; fi++) {
+                    const file = pendingProductFiles[fi];
+                    try {
+                        updateProgress(5 + (fi / pendingProductFiles.length) * 20, `قراءة: ${file.name}`);
+                        const rows = await readExcelFile(file);
+                        if (!rows || rows.length < 1) throw new Error("لا توجد بيانات");
+                        const dataRows = colMap.noHeader ? rows : rows.slice(1);
+                        const BATCH_SIZE = 150;
+                        for (let start = 0; start < dataRows.length; start += BATCH_SIZE) {
+                            const pct = 25 + ((fi / pendingProductFiles.length) + ((start / dataRows.length) / pendingProductFiles.length)) * 70;
+                            updateProgress(pct, `معالجة ${Math.min(start + BATCH_SIZE, dataRows.length)} / ${dataRows.length}`);
+                            const batch = dataRows.slice(start, Math.min(start + BATCH_SIZE, dataRows.length));
+                            const tx = db.transaction(["products"], "readwrite");
+                            const store = tx.objectStore("products");
+                            for (const row of batch) {
+                                if (!Array.isArray(row)) continue;
+                                const barcode = colMap.barcode !== null ? String(row[colMap.barcode]||'').trim().replace(/\.0+$/,'') : '';
+                                const itemno  = colMap.itemno  !== null ? String(row[colMap.itemno] ||'').trim().replace(/\.0+$/,'') : '';
+                                const name    = colMap.name    !== null ? String(row[colMap.name]   ||'').trim() : '';
+                                if (!barcode && !itemno) continue;
+                                store.add({ id: generateUniqueId(), barcode, item_no: itemno, name: name || 'بدون اسم', sourceId });
+                                totalAdded++;
+                            }
+                            await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); });
+                            await new Promise(r => setTimeout(r, 10));
+                        }
+                    } catch (err) { hideProgress(); showToast(`خطأ في ${file.name}: ${err.message}`, true); return; }
+                }
+                const ftx = db.transaction("uploadedFiles", "readwrite");
+                ftx.objectStore("uploadedFiles").add({ names: pendingProductFiles.map(f => f.name).join(', '), count: totalAdded, sourceId });
+                await new Promise(r => { ftx.oncomplete = r; });
+                hideProgress();
+                showToast(`✅ تم رفع ${totalAdded} منتج`);
+                pendingProductFiles = [];
+                updateAllUI();
+            }
+        );
     }
-    document.getElementById('processDbBtn').onclick = () => processProductFiles(false);
-    document.getElementById('processDbNoFilterBtn').onclick = () => processProductFiles(true);
+    document.getElementById('processDbBtn').onclick = processProductFiles;
+    document.getElementById('processDbNoFilterBtn').onclick = processProductFiles;
 
     let pendingStockFiles = [];
     document.getElementById('stockFileInput').addEventListener('change', (e) => { pendingStockFiles = Array.from(e.target.files); });
-    async function processStockFiles() {
-        if (!pendingStockFiles.length) { showToast("اختر ملف المرجع أولاً", true); return; }
-        showProgress('رفع المرجع...', 'جاري القراءة', 5);
-        const mode = document.getElementById('stockModeSelect').value;
-        if (mode === 'replace') {
-            updateProgress(10, 'مسح البيانات القديمة...');
-            const clearTx = db.transaction("stock", "readwrite");
-            clearTx.objectStore("stock").clear();
-            await new Promise(r => { clearTx.oncomplete = r; });
-        }
-        for (let fi = 0; fi < pendingStockFiles.length; fi++) {
-            const file = pendingStockFiles[fi];
-            updateProgress(15 + (fi / pendingStockFiles.length) * 15, `قراءة: ${file.name}`);
-            const rows = await readExcelFile(file);
-            let qtyCol = undefined;
-            if (rows[0]) for (let i = 0; i < rows[0].length; i++) if (String(rows[0][i]).trim() === "الفعلي النهائي") qtyCol = i;
-            if (qtyCol === undefined && rows[0]) for (let i = 0; i < rows[0].length; i++) if (String(rows[0][i]).trim() === "كمية التحويل") qtyCol = i;
-            const blacklist = getCommonBlacklist(rows);
-            const dataRows = rows.slice(1);
-            const totalBatches = Math.ceil(dataRows.length / 200);
-            for (let bi = 0, start = 0; start < dataRows.length; start += 200, bi++) {
-                const pct = 30 + ((fi / pendingStockFiles.length) + (bi / totalBatches / pendingStockFiles.length)) * 65;
-                updateProgress(pct, `معالجة ${Math.min(start + 200, dataRows.length)} / ${dataRows.length}`);
-                const batch = dataRows.slice(start, start + 200);
-                const tx = db.transaction("stock", "readwrite");
-                const store = tx.objectStore("stock");
-                for (const row of batch) {
-                    let d = parseStockRow(row, blacklist, qtyCol);
-                    if (!d.item_no) continue;
-                    if (mode === 'merge') {
-                        const existing = await new Promise(r => store.get(d.item_no).onsuccess = e => r(e.target.result));
-                        store.put({ key: d.item_no, name: d.name || existing?.name || '', qty: (existing ? existing.qty : 0) + d.qty });
-                    } else {
-                        store.put({ key: d.item_no, name: d.name, qty: d.qty });
+
+    function showColMapModal(title, fileName, fileForHeaders, fields, onConfirm) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', blankrows: false });
+                const chk = document.getElementById('colMapNoHeader');
+                chk.checked = false;
+
+                function buildUI() {
+                    const noHeader = chk.checked;
+                    const firstRow = rawRows[0] || [];
+                    const hdrs = firstRow.map((h, i) => ({
+                        label: noHeader ? ('عمود ' + (i+1)) : (String(h||'').trim() || ('عمود ' + (i+1))),
+                        idx: i
+                    }));
+                    document.getElementById('colMapPreview').innerHTML = hdrs.map(h =>
+                        '<span style="background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.2);border-radius:6px;padding:2px 8px;font-size:0.68rem;color:var(--accent);white-space:nowrap;">' + h.label + '</span>'
+                    ).join('');
+                    const fieldsDiv = document.getElementById('colMapFields');
+                    fieldsDiv.innerHTML = '';
+                    fields.forEach(function(f) {
+                        const opts = '<option value="">— اختر —</option>' +
+                            hdrs.map(h => '<option value="' + h.idx + '">' + h.label + '</option>').join('');
+                        fieldsDiv.innerHTML += '<div style="background:var(--surface2);border-radius:11px;padding:11px 13px;border:1px solid var(--border);">' +
+                            '<label style="font-size:0.73rem;font-weight:700;color:' + (f.color||'var(--text-muted)') + ';display:flex;align-items:center;gap:5px;margin-bottom:6px;">' +
+                            '<i class="' + f.icon + '"></i>' + f.label +
+                            (f.required ? '<span style="color:var(--negative);font-size:0.68rem;margin-right:4px;">*مطلوب</span>' : '') +
+                            '</label>' +
+                            '<select id="cmf_' + f.id + '" style="width:100%;padding:8px 11px;border-radius:9px;background:var(--surface3);border:1px solid var(--border);color:var(--text);font-family:Cairo,sans-serif;font-size:0.8rem;">' + opts + '</select>' +
+                            '</div>';
+                    });
+                    if (!noHeader) {
+                        fields.forEach(function(f) {
+                            const sel = document.getElementById('cmf_' + f.id);
+                            const match = hdrs.find(h => f.keywords.some(kw => h.label.includes(kw)));
+                            if (match) sel.value = match.idx;
+                        });
                     }
                 }
-                await new Promise(r => { tx.oncomplete = r; });
-                await new Promise(r => setTimeout(r, 10));
+
+                document.getElementById('colMapTitle').innerHTML = '<i class="fas fa-table-columns"></i> ' + title;
+                document.getElementById('colMapFileName').textContent = 'الملف: ' + fileName;
+                buildUI();
+                chk.onchange = buildUI;
+                document.getElementById('colMapModal').style.display = 'flex';
+
+                document.getElementById('colMapCancelBtn').onclick = function() {
+                    document.getElementById('colMapModal').style.display = 'none';
+                    chk.onchange = null;
+                };
+                document.getElementById('colMapConfirmBtn').onclick = function() {
+                    const result = { noHeader: chk.checked };
+                    for (const f of fields) {
+                        const val = document.getElementById('cmf_' + f.id).value;
+                        if (f.required && val === '') { showToast('يرجى تحديد: ' + f.label, true); return; }
+                        result[f.id] = val === '' ? null : parseInt(val);
+                    }
+                    document.getElementById('colMapModal').style.display = 'none';
+                    chk.onchange = null;
+                    onConfirm(result);
+                };
+            } catch(err) { showToast('خطأ في قراءة الملف: ' + err.message, true); }
+        };
+        reader.onerror = () => showToast('فشل قراءة الملف', true);
+        reader.readAsArrayBuffer(fileForHeaders);
+    }
+
+    async function processStockFiles() {
+        if (!pendingStockFiles.length) { showToast("اختر ملف المرجع أولاً", true); return; }
+        showColMapModal(
+            'تعيين أعمدة المرجع',
+            pendingStockFiles.map(f => f.name).join(', '),
+            pendingStockFiles[0],
+            [
+                { id: 'itemno', label: 'رقم الصنف', icon: 'fas fa-hashtag', color: 'var(--accent)',     required: true,  keywords: ['رقم الصنف','رقم','item','code','كود','صنف'] },
+                { id: 'name',   label: 'الاسم',      icon: 'fas fa-tag',     color: 'var(--text-muted)', required: false, keywords: ['اسم','name','وصف','desc','المادة'] },
+                { id: 'qty',    label: 'الكمية',     icon: 'fas fa-layer-group', color: 'var(--gold)',  required: true,  keywords: ['الفعلي','كمية','qty','quant','count','تحويل','النهائي'] },
+            ],
+            async function(colMap) {
+                showProgress('رفع المرجع...', 'جاري القراءة', 5);
+                const mode = document.getElementById('stockModeSelect').value;
+                if (mode === 'replace') {
+                    updateProgress(10, 'مسح البيانات القديمة...');
+                    const clearTx = db.transaction("stock", "readwrite");
+                    clearTx.objectStore("stock").clear();
+                    await new Promise(r => { clearTx.oncomplete = r; });
+                }
+                for (let fi = 0; fi < pendingStockFiles.length; fi++) {
+                    const file = pendingStockFiles[fi];
+                    updateProgress(15 + (fi / pendingStockFiles.length) * 15, `قراءة: ${file.name}`);
+                    const rows = await readExcelFile(file);
+                    const dataRows = colMap.noHeader ? rows : rows.slice(1);
+                    const totalBatches = Math.ceil(dataRows.length / 200);
+                    for (let bi = 0, start = 0; start < dataRows.length; start += 200, bi++) {
+                        const pct = 30 + ((fi / pendingStockFiles.length) + (bi / totalBatches / pendingStockFiles.length)) * 65;
+                        updateProgress(pct, `معالجة ${Math.min(start + 200, dataRows.length)} / ${dataRows.length}`);
+                        const batch = dataRows.slice(start, start + 200);
+                        const tx = db.transaction("stock", "readwrite");
+                        const store = tx.objectStore("stock");
+                        for (const row of batch) {
+                            if (!Array.isArray(row)) continue;
+                            const itemNo = String(row[colMap.itemno] ?? '').trim().replace(/\.0+$/, '');
+                            if (!itemNo) continue;
+                            const name = colMap.name !== null ? String(row[colMap.name] ?? '').trim() : '';
+                            const qty  = parseInt(row[colMap.qty]) || 0;
+                            if (mode === 'merge') {
+                                const existing = await new Promise(r => store.get(itemNo).onsuccess = e => r(e.target.result));
+                                store.put({ key: itemNo, name: name || existing?.name || '', qty: (existing ? existing.qty : 0) + qty });
+                            } else {
+                                store.put({ key: itemNo, name, qty });
+                            }
+                        }
+                        await new Promise(r => { tx.oncomplete = r; });
+                        await new Promise(r => setTimeout(r, 10));
+                    }
+                }
+                hideProgress();
+                showToast("تم تحديث المرجع");
+                pendingStockFiles = [];
+                updateAllUI();
             }
-        }
-        hideProgress();
-        showToast("تم تحديث المرجع");
-        pendingStockFiles = [];
-        updateAllUI();
+        );
     }
     document.getElementById('processStockBtn').onclick = processStockFiles;
 
     // تعديل addToInventory لتخزين timestamp
-    async function addToInventory(itemCode, productName, barcode = '') {
+    async function addToInventory(itemCode, productName, barcode = '', item_no_override = '') {
         const now = Date.now();
+        // أرقام فقط → باركود، أرقام مع داش → رقم صنف
+        const isOnlyDigits = /^\d+$/.test(itemCode);
+        const hasDash      = /^[\d]+-[\d-]+$/.test(itemCode);
+        const storedBarcode = barcode ? barcode : (isOnlyDigits ? itemCode : '');
+        const storedItemNo  = item_no_override ? item_no_override : (hasDash ? itemCode : '');
+        const key = storedItemNo || storedBarcode || itemCode;
         // أ) تحديث السجل المجمّع (inventory)
         await new Promise((resolve) => {
             const tx = db.transaction("inventory", "readwrite");
             const store = tx.objectStore("inventory");
-            const key = itemCode;
             const getReq = store.get(key);
             getReq.onsuccess = () => {
                 let existing = getReq.result;
                 if (existing) { existing.qty++; existing.timestamp = now; store.put(existing); }
-                else { store.put({ key, name: productName, qty: 1, barcode, item_no: itemCode, timestamp: now }); }
+                else { store.put({ key, name: productName, qty: 1, barcode: storedBarcode, item_no: storedItemNo, timestamp: now }); }
                 tx.oncomplete = () => resolve(true);
                 tx.onerror   = () => resolve(false);
             };
@@ -1389,7 +1465,7 @@
         // ب) إضافة سطر في السجل التفصيلي (scanLog) — كل مسحة بسطر مستقل
         await new Promise((resolve) => {
             const tx = db.transaction("scanLog", "readwrite");
-            tx.objectStore("scanLog").add({ itemCode, name: productName, barcode, timestamp: now });
+            tx.objectStore("scanLog").add({ itemCode, name: productName, barcode: storedBarcode, timestamp: now });
             tx.oncomplete = () => resolve();
             tx.onerror    = () => resolve();
         });
@@ -1417,29 +1493,48 @@
         if (infoEl) infoEl.textContent = `آخر مسح: ${new Date().toLocaleTimeString('ar-SA')}`;
 
         try {
+            // باركود = أرقام فقط، رقم صنف = أرقام مع داش
+            const isBarcode = /^\d+$/.test(cleanVal);
+            const isItemNo  = /^[\d]+-[\d-]+$/.test(cleanVal);
+
             const tx = db.transaction(["products", "stock"], "readonly");
             const products = await new Promise(r => tx.objectStore("products").getAll().onsuccess = e => r(e.target.result));
-            let match = products.find(p => p.barcode === cleanVal || p.item_no === cleanVal);
+
+            // بحث حسب النوع أولاً ثم الكل
+            let match = null;
+            if (isBarcode)      match = products.find(p => p.barcode  === cleanVal) || products.find(p => p.item_no === cleanVal);
+            else if (isItemNo)  match = products.find(p => p.item_no  === cleanVal) || products.find(p => p.barcode === cleanVal);
+            else                match = products.find(p => p.barcode  === cleanVal || p.item_no === cleanVal);
+
             if (match) {
-                await addToInventory(match.item_no || match.barcode, match.name, match.barcode);
+                const matchKey = match.item_no || match.barcode;
+                await addToInventory(matchKey, match.name, match.barcode, match.item_no);
                 playBeep(true); flashCard('green');
                 showToast(`✓ ${match.name}`, false, 1200);
                 setScanStatus('ready', `✓ تم جرد: ${match.name}`);
                 updateAllUI(); isScanLocked = false; return;
             }
             const stockStore = tx.objectStore("stock");
+            // البحث في المرجع — بالباركود أو رقم الصنف
             const stockItem = await new Promise(r => stockStore.get(cleanVal).onsuccess = e => r(e.target.result));
             if (stockItem) {
                 const addTx = db.transaction(["products"], "readwrite");
-                addTx.objectStore("products").add({ id: generateUniqueId(), barcode: cleanVal, item_no: stockItem.key, name: stockItem.name, sourceId: "auto" });
+                const barcodeVal = isBarcode ? cleanVal : '';
+                const itemNoVal  = isItemNo  ? cleanVal : stockItem.key;
+                addTx.objectStore("products").add({ id: generateUniqueId(), barcode: barcodeVal, item_no: itemNoVal, name: stockItem.name, sourceId: "auto" });
                 await new Promise(r => { addTx.oncomplete = r; });
-                await addToInventory(stockItem.key, stockItem.name, cleanVal);
+                await addToInventory(itemNoVal, stockItem.name, barcodeVal);
                 playBeep(true); flashCard('green');
                 showToast(`✓ إضافة تلقائية: ${stockItem.name}`, false, 1500);
                 setScanStatus('ready', `✓ ${stockItem.name}`);
                 updateAllUI(); isScanLocked = false; return;
             }
-            await addToInventory(cleanVal, "❓ غير معروف", cleanVal);
+            // لم يُعثر عليه
+            // تسجيل في الحقل الصحيح حسب النوع
+            const unknownItemNo  = isItemNo  ? cleanVal : '';
+            const unknownBarcode = isBarcode ? cleanVal : '';
+            const unknownKey     = unknownItemNo || unknownBarcode || cleanVal;
+            await addToInventory(unknownKey, "❓ غير معروف", unknownBarcode, unknownItemNo);
             playBeep(false); flashCard('red');
             showToast(`⚠️ غير مسجل — تم تسجيله: ${cleanVal}`, true, 2000);
             setScanStatus('idle', `⚠️ غير معروف: ${cleanVal}`);
@@ -1706,8 +1801,8 @@
         document.getElementById('inventoryFullTable').innerHTML = `<table class="data-table">
             <thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th>الكمية</th><th>آخر مسح</th></thead>
             <tbody>${inventory.map(i => `<tr>
-                <td style="font-size:0.72rem; color:var(--text-muted);">${escapeHtml(i.barcode && i.barcode !== i.key ? i.barcode : '')}</td>
-                <td>${escapeHtml(i.key)}</td>
+                <td style="font-size:0.72rem; color:var(--text-muted);">${escapeHtml(i.barcode || '')}</td>
+                <td>${escapeHtml(i.item_no || '')}</td>
                 <td>${escapeHtml(i.name)}</td>
                 <td><strong style="color:var(--accent)">${i.qty}</strong></td>
                 <td style="font-size:0.7rem; color:var(--text-muted)">${i.timestamp ? new Date(i.timestamp).toLocaleTimeString('ar-SA') : '-'}</td>
@@ -1720,10 +1815,13 @@
             let i = inventory.find(x => x.key === k), s = stock.find(x => x.key === k);
             let qi = i ? i.qty : 0, qs = s ? s.qty : 0, diff = qi - qs;
             // الباركود: من inventory أو من products (أيهما يجد قيمة مختلفة عن رقم الصنف)
-            const fromInv  = i?.barcode && i.barcode !== k ? i.barcode : '';
+            // الباركود: من inventory أو من products
+            const fromInv  = i?.barcode || '';
             const fromProd = prods.find(p => p.item_no === k || p.barcode === k);
-            const bc = fromInv || (fromProd?.barcode && fromProd.barcode !== k ? fromProd.barcode : '');
-            return { itemNo: (i||s)?.item_no||k, barcode: bc, name: (i||s)?.name||'', qs, qi, diff };
+            const bc = fromInv || fromProd?.barcode || '';
+            // رقم الصنف: من inventory أو من products — لا نستخدم k كبديل
+            const itemNo = (i||s)?.item_no || fromProd?.item_no || '';
+            return { itemNo, barcode: bc, name: (i||s)?.name||'', qs, qi, diff };
         });
         let filter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
         let filtered = cmpRows;
@@ -2244,62 +2342,69 @@
     };
 
     // ── استيراد الجرد ──
-    async function importInventory(mode) {
+    function importInventory(mode) {
         const file = document.getElementById('invImportFile').files[0];
         if (!file) { showToast('اختر ملف أولاً', true); return; }
-        showProgress('استيراد الجرد...', 'جاري قراءة الملف', 5);
-        try {
-            const buf  = await file.arrayBuffer();
-            updateProgress(20, 'تحليل البيانات...');
-            const wb   = XLSX.read(buf, { type: 'array' });
-            const ws   = wb.Sheets[wb.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
-            if (!rows.length) { hideProgress(); showToast('الملف فارغ', true); return; }
-            const cols = Object.keys(rows[0]);
-            const keyCol  = cols.find(k => /item|رقم|code|كود|barcode|باركود/i.test(k)) || cols[0];
-            const nameCol = cols.find(k => /name|اسم|وصف|desc/i.test(k))               || cols[1];
-            const qtyCol  = cols.find(k => /qty|كمية|quant|count/i.test(k))             || cols[2];
-            const now = Date.now();
-
-            if (mode === 'replace') {
-                updateProgress(30, 'مسح البيانات القديمة...');
-                await new Promise(r => { const t=db.transaction(['inventory','scanLog'],'readwrite'); t.objectStore('inventory').clear(); t.objectStore('scanLog').clear(); t.oncomplete=r; });
+        showColMapModal(
+            'تعيين أعمدة الجرد',
+            file.name,
+            file,
+            [
+                { id: 'key',  label: 'رقم الصنف / الباركود', icon: 'fas fa-hashtag',    color: 'var(--accent)',     required: true,  keywords: ['رقم الصنف','رقم','باركود','barcode','item','كود','صنف'] },
+                { id: 'name', label: 'الاسم',                 icon: 'fas fa-tag',        color: 'var(--text-muted)', required: false, keywords: ['اسم','name','وصف','desc','المادة'] },
+                { id: 'qty',  label: 'الكمية',                icon: 'fas fa-layer-group', color: 'var(--gold)',      required: true,  keywords: ['كمية','qty','quant','count','الفعلي','تحويل','النهائي'] },
+            ],
+            async function(colMap) {
+                showProgress('استيراد الجرد...', 'جاري قراءة الملف', 5);
+                try {
+                    const buf = await file.arrayBuffer();
+                    updateProgress(20, 'تحليل البيانات...');
+                    const wb  = XLSX.read(buf, { type: 'array' });
+                    const ws  = wb.Sheets[wb.SheetNames[0]];
+                    const allRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', blankrows: false });
+                    const rows = colMap.noHeader ? allRows : allRows.slice(1);
+                    if (!rows.length) { hideProgress(); showToast('الملف فارغ', true); return; }
+                    const now = Date.now();
+                    if (mode === 'replace') {
+                        updateProgress(30, 'مسح البيانات القديمة...');
+                        await new Promise(r => { const t=db.transaction(['inventory','scanLog'],'readwrite'); t.objectStore('inventory').clear(); t.objectStore('scanLog').clear(); t.oncomplete=r; });
+                    }
+                    const validRows = rows.filter(row => {
+                        if (!Array.isArray(row)) return false;
+                        const key = String(row[colMap.key]||'').trim().replace(/\.0+$/,'');
+                        const qty = parseInt(row[colMap.qty]) || 0;
+                        return key && qty > 0;
+                    });
+                    const total = validRows.length;
+                    const tx = db.transaction(['inventory','scanLog'], 'readwrite');
+                    const invS = tx.objectStore('inventory');
+                    const logS = tx.objectStore('scanLog');
+                    let count = 0;
+                    for (const row of validRows) {
+                        const key  = String(row[colMap.key]||'').trim().replace(/\.0+$/,'');
+                        const name = colMap.name !== null ? String(row[colMap.name]||'').trim() : '';
+                        const qty  = parseInt(row[colMap.qty]) || 0;
+                        count++;
+                        updateProgress(30 + (count / total) * 60, `معالجة ${count} / ${total}`);
+                        if (mode === 'merge') {
+                            const existing = await new Promise(r => invS.get(key).onsuccess = e => r(e.target.result));
+                            const newQty = (existing ? existing.qty : 0) + qty;
+                            invS.put({ key, name: existing?.name||name, qty: newQty, barcode: existing?.barcode||key, item_no: key, timestamp: now });
+                            for (let i=0;i<qty;i++) logS.add({ itemCode:key, name:existing?.name||name, barcode:key, timestamp: now+count*1000+i });
+                        } else {
+                            invS.put({ key, name, qty, barcode:key, item_no:key, timestamp: now });
+                            for (let i=0;i<qty;i++) logS.add({ itemCode:key, name, barcode:key, timestamp: now+count*1000+i });
+                        }
+                    }
+                    await new Promise(r => { tx.oncomplete = r; });
+                    updateProgress(100, 'اكتمل!');
+                    hideProgress();
+                    showToast(`✓ تم استيراد ${count} صنف — ${mode==='replace'?'تحديث':'دمج'}`);
+                    document.getElementById('invImportFile').value = '';
+                    updateAllUI();
+                } catch(e) { console.error(e); hideProgress(); showToast('خطأ في قراءة الملف', true); }
             }
-
-            const tx = db.transaction(['inventory','scanLog'], 'readwrite');
-            const invS = tx.objectStore('inventory');
-            const logS = tx.objectStore('scanLog');
-            let count = 0;
-            const total = rows.filter(row => {
-                const key = String(row[keyCol]||'').trim().replace(/\.0+$/,'');
-                const qty = parseInt(row[qtyCol]) || 0;
-                return key && qty > 0;
-            }).length;
-
-            for (const row of rows) {
-                const key  = String(row[keyCol]||'').trim().replace(/\.0+$/,'');
-                const name = String(row[nameCol]||'').trim();
-                const qty  = parseInt(row[qtyCol]) || 0;
-                if (!key || qty <= 0) continue;
-                count++;
-                updateProgress(30 + (count / total) * 60, `معالجة ${count} / ${total}`);
-                if (mode === 'merge') {
-                    const existing = await new Promise(r => invS.get(key).onsuccess = e => r(e.target.result));
-                    const newQty = (existing ? existing.qty : 0) + qty;
-                    invS.put({ key, name: existing?.name||name, qty: newQty, barcode: existing?.barcode||key, item_no: key, timestamp: now });
-                    for (let i=0;i<qty;i++) logS.add({ itemCode:key, name:existing?.name||name, barcode:key, timestamp: now+count*1000+i });
-                } else {
-                    invS.put({ key, name, qty, barcode:key, item_no:key, timestamp: now });
-                    for (let i=0;i<qty;i++) logS.add({ itemCode:key, name, barcode:key, timestamp: now+count*1000+i });
-                }
-            }
-            await new Promise(r => { tx.oncomplete = r; });
-            updateProgress(100, 'اكتمل!');
-            hideProgress();
-            showToast(`✓ تم استيراد ${count} صنف — ${mode==='replace'?'تحديث':'دمج'}`);
-            document.getElementById('invImportFile').value = '';
-            updateAllUI();
-        } catch(e) { console.error(e); hideProgress(); showToast('خطأ في قراءة الملف', true); }
+        );
     }
     document.getElementById('invImportReplaceBtn').onclick = () => { if (confirm('سيُمسح الجرد الحالي بالكامل ويُستبدل. متأكد؟')) importInventory('replace'); };
     document.getElementById('invImportMergeBtn').onclick   = () => importInventory('merge');
