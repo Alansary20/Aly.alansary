@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>نظام الجرد الذكي | ترتيب تنازلي وتأخير</title>
+    <!-- Use local libraries if available, otherwise fall back to CDN -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.18.5/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
@@ -13,59 +15,60 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0f14;
-            --surface: #13161e;
-            --surface2: #1a1e2a;
-            --surface3: #222736;
-            --border: rgba(255,255,255,0.07);
-            --border-glow: rgba(0,212,170,0.3);
-            --accent: #00d4aa;
-            --accent2: #0096ff;
-            --accent3: #ff6b6b;
-            --accent-glow: rgba(0,212,170,0.15);
-            --text: #e8edf5;
-            --text-muted: #6b7a9a;
-            --text-dim: #3d4a63;
-            --gold: #ffd166;
-            --positive: #00d4aa;
-            --negative: #ff6b6b;
-            --neutral: #0096ff;
-            --shadow: rgba(0,0,0,0.35);
+            --bg: #0e1117;
+            --surface: #161b26;
+            --surface2: #1c2333;
+            --surface3: #232d42;
+            --border: rgba(255,255,255,0.06);
+            --border-glow: rgba(56,189,248,0.3);
+            --accent: #38bdf8;
+            --accent2: #818cf8;
+            --accent3: #fb7185;
+            --accent-glow: rgba(56,189,248,0.12);
+            --text: #e2e8f0;
+            --text-muted: #64748b;
+            --text-dim: #334155;
+            --gold: #f0c94a;
+            --positive: #34d399;
+            --negative: #fb7185;
+            --neutral: #818cf8;
+            --shadow: rgba(0,0,0,0.4);
+            --teal: #2dd4bf;
         }
 
         /* ── الثيم الفاتح ── */
         body.light-theme {
-            --bg: #f0f4f8;
+            --bg: #f1f5f9;
             --surface: #ffffff;
-            --surface2: #f4f7fb;
-            --surface3: #e8eef5;
-            --border: rgba(0,0,0,0.08);
-            --border-glow: rgba(0,150,120,0.25);
-            --accent: #00a885;
-            --accent2: #0070cc;
-            --accent3: #e05555;
-            --accent-glow: rgba(0,168,133,0.12);
-            --text: #1a202c;
-            --text-muted: #4a5568;
-            --text-dim: #a0aec0;
-            --gold: #d4900a;
-            --positive: #00a885;
-            --negative: #e05555;
-            --neutral: #0070cc;
-            --shadow: rgba(0,0,0,0.1);
+            --surface2: #f8fafc;
+            --surface3: #e2e8f0;
+            --border: rgba(0,0,0,0.07);
+            --border-glow: rgba(56,189,248,0.2);
+            --accent: #0284c7;
+            --accent2: #6366f1;
+            --accent3: #e11d48;
+            --accent-glow: rgba(2,132,199,0.1);
+            --text: #0f172a;
+            --text-muted: #475569;
+            --text-dim: #94a3b8;
+            --gold: #b45309;
+            --positive: #059669;
+            --negative: #e11d48;
+            --neutral: #6366f1;
+            --shadow: rgba(0,0,0,0.08);
         }
         body.light-theme::before {
             background-image:
-                linear-gradient(rgba(0,168,133,0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,168,133,0.04) 1px, transparent 1px);
+                linear-gradient(rgba(2,132,199,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(2,132,199,0.04) 1px, transparent 1px);
         }
         body.light-theme::after {
-            background: radial-gradient(circle, rgba(0,168,133,0.05) 0%, transparent 65%);
+            background: radial-gradient(circle, rgba(56,189,248,0.06) 0%, transparent 65%);
         }
         body.light-theme .header {
-            background: linear-gradient(135deg,#0a4d3a 0%,#0d6b50 50%,#0a4d3a 100%) !important;
+            background: linear-gradient(135deg,#0c1a2e 0%,#0f2845 50%,#0c1a2e 100%) !important;
         }
-        body.light-theme .data-table th { background: #edf2f7; color: #4a5568; }
+        body.light-theme .data-table th { background: #f1f5f9; color: #475569; }
         body.light-theme .data-table tbody tr:hover { background: rgba(0,0,0,0.02); }
 
         /* زر تبديل الثيم */
@@ -97,9 +100,9 @@
             position: fixed;
             inset: 0;
             background-image:
-                linear-gradient(rgba(0,212,170,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,212,170,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
+                linear-gradient(rgba(56,189,248,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56,189,248,0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
             pointer-events: none;
             z-index: 0;
         }
@@ -111,7 +114,7 @@
             right: -20%;
             width: 60vw;
             height: 60vw;
-            background: radial-gradient(circle, rgba(0,212,170,0.06) 0%, transparent 65%);
+            background: radial-gradient(circle, rgba(56,189,248,0.05) 0%, transparent 65%);
             pointer-events: none;
             z-index: 0;
         }
@@ -125,13 +128,13 @@
 
         /* ── HEADER ── */
         .header {
-            background: linear-gradient(135deg, #0d1f2d 0%, #0a1628 50%, #0d1f2d 100%);
+            background: linear-gradient(160deg, #0c1628 0%, #0f1e3a 40%, #0c1628 100%);
             border-radius: 24px;
             padding: 22px 20px 18px;
             margin-bottom: 18px;
             color: white;
-            border: 1px solid rgba(0,212,170,0.2);
-            box-shadow: 0 0 40px rgba(0,212,170,0.08), 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(56,189,248,0.15);
+            box-shadow: 0 0 60px rgba(56,189,248,0.06), 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
             position: relative;
             overflow: hidden;
         }
@@ -140,8 +143,17 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(56,189,248,0.6), rgba(129,140,248,0.5), transparent);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 120px;
+            background: radial-gradient(ellipse, rgba(56,189,248,0.08) 0%, transparent 70%);
+            pointer-events: none;
         }
 
         .header h1 {
@@ -157,22 +169,33 @@
 
         .header h1 i {
             color: var(--accent);
-            filter: drop-shadow(0 0 8px var(--accent));
+            filter: drop-shadow(0 0 10px rgba(56,189,248,0.5));
         }
 
         .header-subtitle {
             text-align: center;
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.4);
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.3);
             margin-top: 4px;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .header-byline {
+            text-align: center;
+            font-size: 0.62rem;
+            color: rgba(56,189,248,0.45);
+            margin-top: 3px;
+            letter-spacing: 1px;
+            font-style: italic;
+            font-family: 'Cairo', sans-serif;
         }
 
         /* Header buttons */
         .header > div button {
-            background: rgba(0,212,170,0.1) !important;
-            border: 1px solid rgba(0,212,170,0.25) !important;
+            background: rgba(56,189,248,0.08) !important;
+            border: 1px solid rgba(56,189,248,0.2) !important;
             color: var(--accent) !important;
             font-family: 'Cairo', sans-serif;
             font-size: 0.78rem;
@@ -180,8 +203,8 @@
             transition: all 0.2s ease;
         }
         .header > div button:hover {
-            background: rgba(0,212,170,0.2) !important;
-            box-shadow: 0 0 16px rgba(0,212,170,0.2);
+            background: rgba(56,189,248,0.16) !important;
+            box-shadow: 0 0 20px rgba(56,189,248,0.2);
         }
 
         /* ── STATS ── */
@@ -194,18 +217,20 @@
 
         .stat-card {
             background: var(--surface);
-            border-radius: 16px;
+            border-radius: 18px;
             padding: 16px 8px 12px;
             text-align: center;
             border: 1px solid var(--border);
             position: relative;
             overflow: hidden;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
         .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(0,212,170,0.3);
+            transform: translateY(-3px);
+            border-color: rgba(56,189,248,0.25);
+            box-shadow: 0 8px 30px rgba(56,189,248,0.08);
         }
 
         .stat-card::after {
@@ -214,7 +239,7 @@
             bottom: 0; left: 0; right: 0;
             height: 2px;
             background: linear-gradient(90deg, var(--accent2), var(--accent));
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
         .stat-number {
@@ -223,7 +248,7 @@
             color: var(--accent);
             font-family: 'Tajawal', sans-serif;
             line-height: 1;
-            text-shadow: 0 0 20px rgba(0,212,170,0.4);
+            text-shadow: 0 0 24px rgba(56,189,248,0.35);
         }
 
         .stat-label {
@@ -238,11 +263,12 @@
         .tabs {
             display: flex;
             background: var(--surface);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 4px;
             margin-bottom: 16px;
             gap: 3px;
             border: 1px solid var(--border);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
         }
 
         .tab-btn {
@@ -250,7 +276,7 @@
             background: transparent;
             border: none;
             padding: 10px 4px;
-            border-radius: 10px;
+            border-radius: 12px;
             font-weight: 700;
             font-size: 0.68rem;
             display: flex;
@@ -268,20 +294,20 @@
         .tab-btn:hover { color: var(--text); }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,150,255,0.1));
+            background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(129,140,248,0.08));
             color: var(--accent);
-            border: 1px solid rgba(0,212,170,0.25);
-            box-shadow: 0 2px 12px rgba(0,212,170,0.1);
+            border: 1px solid rgba(56,189,248,0.2);
+            box-shadow: 0 2px 12px rgba(56,189,248,0.1);
         }
 
         /* ── CARD ── */
         .card {
             background: var(--surface);
-            border-radius: 20px;
-            padding: 18px 16px;
+            border-radius: 22px;
+            padding: 20px 18px;
             margin-bottom: 16px;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.03);
         }
 
         /* ── PANEL ── */
@@ -298,7 +324,7 @@
             padding: 13px 18px;
             font-size: 0.95rem;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 13px;
             background: var(--surface2);
             margin-bottom: 12px;
             color: var(--text);
@@ -308,8 +334,8 @@
         .input-field::placeholder { color: var(--text-dim); }
         .input-field:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0,212,170,0.12);
+            border-color: rgba(56,189,248,0.5);
+            box-shadow: 0 0 0 3px rgba(56,189,248,0.1);
             background: var(--surface3);
         }
 
@@ -317,7 +343,7 @@
         .btn-primary, .btn-secondary {
             border: none;
             padding: 13px 18px;
-            border-radius: 12px;
+            border-radius: 13px;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
@@ -331,20 +357,20 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #00b894, #00d4aa);
-            color: #021a14;
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+            color: #04101a;
             font-weight: 800;
-            box-shadow: 0 4px 20px rgba(0,212,170,0.3);
+            box-shadow: 0 4px 20px rgba(56,189,248,0.28);
         }
-        .btn-primary:hover { box-shadow: 0 6px 28px rgba(0,212,170,0.45); transform: translateY(-1px); }
-        .btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(0,212,170,0.2); }
+        .btn-primary:hover { box-shadow: 0 6px 30px rgba(56,189,248,0.42); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(56,189,248,0.2); }
 
         .btn-secondary {
             background: var(--surface2);
             color: var(--text);
             border: 1px solid var(--border);
         }
-        .btn-secondary:hover { border-color: rgba(0,212,170,0.3); color: var(--accent); }
+        .btn-secondary:hover { border-color: rgba(56,189,248,0.3); color: var(--accent); }
 
         /* ── FLEX 2 COLS ── */
         .flex-2cols { display: flex; gap: 10px; margin: 10px 0; }
@@ -355,13 +381,13 @@
 
         .product-card {
             background: var(--surface2);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 14px;
             margin-bottom: 10px;
             border: 1px solid var(--border);
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .product-card:hover { border-color: rgba(0,212,170,0.2); }
+        .product-card:hover { border-color: rgba(56,189,248,0.2); box-shadow: 0 4px 20px rgba(56,189,248,0.05); }
 
         .product-info {
             display: flex;
@@ -378,12 +404,12 @@
             font-size: 1.6rem;
             font-weight: 900;
             color: var(--accent);
-            background: rgba(0,212,170,0.1);
+            background: rgba(56,189,248,0.08);
             padding: 4px 16px;
             border-radius: 10px;
-            border: 1px solid rgba(0,212,170,0.2);
+            border: 1px solid rgba(56,189,248,0.18);
             font-family: 'Tajawal', sans-serif;
-            text-shadow: 0 0 12px rgba(0,212,170,0.4);
+            text-shadow: 0 0 14px rgba(56,189,248,0.35);
         }
 
         .product-time {
@@ -456,15 +482,15 @@
 
         .data-table tbody tr:hover { background: rgba(255,255,255,0.03); }
 
-        .diff-positive { background: rgba(0,212,170,0.12); color: var(--positive); font-weight: 700; }
-        .diff-negative { background: rgba(255,107,107,0.12); color: var(--negative); font-weight: 700; }
-        .diff-zero { background: rgba(0,150,255,0.1); color: var(--neutral); font-weight: 700; }
+        .diff-positive { background: rgba(52,211,153,0.1); color: var(--positive); font-weight: 700; }
+        .diff-negative { background: rgba(251,113,133,0.1); color: var(--negative); font-weight: 700; }
+        .diff-zero { background: rgba(129,140,248,0.1); color: var(--neutral); font-weight: 700; }
 
         /* ── SEARCH ── */
         .search-input {
             width: 100%;
             padding: 11px 16px;
-            border-radius: 12px;
+            border-radius: 13px;
             border: 1px solid var(--border);
             margin-bottom: 12px;
             background: var(--surface2);
@@ -473,16 +499,16 @@
             font-size: 0.88rem;
         }
         .search-input::placeholder { color: var(--text-dim); }
-        .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,170,0.1); }
+        .search-input:focus { outline: none; border-color: rgba(56,189,248,0.4); box-shadow: 0 0 0 3px rgba(56,189,248,0.08); }
 
         /* ── FILE UPLOAD ── */
         .file-label {
             background: var(--surface2);
-            border-radius: 12px;
+            border-radius: 13px;
             padding: 14px;
             text-align: center;
             cursor: pointer;
-            border: 1px dashed rgba(0,212,170,0.3);
+            border: 1px dashed rgba(56,189,248,0.25);
             margin-bottom: 14px;
             color: var(--text-muted);
             font-size: 0.9rem;
@@ -491,7 +517,7 @@
         .file-label:hover {
             border-color: var(--accent);
             color: var(--accent);
-            background: rgba(0,212,170,0.05);
+            background: rgba(56,189,248,0.04);
         }
 
         /* ── CAMERA ── */
@@ -504,7 +530,7 @@
             max-width: 400px;
             margin-left: auto;
             margin-right: auto;
-            border: 1px solid rgba(0,212,170,0.2);
+            border: 1px solid rgba(56,189,248,0.2);
         }
 
         .camera-selector {
@@ -562,15 +588,15 @@
             border: 1px solid var(--border);
             color: var(--text-muted);
             padding: 7px 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 0.78rem;
             cursor: pointer;
             font-family: 'Cairo', sans-serif;
             transition: all 0.15s;
         }
         .filter-btn.active {
-            background: rgba(0,212,170,0.15);
-            border-color: rgba(0,212,170,0.35);
+            background: rgba(56,189,248,0.12);
+            border-color: rgba(56,189,248,0.3);
             color: var(--accent);
         }
 
@@ -584,11 +610,11 @@
             color: var(--text);
             text-align: center;
             padding: 13px 20px;
-            border-radius: 14px;
+            border-radius: 16px;
             font-size: 0.85rem;
             z-index: 2100;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            border: 1px solid rgba(0,212,170,0.2);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(56,189,248,0.15);
+            border: 1px solid rgba(56,189,248,0.15);
             font-family: 'Cairo', sans-serif;
             animation: slideUp 0.3s ease;
         }
@@ -601,21 +627,21 @@
         /* ── FLASH EFFECTS ── */
         .flash-green {
             border-color: var(--accent) !important;
-            box-shadow: 0 0 0 3px rgba(0,212,170,0.3) !important;
-            background: rgba(0,212,170,0.08) !important;
+            box-shadow: 0 0 0 3px rgba(56,189,248,0.25) !important;
+            background: rgba(56,189,248,0.06) !important;
             transition: 0.08s;
         }
         .flash-red {
             border-color: var(--negative) !important;
-            box-shadow: 0 0 0 3px rgba(255,107,107,0.3) !important;
-            background: rgba(255,107,107,0.06) !important;
+            box-shadow: 0 0 0 3px rgba(251,113,133,0.25) !important;
+            background: rgba(251,113,133,0.06) !important;
             transition: 0.08s;
         }
 
         /* ── MODAL ── */
         #productModal > div {
             background: var(--surface) !important;
-            border: 1px solid rgba(0,212,170,0.2) !important;
+            border: 1px solid rgba(56,189,248,0.18) !important;
             color: var(--text) !important;
         }
         #productModal h3 { color: var(--accent); margin-bottom: 16px; font-family: 'Tajawal', sans-serif; }
@@ -633,8 +659,8 @@
         #productModal input:focus { outline: none; border-color: var(--accent); }
         #productModal input::placeholder { color: var(--text-dim); }
         #saveProductBtn {
-            background: linear-gradient(135deg, #00b894, #00d4aa) !important;
-            color: #021a14 !important;
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8) !important;
+            color: #04101a !important;
             font-weight: 800 !important;
             font-family: 'Cairo', sans-serif;
         }
@@ -647,9 +673,9 @@
 
         /* ── INVENTORY COUNT BADGE ── */
         #inventoryCount {
-            background: rgba(0,212,170,0.15) !important;
+            background: rgba(56,189,248,0.1) !important;
             color: var(--accent) !important;
-            border: 1px solid rgba(0,212,170,0.3) !important;
+            border: 1px solid rgba(56,189,248,0.25) !important;
             font-family: 'Tajawal', sans-serif;
         }
 
@@ -695,8 +721,51 @@
         #progressTitle { font-size:0.92rem; font-weight:800; color:var(--text); margin-bottom:5px; font-family:'Tajawal',sans-serif; }
         #progressSub   { font-size:0.72rem; color:var(--text-muted); margin-bottom:14px; min-height:16px; }
         #progressTrack { height:9px; background:var(--surface3); border-radius:99px; overflow:hidden; margin-bottom:8px; }
-        #progressFill  { height:100%; width:0%; background:linear-gradient(90deg,#00b894,#00d4aa); border-radius:99px; transition:width 0.2s ease; box-shadow:0 0 10px rgba(0,212,170,0.4); }
+        #progressFill  { height:100%; width:0%; background:linear-gradient(90deg,#0ea5e9,#38bdf8); border-radius:99px; transition:width 0.2s ease; box-shadow:0 0 12px rgba(56,189,248,0.5); }
         #progressPct   { text-align:left; font-size:0.8rem; color:var(--accent); font-weight:800; font-family:'Tajawal',sans-serif; }
+
+        /* ── Extra polish ── */
+        .icon-btn {
+            background: var(--surface3);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 9px;
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.15s;
+        }
+        .icon-btn:hover { color: var(--accent); border-color: rgba(56,189,248,0.3); }
+
+        /* Scan cooldown badge */
+        #scanCooldownBadge {
+            background: rgba(251,113,133,0.12) !important;
+            color: var(--negative) !important;
+            border: 1px solid rgba(251,113,133,0.2) !important;
+        }
+
+        /* Add one button */
+        #addOneBtn { background: var(--accent) !important; color: #04101a !important; }
+
+        /* Start cam button */
+        #startCamBtn { background: linear-gradient(135deg,#0ea5e9,#38bdf8) !important; box-shadow: 0 4px 16px rgba(56,189,248,0.25) !important; }
+
+        /* Data table refinements */
+        .data-table { font-size: 0.78rem; }
+        .data-table th { font-size: 0.7rem; letter-spacing: 0.5px; }
+        .data-wrapper { border-radius: 16px; border-color: var(--border); }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 10px; }
+
+        /* Body font */
+        body { font-family: 'Cairo', 'Tajawal', sans-serif; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -715,6 +784,7 @@
         <button id="themeToggle" title="تبديل الثيم"><i class="fas fa-moon"></i></button>
         <h1><i class="fas fa-cube"></i> نظام الجرد الذكي</h1>
         <div class="header-subtitle">SMART INVENTORY SYSTEM</div>
+        <div class="header-byline">by Aly Alansary</div>
         <div style="display: flex; justify-content: center; gap: 10px; margin-top: 14px;">
             <button id="globalResetBtn" style="border: none; padding: 7px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.8rem;"><i class="fas fa-sync-alt"></i> إعادة تعيين</button>
             <button id="globalManualBtn" style="border: none; padding: 7px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.8rem;"><i class="fas fa-plus-circle"></i> إضافة منتج</button>
@@ -808,7 +878,10 @@
             </div>
             <input type="file" id="invImportFile" style="display:none;">
             <button id="invImportFileBtn" onclick="document.getElementById('invImportFile').click()"
-                style="display:block; width:100%; padding:12px; border-radius:10px; border:1px dashed rgba(0,212,170,0.3); text-align:center; cursor:pointer; color:var(--text-muted); font-size:0.82rem; margin-bottom:10px; background:transparent; font-family:'Cairo',sans-serif; transition:all 0.2s;">
+                style="display:block; width:100%; padding:12px; border-radius:10px;
+                    border:1px dashed rgba(0,212,170,0.3); text-align:center; cursor:pointer;
+                    color:var(--text-muted); font-size:0.82rem; margin-bottom:10px;
+                    background:transparent; font-family:'Cairo',sans-serif; transition:all 0.2s;">
                 <i class="fas fa-upload" style="color:var(--accent); margin-left:6px;"></i> اختر ملف Excel للجرد
             </button>
             <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
@@ -1038,25 +1111,25 @@
     </div></div>
 </div>
 <!-- نافذة تعيين الأعمدة -->
-<div id="colMapModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);justify-content:center;align-items:center;z-index:5000;padding:14px;">
-  <div style="background:var(--surface);border-radius:22px;padding:22px 18px 18px;width:100%;max-width:420px;border:1px solid rgba(0,212,170,0.25);box-shadow:0 24px 70px rgba(0,0,0,0.7);position:relative;max-height:92vh;overflow-y:auto;">
-    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:22px 22px 0 0;"></div>
-    <h3 id="colMapTitle" style="color:var(--accent);margin-bottom:4px;font-family:'Tajawal',sans-serif;font-size:1rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-table-columns"></i> تعيين الأعمدة</h3>
-    <p id="colMapFileName" style="font-size:0.7rem;color:var(--text-muted);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);"></p>
-    <div style="margin-bottom:12px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);"><i class="fas fa-eye" style="color:var(--accent2);margin-left:5px;"></i>رؤوس الأعمدة</div>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.7rem;color:var(--text-muted);">
+<div id="colMapModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);justify-content:center;align-items:flex-start;z-index:5000;padding:10px;overflow-y:auto;">
+  <div style="background:var(--surface);border-radius:24px;padding:24px 20px 20px;width:100%;max-width:520px;border:1px solid rgba(0,212,170,0.3);box-shadow:0 30px 80px rgba(0,0,0,0.8);position:relative;margin:20px auto;min-height:min-content;">
+    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:24px 24px 0 0;"></div>
+    <h3 id="colMapTitle" style="color:var(--accent);margin-bottom:6px;font-family:'Tajawal',sans-serif;font-size:1.1rem;display:flex;align-items:center;gap:10px;"><i class="fas fa-table-columns"></i> تعيين الأعمدة</h3>
+    <p id="colMapFileName" style="font-size:0.75rem;color:var(--text-muted);margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid var(--border);"></p>
+    <div style="margin-bottom:15px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);"><i class="fas fa-eye" style="color:var(--accent2);margin-left:6px;"></i>رؤوس الأعمدة</div>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.75rem;color:var(--text-muted);">
           <span>بدون رؤوس</span>
-          <input type="checkbox" id="colMapNoHeader" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer;">
+          <input type="checkbox" id="colMapNoHeader" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
         </label>
       </div>
-      <div id="colMapPreview" style="display:flex;flex-wrap:wrap;gap:4px;padding:9px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);max-height:72px;overflow-y:auto;"></div>
+      <div id="colMapPreview" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);max-height:100px;overflow-y:auto;"></div>
     </div>
-    <div id="colMapFields" style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px;"></div>
-    <div style="display:flex;gap:9px;">
-      <button id="colMapConfirmBtn" class="btn-primary" style="flex:2;font-size:0.86rem;"><i class="fas fa-check-circle"></i> تأكيد ومعالجة</button>
-      <button id="colMapCancelBtn" class="btn-secondary" style="flex:1;font-size:0.86rem;">إلغاء</button>
+    <div id="colMapFields" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;"></div>
+    <div style="display:flex;gap:12px;">
+      <button id="colMapConfirmBtn" class="btn-primary" style="flex:2;font-size:0.95rem;padding:14px;"><i class="fas fa-check-circle"></i> تأكيد ومعالجة</button>
+      <button id="colMapCancelBtn" class="btn-secondary" style="flex:1;font-size:0.95rem;padding:14px;">إلغاء</button>
     </div>
   </div>
 </div>
@@ -1073,7 +1146,27 @@
     // اسم قاعدة بيانات فريد لكل ملف بناءً على مساره الكامل
     const _rawPath = (location.href || location.pathname || '').replace(/[^a-zA-Z0-9]/g, '_').slice(-40);
     const DB_NAME = "InvSmartDB_" + (_rawPath || "default");
-    const DB_VERSION = 2;
+    const DB_VERSION = 3;
+
+    // ── حفظ وقراءة الإعدادات من indexedDB ──
+    function saveSetting(key, value) {
+        if (!db) { localStorage.setItem(key, value); return; }
+        try {
+            const tx = db.transaction("settings", "readwrite");
+            tx.objectStore("settings").put({ k: key, v: value });
+        } catch(e) { localStorage.setItem(key, value); }
+    }
+    function loadSetting(key, fallback) {
+        return new Promise(resolve => {
+            if (!db) { resolve(localStorage.getItem(key) || fallback); return; }
+            try {
+                const tx = db.transaction("settings", "readonly");
+                const req = tx.objectStore("settings").get(key);
+                req.onsuccess = () => resolve(req.result ? req.result.v : (localStorage.getItem(key) || fallback));
+                req.onerror  = () => resolve(localStorage.getItem(key) || fallback);
+            } catch(e) { resolve(localStorage.getItem(key) || fallback); }
+        });
+    }
     let inventory = [];
     let html5QrScanner = null;
     let scanningActive = false;
@@ -1148,7 +1241,7 @@
         const colors = {
             idle:     'var(--text-dim)',
             ready:    'var(--accent)',
-            scanning: '#ffd166',
+            scanning: 'var(--gold)',
             locked:   'var(--negative)',
             confirm:  '#a78bfa'   // بنفسجي: انتظار التأكيد
         };
@@ -1287,52 +1380,55 @@
     document.getElementById('processDbBtn').onclick = async () => {
         if (!pendingProductFiles.length) { showToast("اختر ملفات أولاً", true); return; }
         if (dbUploadMode === 'update') { if (!confirm('سيتم حذف جميع المنتجات الحالية واستبدالها. متأكد؟')) return; }
-        showColMapModal('تعيين أعمدة المنتجات', pendingProductFiles.map(f=>f.name).join(', '), pendingProductFiles[0],
+        showColMapModal(
+            'تعيين أعمدة المنتجات',
+            pendingProductFiles.map(f => f.name).join(', '),
+            pendingProductFiles[0],
             [
-                { id:'barcode', label:'الباركود',  icon:'fas fa-barcode', color:'var(--accent2)',    required:false, keywords:['باركود','barcode','بار','كود'] },
-                { id:'itemno',  label:'رقم الصنف', icon:'fas fa-hashtag', color:'var(--accent)',     required:false, keywords:['رقم الصنف','رقم','item','صنف'] },
-                { id:'name',    label:'الاسم',      icon:'fas fa-tag',     color:'var(--text-muted)', required:false, keywords:['اسم','name','وصف','desc','المادة'] },
+                { id: 'barcode', label: 'الباركود',  icon: 'fas fa-barcode',     color: 'var(--accent2)',    required: false, keywords: ['باركود','barcode','بار','كود'] },
+                { id: 'itemno',  label: 'رقم الصنف', icon: 'fas fa-hashtag',     color: 'var(--accent)',     required: false, keywords: ['رقم الصنف','رقم','item','صنف'] },
+                { id: 'name',    label: 'الاسم',      icon: 'fas fa-tag',         color: 'var(--text-muted)', required: false, keywords: ['اسم','name','وصف','desc','المادة'] },
             ],
             async function(colMap) {
-                if (colMap.barcode===null && colMap.itemno===null) { showToast('يرجى تحديد عمود الباركود أو رقم الصنف على الأقل', true); return; }
+                if (colMap.barcode === null && colMap.itemno === null) { showToast('يرجى تحديد عمود الباركود أو رقم الصنف على الأقل', true); return; }
                 showProgress('رفع المنتجات...', 'جاري قراءة الملفات', 5);
-                if (dbUploadMode==='update') {
+                if (dbUploadMode === 'update') {
                     updateProgress(8, 'مسح المنتجات القديمة...');
-                    const c1=db.transaction("products","readwrite"); c1.objectStore("products").clear(); await new Promise(r=>{c1.oncomplete=r;});
-                    const c2=db.transaction("uploadedFiles","readwrite"); c2.objectStore("uploadedFiles").clear(); await new Promise(r=>{c2.oncomplete=r;});
+                    const c1 = db.transaction("products","readwrite"); c1.objectStore("products").clear(); await new Promise(r=>{ c1.oncomplete=r; });
+                    const c2 = db.transaction("uploadedFiles","readwrite"); c2.objectStore("uploadedFiles").clear(); await new Promise(r=>{ c2.oncomplete=r; });
                 }
-                const sourceId=Date.now(); let totalAdded=0;
-                for (let fi=0; fi<pendingProductFiles.length; fi++) {
-                    const file=pendingProductFiles[fi];
+                const sourceId = Date.now(); let totalAdded = 0;
+                for (let fi = 0; fi < pendingProductFiles.length; fi++) {
+                    const file = pendingProductFiles[fi];
                     try {
-                        updateProgress(10+(fi/pendingProductFiles.length)*20, `قراءة: ${file.name}`);
-                        const rows=await readExcelFile(file);
-                        if (!rows||rows.length<1) throw new Error("لا توجد بيانات");
-                        const dataRows=colMap.noHeader?rows:rows.slice(1);
-                        const BATCH_SIZE=150;
-                        for (let start=0; start<dataRows.length; start+=BATCH_SIZE) {
-                            const pct=30+((fi/pendingProductFiles.length)+((start/dataRows.length)/pendingProductFiles.length))*65;
-                            updateProgress(pct, `معالجة ${Math.min(start+BATCH_SIZE,dataRows.length)} / ${dataRows.length}`);
-                            const batch=dataRows.slice(start,Math.min(start+BATCH_SIZE,dataRows.length));
-                            const tx=db.transaction(["products"],"readwrite"); const store=tx.objectStore("products");
+                        updateProgress(10 + (fi / pendingProductFiles.length) * 20, `قراءة: ${file.name}`);
+                        const rows = await readExcelFile(file);
+                        if (!rows || rows.length < 1) throw new Error("لا توجد بيانات");
+                        const dataRows = colMap.noHeader ? rows : rows.slice(1);
+                        const BATCH_SIZE = 150;
+                        for (let start = 0; start < dataRows.length; start += BATCH_SIZE) {
+                            const pct = 30 + ((fi / pendingProductFiles.length) + ((start / dataRows.length) / pendingProductFiles.length)) * 65;
+                            updateProgress(pct, `معالجة ${Math.min(start + BATCH_SIZE, dataRows.length)} / ${dataRows.length}`);
+                            const batch = dataRows.slice(start, Math.min(start + BATCH_SIZE, dataRows.length));
+                            const tx = db.transaction(["products"], "readwrite"); const store = tx.objectStore("products");
                             for (const row of batch) {
                                 if (!Array.isArray(row)) continue;
-                                const barcode=colMap.barcode!==null?String(row[colMap.barcode]||'').trim().replace(/\.0+$/,''):'';
-                                const itemno =colMap.itemno !==null?String(row[colMap.itemno] ||'').trim().replace(/\.0+$/,''):'';
-                                const name   =colMap.name   !==null?String(row[colMap.name]   ||'').trim():'';
-                                if (!barcode&&!itemno) continue;
-                                store.add({id:generateUniqueId(),barcode,item_no:itemno,name:name||'بدون اسم',sourceId}); totalAdded++;
+                                const barcode = colMap.barcode !== null ? String(row[colMap.barcode]||'').trim().replace(/\.0+$/,'') : '';
+                                const itemno  = colMap.itemno  !== null ? String(row[colMap.itemno] ||'').trim().replace(/\.0+$/,'') : '';
+                                const name    = colMap.name    !== null ? String(row[colMap.name]   ||'').trim() : '';
+                                if (!barcode && !itemno) continue;
+                                store.add({ id: generateUniqueId(), barcode, item_no: itemno, name: name || 'بدون اسم', sourceId }); totalAdded++;
                             }
-                            await new Promise((resolve,reject)=>{tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});
-                            await new Promise(r=>setTimeout(r,10));
+                            await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); });
+                            await new Promise(r => setTimeout(r, 10));
                         }
-                    } catch(err) { hideProgress(); showToast(`خطأ في ${file.name}: ${err.message}`,true); return; }
+                    } catch (err) { hideProgress(); showToast(`خطأ في ${file.name}: ${err.message}`, true); return; }
                 }
-                const ftx=db.transaction("uploadedFiles","readwrite");
-                ftx.objectStore("uploadedFiles").add({names:pendingProductFiles.map(f=>f.name).join(', '),count:totalAdded,sourceId});
-                await new Promise(r=>{ftx.oncomplete=r;});
+                const ftx = db.transaction("uploadedFiles","readwrite");
+                ftx.objectStore("uploadedFiles").add({ names: pendingProductFiles.map(f=>f.name).join(', '), count: totalAdded, sourceId });
+                await new Promise(r=>{ ftx.oncomplete=r; });
                 hideProgress(); showToast(`✅ تم ${dbUploadMode==='update'?'تحديث':'دمج'} ${totalAdded} منتج`);
-                pendingProductFiles=[]; updateAllUI();
+                pendingProductFiles = []; updateAllUI();
             }
         );
     };
@@ -1619,18 +1715,24 @@
                 select.appendChild(option);
             });
             if (devices.length > 0) {
-                // استعادة الكاميرا المحفوظة أولاً، ثم الخلفية، ثم الأخيرة
-                const savedId = localStorage.getItem('preferredCameraId');
-                let selectedCam = (savedId && devices.find(d => d.id === savedId))
-                    || devices.find(d => /back|rear|خلفية|environment/i.test(d.label))
-                    || devices[devices.length - 1];
+                // استعادة الكاميرا المحفوظة أولاً
+                const savedCamId = await loadSetting('invSelectedCamera', '');
+                let selectedCam = savedCamId
+                    ? devices.find(d => d.id === savedCamId)
+                    : null;
+                // إذا لم توجد المحفوظة، تفضيل الخلفية
+                if (!selectedCam) {
+                    selectedCam = devices.find(d =>
+                        /back|rear|خلفية|environment/i.test(d.label)
+                    ) || devices[devices.length - 1];
+                }
                 currentCameraId = selectedCam.id;
                 select.value = currentCameraId;
             }
-            // حفظ اختيار المستخدم عند التغيير
+            // تحديث select عند التغيير وحفظه
             select.onchange = () => {
                 currentCameraId = select.value;
-                localStorage.setItem('preferredCameraId', currentCameraId);
+                saveSetting('invSelectedCamera', currentCameraId);
             };
         } catch (err) { console.warn(err); }
     }
@@ -1654,12 +1756,15 @@
                     aspectRatio: 1.5,
                     disableFlip: false,
                     formatsToSupport: [
-                        Html5QrcodeSupportedFormats?.QR_CODE,
                         Html5QrcodeSupportedFormats?.CODE_128,
                         Html5QrcodeSupportedFormats?.CODE_39,
+                        Html5QrcodeSupportedFormats?.CODE_93,
                         Html5QrcodeSupportedFormats?.EAN_13,
                         Html5QrcodeSupportedFormats?.EAN_8,
                         Html5QrcodeSupportedFormats?.UPC_A,
+                        Html5QrcodeSupportedFormats?.UPC_E,
+                        Html5QrcodeSupportedFormats?.ITF,
+                        Html5QrcodeSupportedFormats?.CODABAR,
                     ].filter(Boolean)
                 },
                 async (decoded) => {
@@ -1700,6 +1805,8 @@
         const nextIndex = (currentIndex + 1) % availableCameras.length;
         const nextCam = availableCameras[nextIndex];
         document.getElementById('cameraSelect').value = nextCam.id;
+        currentCameraId = nextCam.id;
+        saveSetting('invSelectedCamera', currentCameraId);
         await startCamera(nextCam.id);
     }
 
@@ -2123,30 +2230,30 @@
         const ws = wb.addWorksheet(sheetName, { views:[{ rightToLeft:true, state:'frozen', ySplit:1 }] });
         ws.columns = columns;
 
-        // رأس الجدول — خلفية خضراء داكنة مع نص أبيض
+        // رأس الجدول
         const hRow = ws.getRow(1);
-        hRow.height = 26;
+        hRow.height = 24;
         columns.forEach((col, ci) => {
             const cell = hRow.getCell(ci + 1);
             cell.value     = col.header;
-            cell.font      = { bold:true, color:{ argb:'FFFFFFFF' }, size:11, name:'Cairo' };
-            cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF0A6B50' } };
+            cell.font      = { bold:true, color:{ argb:'FFFFFFFF' }, size:11 };
+            cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF1B4F72' } };
             cell.alignment = { horizontal:'center', vertical:'middle', readingOrder:'rtl' };
-            cell.border    = { bottom:{ style:'medium', color:{ argb:'FF00A885' } } };
+            cell.border    = { bottom:{ style:'medium', color:{ argb:'FF00A884' } } };
         });
 
-        // صفوف البيانات — ألوان فاتحة متناوبة
+        // صفوف البيانات
         rows.forEach((rowData, ri) => {
             const row = ws.addRow(rowData);
-            row.height = 20;
+            row.height = 18;
             const style = rowStyle ? rowStyle(rowData, ri) : {};
-            const fillArgb = style.fill || (ri % 2 === 0 ? 'FFFFFFFF' : 'FFF0F7F5');
-            const fontArgb = style.font || 'FF1A2C26';
+            const fillArgb = style.fill || (ri % 2 === 0 ? 'FFFFFFFF' : 'FFF5F7FA');
+            const fontArgb = style.font || 'FF1A202C';
             row.eachCell({ includeEmpty:true }, cell => {
                 cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb: fillArgb } };
-                cell.font      = { color:{ argb: fontArgb }, bold: style.bold||false, name:'Cairo' };
+                cell.font      = { color:{ argb: fontArgb }, bold: style.bold||false };
                 cell.alignment = { horizontal:'center', vertical:'middle', readingOrder:'rtl' };
-                cell.border    = { bottom:{ style:'thin', color:{ argb:'FFD4E8E0' } } };
+                cell.border    = { bottom:{ style:'thin', color:{ argb:'FFD1D5DB' } } };
             });
         });
 
@@ -2260,20 +2367,20 @@
 
             // تنسيق رأس الجدول
             const headerRow = ws.getRow(1);
-            headerRow.height = 24;
+            headerRow.height = 22;
             headerRow.eachCell(cell => {
                 cell.font      = { bold:true, color:{ argb:'FFFFFFFF' }, size:11, name:'Cairo' };
-                cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF0A6B50' } };
+                cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF1B4F72' } };
                 cell.alignment = { horizontal:'center', vertical:'middle', wrapText:true, readingOrder:'rtl' };
-                cell.border    = { bottom:{ style:'medium', color:{ argb:'FF00A885' } } };
+                cell.border    = { bottom:{ style:'medium', color:{ argb:'FF00A884' } } };
             });
 
-            // إضافة الصفوف بالألوان الفاتحة
+            // إضافة الصفوف بالألوان
             const colorMap = {
-                increase: { fill:'FFD6F5EC', font:'FF06613A', label:'زيادة' },
-                decrease: { fill:'FFFDE8E8', font:'FF9B1C1C', label:'نقص'   },
-                match:    { fill:'FFE8F4FF', font:'FF1E4D8C', label:'مطابق' },
-                none:     { fill:'FFF9FAFB', font:'FF6B7280', label:'—'     },
+                increase: { fill:'FFD1FAE5', font:'FF065F46', label:'زيادة' },
+                decrease: { fill:'FFFEE2E2', font:'FF991B1B', label:'نقص'   },
+                match:    { fill:'FFE0F2FE', font:'FF0369A1', label:'مطابق' },
+                none:     { fill:'FFF3F4F6', font:'FF6B7280', label:'—'     },
             };
 
             rows.forEach(r => {
@@ -2291,7 +2398,7 @@
                     cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb: c.fill } };
                     cell.font      = { color:{ argb: c.font }, name:'Cairo', bold: ['diff','status'].includes(cell._column.key) };
                     cell.alignment = { horizontal:'center', vertical:'middle', readingOrder:'rtl' };
-                    cell.border    = { bottom:{ style:'thin', color:{ argb:'FFD4E8E0' } } };
+                    cell.border    = { bottom:{ style:'thin', color:{ argb:'FFD1D5DB' } } };
                 });
             });
 
@@ -2336,20 +2443,27 @@
     let invUploadMode = 'replace';
     function setInvMode(mode) {
         invUploadMode = mode;
-        const on='linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
-        const btnU=document.getElementById('invModeUpdate'), btnM=document.getElementById('invModeMerge');
-        const desc=document.getElementById('invModeDescText');
-        if(mode==='replace'){btnU.style.background=on;btnU.style.color='var(--accent)';btnU.style.borderColor='rgba(0,212,170,0.3)';btnM.style.background='transparent';btnM.style.color='var(--text-muted)';btnM.style.borderColor='transparent';desc.textContent='تحديث: يحذف الجرد القديم بالكامل ويستبدله بالجديد';}
-        else{btnM.style.background=on;btnM.style.color='var(--accent)';btnM.style.borderColor='rgba(0,212,170,0.3)';btnU.style.background='transparent';btnU.style.color='var(--text-muted)';btnU.style.borderColor='transparent';desc.textContent='دمج: يضيف الجرد الجديد فوق الموجود دون حذف';}
+        const on = 'linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
+        const btnU = document.getElementById('invModeUpdate'), btnM = document.getElementById('invModeMerge');
+        const desc = document.getElementById('invModeDescText');
+        if (mode === 'replace') {
+            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(0,212,170,0.3)';
+            btnM.style.background='transparent'; btnM.style.color='var(--text-muted)'; btnM.style.borderColor='transparent';
+            desc.textContent='تحديث: يحذف الجرد القديم بالكامل ويستبدله بالجديد';
+        } else {
+            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(0,212,170,0.3)';
+            btnU.style.background='transparent'; btnU.style.color='var(--text-muted)'; btnU.style.borderColor='transparent';
+            desc.textContent='دمج: يضيف الجرد الجديد فوق الموجود دون حذف';
+        }
     }
     document.getElementById('invModeUpdate').onclick = () => setInvMode('replace');
     document.getElementById('invModeMerge').onclick  = () => setInvMode('merge');
     document.getElementById('invImportFile').addEventListener('change', e => {
-        const btn=document.getElementById('invImportFileBtn');
-        if(btn && e.target.files[0]) btn.innerHTML=`<i class="fas fa-check-circle" style="color:var(--accent);margin-left:6px;"></i> ${e.target.files[0].name}`;
+        const btn = document.getElementById('invImportFileBtn');
+        if (btn && e.target.files[0]) btn.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent); margin-left:6px;"></i> ${e.target.files[0].name}`;
     });
     document.getElementById('invImportRunBtn').onclick = () => {
-        if(invUploadMode==='replace'){if(confirm('سيُمسح الجرد الحالي بالكامل ويُستبدل. متأكد؟'))importInventory('replace');}
+        if (invUploadMode === 'replace') { if (confirm('سيُمسح الجرد الحالي بالكامل ويُستبدل. متأكد؟')) importInventory('replace'); }
         else importInventory('merge');
     };
 
@@ -2357,11 +2471,18 @@
     let stockUploadMode = 'replace';
     function setStockMode(mode) {
         stockUploadMode = mode;
-        const on='linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
-        const btnU=document.getElementById('stockModeUpdate'), btnM=document.getElementById('stockModeMerge');
-        const desc=document.getElementById('stockModeDescText');
-        if(mode==='replace'){btnU.style.background=on;btnU.style.color='var(--accent)';btnU.style.borderColor='rgba(0,212,170,0.3)';btnM.style.background='transparent';btnM.style.color='var(--text-muted)';btnM.style.borderColor='transparent';desc.textContent='تحديث: يحذف بيانات المرجع القديمة ويستبدلها بالجديدة';}
-        else{btnM.style.background=on;btnM.style.color='var(--accent)';btnM.style.borderColor='rgba(0,212,170,0.3)';btnU.style.background='transparent';btnU.style.color='var(--text-muted)';btnU.style.borderColor='transparent';desc.textContent='دمج: يضيف بيانات المرجع الجديدة فوق الموجودة دون حذف';}
+        const on = 'linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
+        const btnU = document.getElementById('stockModeUpdate'), btnM = document.getElementById('stockModeMerge');
+        const desc = document.getElementById('stockModeDescText');
+        if (mode === 'replace') {
+            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(0,212,170,0.3)';
+            btnM.style.background='transparent'; btnM.style.color='var(--text-muted)'; btnM.style.borderColor='transparent';
+            desc.textContent='تحديث: يحذف بيانات المرجع القديمة ويستبدلها بالجديدة';
+        } else {
+            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(0,212,170,0.3)';
+            btnU.style.background='transparent'; btnU.style.color='var(--text-muted)'; btnU.style.borderColor='transparent';
+            desc.textContent='دمج: يضيف بيانات المرجع الجديدة فوق الموجودة دون حذف';
+        }
     }
     document.getElementById('stockModeUpdate').onclick = () => setStockMode('replace');
     document.getElementById('stockModeMerge').onclick  = () => setStockMode('merge');
@@ -2370,14 +2491,27 @@
     let dbUploadMode = 'update';
     function setDbMode(mode) {
         dbUploadMode = mode;
-        const on='linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
-        const btnU=document.getElementById('dbModeUpdate'), btnM=document.getElementById('dbModeMerge');
-        const desc=document.getElementById('dbModeDescText');
-        if(mode==='update'){btnU.style.background=on;btnU.style.color='var(--accent)';btnU.style.borderColor='rgba(0,212,170,0.3)';btnM.style.background='transparent';btnM.style.color='var(--text-muted)';btnM.style.borderColor='transparent';desc.textContent='تحديث: يحذف المنتجات القديمة ويستبدلها بالجديدة';}
-        else{btnM.style.background=on;btnM.style.color='var(--accent)';btnM.style.borderColor='rgba(0,212,170,0.3)';btnU.style.background='transparent';btnU.style.color='var(--text-muted)';btnU.style.borderColor='transparent';desc.textContent='دمج: يضيف المنتجات الجديدة بجانب القديمة دون حذف';}
+        const on = 'linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
+        const btnU = document.getElementById('dbModeUpdate'), btnM = document.getElementById('dbModeMerge');
+        const desc = document.getElementById('dbModeDescText');
+        if (mode === 'update') {
+            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(0,212,170,0.3)';
+            btnM.style.background='transparent'; btnM.style.color='var(--text-muted)'; btnM.style.borderColor='transparent';
+            desc.textContent='تحديث: يحذف المنتجات القديمة ويستبدلها بالجديدة';
+        } else {
+            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(0,212,170,0.3)';
+            btnU.style.background='transparent'; btnU.style.color='var(--text-muted)'; btnU.style.borderColor='transparent';
+            desc.textContent='دمج: يضيف المنتجات الجديدة بجانب القديمة دون حذف';
+        }
     }
     document.getElementById('dbModeUpdate').onclick = () => setDbMode('update');
     document.getElementById('dbModeMerge').onclick  = () => setDbMode('merge');
+
+    // تحديث اسم الملف في الجرد عند اختياره
+    document.getElementById('invImportFile').addEventListener('change', e => {
+        const btn = document.querySelector('button[onclick*="invImportFile"]');
+        if (btn && e.target.files[0]) btn.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent); margin-left:6px;"></i> ${e.target.files[0].name}`;
+    });
     document.getElementById('clearProductsBtn').onclick = () => {
         if(confirm("مسح كل المنتجات؟")){
             const tx1=db.transaction("products","readwrite"); tx1.objectStore("products").clear();
@@ -2478,18 +2612,18 @@
             }
         );
     }
-    // (invImportRunBtn handler defined above)
+    // (invImportRunBtn handler defined above with mode logic)
 
     document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', function() {
         let target = this.getAttribute('data-tab');
-        // أغلق الكاميرا عند الخروج من تبويب المسح
+        // أغلق الكاميرا إذا انتقلنا بعيداً عن تبويب المسح
         if (target !== 'tab-scan' && html5QrScanner) {
             html5QrScanner.stop().catch(() => {});
             html5QrScanner = null;
-            const startBtn = document.getElementById('startScanBtn');
-            const stopBtn  = document.getElementById('stopScanBtn');
-            if (startBtn) startBtn.style.display = '';
-            if (stopBtn)  stopBtn.style.display  = 'none';
+            scanningActive = false;
+            const scanLine = document.getElementById('scanLine');
+            if (scanLine) scanLine.style.display = 'none';
+            setScanStatus('idle', 'اضغط فتح لبدء المسح');
         }
         document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
         this.classList.add('active');
@@ -2510,6 +2644,7 @@
                 const sl = db.createObjectStore("scanLog", { keyPath: "id", autoIncrement: true });
                 sl.createIndex("by_time", "timestamp");
             }
+            if (!db.objectStoreNames.contains("settings")) db.createObjectStore("settings", { keyPath: "k" });
         };
         req.onsuccess = (e) => { db = e.target.result; updateAllUI(); listCameras(); };
         req.onerror = (e) => console.error(e);
