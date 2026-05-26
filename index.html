@@ -413,10 +413,20 @@
         /* ── TABLES ── */
         .data-wrapper {
             overflow-x: auto;
+            overflow-y: auto;
+            max-height: 420px;
             border-radius: 14px;
             border: 1px solid var(--border);
             background: var(--surface2);
             margin-top: 12px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--surface3) transparent;
+        }
+        .data-wrapper .data-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--surface3);
         }
 
         .data-table {
@@ -792,26 +802,33 @@
     <div id="tab-inv" class="panel"><div class="card">
 
         <!-- استيراد الجرد -->
-        <div style="margin-bottom:14px; padding:14px; border-radius:14px; background:var(--surface2); border:1px solid var(--border);">
+        <div style="margin-bottom:14px;">
             <div style="font-size:0.82rem; font-weight:700; color:var(--text-muted); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
                 <i class="fas fa-file-import" style="color:var(--accent);"></i> استيراد الجرد من Excel
             </div>
             <input type="file" id="invImportFile" style="display:none;">
-            <button onclick="document.getElementById('invImportFile').click()"
+            <button id="invImportFileBtn" onclick="document.getElementById('invImportFile').click()"
                 style="display:block; width:100%; padding:12px; border-radius:10px;
                     border:1px dashed rgba(0,212,170,0.3); text-align:center; cursor:pointer;
                     color:var(--text-muted); font-size:0.82rem; margin-bottom:10px;
                     background:transparent; font-family:'Cairo',sans-serif; transition:all 0.2s;">
                 <i class="fas fa-upload" style="color:var(--accent); margin-left:6px;"></i> اختر ملف Excel للجرد
             </button>
-            <div style="display:flex; gap:8px;">
-                <button id="invImportReplaceBtn" class="btn-primary" style="flex:1; gap:6px; font-size:0.8rem; padding:10px;">
-                    <i class="fas fa-sync-alt"></i> تحديث (يمسح الجرد القديم)
+            <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
+                <button id="invModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12)); color:var(--accent); border:1px solid rgba(0,212,170,0.3); transition:all 0.18s;">
+                    <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
                 </button>
-                <button id="invImportMergeBtn" class="btn-secondary" style="flex:1; gap:6px; font-size:0.8rem; padding:10px;">
-                    <i class="fas fa-code-merge"></i> دمج (يضيف للموجود)
+                <button id="invModeMerge" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:transparent; color:var(--text-muted); border:1px solid transparent; transition:all 0.18s;">
+                    <i class="fas fa-layer-group" style="margin-left:5px;"></i> دمج
                 </button>
             </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(0,212,170,0.06); border:1px solid rgba(0,212,170,0.15);">
+                <i class="fas fa-info-circle" style="color:var(--accent); margin-left:5px;"></i>
+                <span id="invModeDescText">تحديث: يحذف الجرد القديم بالكامل ويستبدله بالجديد</span>
+            </div>
+            <button id="invImportRunBtn" class="btn-primary" style="gap:6px;">
+                <i class="fas fa-file-import"></i> استيراد الجرد
+            </button>
         </div>
 
         <input type="text" id="searchInventory" class="search-input" placeholder="🔍 بحث في سجل الجرد">
@@ -824,10 +841,19 @@
         </div>
 
         <div class="file-label" id="stockUploadArea"><i class="fas fa-upload"></i> اختر ملف Excel <input type="file" id="stockFileInput" style="display:none;"></div>
-        <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <select id="stockModeSelect" style="flex:1; padding:10px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'Cairo',sans-serif;"><option value="replace">استبدال</option><option value="merge">دمج</option></select>
-            <button id="processStockBtn" class="btn-primary" style="width:auto; padding:10px 18px;"><i class="fas fa-play"></i> معالجة</button>
+        <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
+            <button id="stockModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12)); color:var(--accent); border:1px solid rgba(0,212,170,0.3); transition:all 0.18s;">
+                <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
+            </button>
+            <button id="stockModeMerge" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:transparent; color:var(--text-muted); border:1px solid transparent; transition:all 0.18s;">
+                <i class="fas fa-layer-group" style="margin-left:5px;"></i> دمج
+            </button>
         </div>
+        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(0,212,170,0.06); border:1px solid rgba(0,212,170,0.15);">
+            <i class="fas fa-info-circle" style="color:var(--accent); margin-left:5px;"></i>
+            <span id="stockModeDescText">تحديث: يحذف بيانات المرجع القديمة ويستبدلها بالجديدة</span>
+        </div>
+        <button id="processStockBtn" class="btn-primary" style="margin-bottom:12px;"><i class="fas fa-play"></i> معالجة ورفع المرجع</button>
         <button id="exportStockBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> تصدير المرجع</button>
         <div id="stockTableContainer" class="data-wrapper"></div>
     </div></div>
@@ -994,9 +1020,20 @@
     <div id="tab-products" class="panel"><div class="card">
 
         <div class="file-label" id="dbUploadArea"><i class="fas fa-upload"></i> رفع ملف المنتجات <input type="file" id="dbFileInput" style="display:none;" multiple></div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-            <button id="processDbBtn" class="btn-primary">معالجة عادي</button>
-            <button id="processDbNoFilterBtn" class="btn-secondary">بدون فلتر</button>
+        <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
+            <button id="dbModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12)); color:var(--accent); border:1px solid rgba(0,212,170,0.3); transition:all 0.18s;">
+                <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
+            </button>
+            <button id="dbModeMerge" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:transparent; color:var(--text-muted); border:1px solid transparent; transition:all 0.18s;">
+                <i class="fas fa-layer-group" style="margin-left:5px;"></i> دمج
+            </button>
+        </div>
+        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(0,212,170,0.06); border:1px solid rgba(0,212,170,0.15);">
+            <i class="fas fa-info-circle" style="color:var(--accent); margin-left:5px;"></i>
+            <span id="dbModeDescText">تحديث: يحذف المنتجات القديمة ويستبدلها بالجديدة</span>
+        </div>
+        <div style="margin-bottom:10px;">
+            <button id="processDbBtn" class="btn-primary">معالجة ورفع المنتجات</button>
         </div>
         <button id="exportProductsBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> تصدير المنتجات</button>
         <div id="productsTableContainer" class="data-wrapper"></div>
@@ -1250,64 +1287,61 @@
 
     let pendingProductFiles = [];
     document.getElementById('dbFileInput').addEventListener('change', (e) => { pendingProductFiles = Array.from(e.target.files); });
-    async function processProductFiles() {
+    document.getElementById('processDbBtn').onclick = async () => {
         if (!pendingProductFiles.length) { showToast("اختر ملفات أولاً", true); return; }
+        if (dbUploadMode === 'update') { if (!confirm('سيتم حذف جميع المنتجات الحالية واستبدالها. متأكد؟')) return; }
         showColMapModal(
             'تعيين أعمدة المنتجات',
             pendingProductFiles.map(f => f.name).join(', '),
             pendingProductFiles[0],
             [
-                { id: 'barcode', label: 'الباركود',   icon: 'fas fa-barcode',     color: 'var(--accent2)',    required: false, keywords: ['باركود','barcode','بار','كود'] },
-                { id: 'itemno',  label: 'رقم الصنف',  icon: 'fas fa-hashtag',     color: 'var(--accent)',     required: false, keywords: ['رقم الصنف','رقم','item','صنف'] },
-                { id: 'name',    label: 'الاسم',       icon: 'fas fa-tag',         color: 'var(--text-muted)', required: false, keywords: ['اسم','name','وصف','desc','المادة'] },
+                { id: 'barcode', label: 'الباركود',  icon: 'fas fa-barcode',     color: 'var(--accent2)',    required: false, keywords: ['باركود','barcode','بار','كود'] },
+                { id: 'itemno',  label: 'رقم الصنف', icon: 'fas fa-hashtag',     color: 'var(--accent)',     required: false, keywords: ['رقم الصنف','رقم','item','صنف'] },
+                { id: 'name',    label: 'الاسم',      icon: 'fas fa-tag',         color: 'var(--text-muted)', required: false, keywords: ['اسم','name','وصف','desc','المادة'] },
             ],
             async function(colMap) {
-                if (colMap.barcode === null && colMap.itemno === null) {
-                    showToast('يرجى تحديد عمود الباركود أو رقم الصنف على الأقل', true); return;
-                }
+                if (colMap.barcode === null && colMap.itemno === null) { showToast('يرجى تحديد عمود الباركود أو رقم الصنف على الأقل', true); return; }
                 showProgress('رفع المنتجات...', 'جاري قراءة الملفات', 5);
-                const sourceId = Date.now();
-                let totalAdded = 0;
+                if (dbUploadMode === 'update') {
+                    updateProgress(8, 'مسح المنتجات القديمة...');
+                    const c1 = db.transaction("products","readwrite"); c1.objectStore("products").clear(); await new Promise(r=>{ c1.oncomplete=r; });
+                    const c2 = db.transaction("uploadedFiles","readwrite"); c2.objectStore("uploadedFiles").clear(); await new Promise(r=>{ c2.oncomplete=r; });
+                }
+                const sourceId = Date.now(); let totalAdded = 0;
                 for (let fi = 0; fi < pendingProductFiles.length; fi++) {
                     const file = pendingProductFiles[fi];
                     try {
-                        updateProgress(5 + (fi / pendingProductFiles.length) * 20, `قراءة: ${file.name}`);
+                        updateProgress(10 + (fi / pendingProductFiles.length) * 20, `قراءة: ${file.name}`);
                         const rows = await readExcelFile(file);
                         if (!rows || rows.length < 1) throw new Error("لا توجد بيانات");
                         const dataRows = colMap.noHeader ? rows : rows.slice(1);
                         const BATCH_SIZE = 150;
                         for (let start = 0; start < dataRows.length; start += BATCH_SIZE) {
-                            const pct = 25 + ((fi / pendingProductFiles.length) + ((start / dataRows.length) / pendingProductFiles.length)) * 70;
+                            const pct = 30 + ((fi / pendingProductFiles.length) + ((start / dataRows.length) / pendingProductFiles.length)) * 65;
                             updateProgress(pct, `معالجة ${Math.min(start + BATCH_SIZE, dataRows.length)} / ${dataRows.length}`);
                             const batch = dataRows.slice(start, Math.min(start + BATCH_SIZE, dataRows.length));
-                            const tx = db.transaction(["products"], "readwrite");
-                            const store = tx.objectStore("products");
+                            const tx = db.transaction(["products"], "readwrite"); const store = tx.objectStore("products");
                             for (const row of batch) {
                                 if (!Array.isArray(row)) continue;
                                 const barcode = colMap.barcode !== null ? String(row[colMap.barcode]||'').trim().replace(/\.0+$/,'') : '';
                                 const itemno  = colMap.itemno  !== null ? String(row[colMap.itemno] ||'').trim().replace(/\.0+$/,'') : '';
                                 const name    = colMap.name    !== null ? String(row[colMap.name]   ||'').trim() : '';
                                 if (!barcode && !itemno) continue;
-                                store.add({ id: generateUniqueId(), barcode, item_no: itemno, name: name || 'بدون اسم', sourceId });
-                                totalAdded++;
+                                store.add({ id: generateUniqueId(), barcode, item_no: itemno, name: name || 'بدون اسم', sourceId }); totalAdded++;
                             }
                             await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); });
                             await new Promise(r => setTimeout(r, 10));
                         }
                     } catch (err) { hideProgress(); showToast(`خطأ في ${file.name}: ${err.message}`, true); return; }
                 }
-                const ftx = db.transaction("uploadedFiles", "readwrite");
-                ftx.objectStore("uploadedFiles").add({ names: pendingProductFiles.map(f => f.name).join(', '), count: totalAdded, sourceId });
-                await new Promise(r => { ftx.oncomplete = r; });
-                hideProgress();
-                showToast(`✅ تم رفع ${totalAdded} منتج`);
-                pendingProductFiles = [];
-                updateAllUI();
+                const ftx = db.transaction("uploadedFiles","readwrite");
+                ftx.objectStore("uploadedFiles").add({ names: pendingProductFiles.map(f=>f.name).join(', '), count: totalAdded, sourceId });
+                await new Promise(r=>{ ftx.oncomplete=r; });
+                hideProgress(); showToast(`✅ تم ${dbUploadMode==='update'?'تحديث':'دمج'} ${totalAdded} منتج`);
+                pendingProductFiles = []; updateAllUI();
             }
         );
-    }
-    document.getElementById('processDbBtn').onclick = processProductFiles;
-    document.getElementById('processDbNoFilterBtn').onclick = processProductFiles;
+    };
 
     let pendingStockFiles = [];
     document.getElementById('stockFileInput').addEventListener('change', (e) => { pendingStockFiles = Array.from(e.target.files); });
@@ -1394,7 +1428,7 @@
             ],
             async function(colMap) {
                 showProgress('رفع المرجع...', 'جاري القراءة', 5);
-                const mode = document.getElementById('stockModeSelect').value;
+                const mode = stockUploadMode;
                 if (mode === 'replace') {
                     updateProgress(10, 'مسح البيانات القديمة...');
                     const clearTx = db.transaction("stock", "readwrite");
@@ -2299,12 +2333,79 @@
     };
     document.getElementById('stockUploadArea').addEventListener('click',()=>document.getElementById('stockFileInput').click());
     document.getElementById('dbUploadArea').addEventListener('click',()=>document.getElementById('dbFileInput').click());
-    // تحديث اسم الملف عند اختياره في الجرد
+
+    // ── وضع استيراد الجرد ──
+    let invUploadMode = 'replace';
+    function setInvMode(mode) {
+        invUploadMode = mode;
+        const on = 'linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
+        const btnU = document.getElementById('invModeUpdate'), btnM = document.getElementById('invModeMerge');
+        const desc = document.getElementById('invModeDescText');
+        if (mode === 'replace') {
+            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(0,212,170,0.3)';
+            btnM.style.background='transparent'; btnM.style.color='var(--text-muted)'; btnM.style.borderColor='transparent';
+            desc.textContent='تحديث: يحذف الجرد القديم بالكامل ويستبدله بالجديد';
+        } else {
+            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(0,212,170,0.3)';
+            btnU.style.background='transparent'; btnU.style.color='var(--text-muted)'; btnU.style.borderColor='transparent';
+            desc.textContent='دمج: يضيف الجرد الجديد فوق الموجود دون حذف';
+        }
+    }
+    document.getElementById('invModeUpdate').onclick = () => setInvMode('replace');
+    document.getElementById('invModeMerge').onclick  = () => setInvMode('merge');
+    document.getElementById('invImportFile').addEventListener('change', e => {
+        const btn = document.getElementById('invImportFileBtn');
+        if (btn && e.target.files[0]) btn.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent); margin-left:6px;"></i> ${e.target.files[0].name}`;
+    });
+    document.getElementById('invImportRunBtn').onclick = () => {
+        if (invUploadMode === 'replace') { if (confirm('سيُمسح الجرد الحالي بالكامل ويُستبدل. متأكد؟')) importInventory('replace'); }
+        else importInventory('merge');
+    };
+
+    // ── وضع رفع المرجع ──
+    let stockUploadMode = 'replace';
+    function setStockMode(mode) {
+        stockUploadMode = mode;
+        const on = 'linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
+        const btnU = document.getElementById('stockModeUpdate'), btnM = document.getElementById('stockModeMerge');
+        const desc = document.getElementById('stockModeDescText');
+        if (mode === 'replace') {
+            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(0,212,170,0.3)';
+            btnM.style.background='transparent'; btnM.style.color='var(--text-muted)'; btnM.style.borderColor='transparent';
+            desc.textContent='تحديث: يحذف بيانات المرجع القديمة ويستبدلها بالجديدة';
+        } else {
+            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(0,212,170,0.3)';
+            btnU.style.background='transparent'; btnU.style.color='var(--text-muted)'; btnU.style.borderColor='transparent';
+            desc.textContent='دمج: يضيف بيانات المرجع الجديدة فوق الموجودة دون حذف';
+        }
+    }
+    document.getElementById('stockModeUpdate').onclick = () => setStockMode('replace');
+    document.getElementById('stockModeMerge').onclick  = () => setStockMode('merge');
+
+    // ── وضع رفع المنتجات ──
+    let dbUploadMode = 'update';
+    function setDbMode(mode) {
+        dbUploadMode = mode;
+        const on = 'linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
+        const btnU = document.getElementById('dbModeUpdate'), btnM = document.getElementById('dbModeMerge');
+        const desc = document.getElementById('dbModeDescText');
+        if (mode === 'update') {
+            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(0,212,170,0.3)';
+            btnM.style.background='transparent'; btnM.style.color='var(--text-muted)'; btnM.style.borderColor='transparent';
+            desc.textContent='تحديث: يحذف المنتجات القديمة ويستبدلها بالجديدة';
+        } else {
+            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(0,212,170,0.3)';
+            btnU.style.background='transparent'; btnU.style.color='var(--text-muted)'; btnU.style.borderColor='transparent';
+            desc.textContent='دمج: يضيف المنتجات الجديدة بجانب القديمة دون حذف';
+        }
+    }
+    document.getElementById('dbModeUpdate').onclick = () => setDbMode('update');
+    document.getElementById('dbModeMerge').onclick  = () => setDbMode('merge');
+
+    // تحديث اسم الملف في الجرد عند اختياره
     document.getElementById('invImportFile').addEventListener('change', e => {
         const btn = document.querySelector('button[onclick*="invImportFile"]');
-        if (btn && e.target.files[0]) {
-            btn.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent); margin-left:6px;"></i> ${e.target.files[0].name}`;
-        }
+        if (btn && e.target.files[0]) btn.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent); margin-left:6px;"></i> ${e.target.files[0].name}`;
     });
     document.getElementById('clearProductsBtn').onclick = () => {
         if(confirm("مسح كل المنتجات؟")){
@@ -2406,8 +2507,7 @@
             }
         );
     }
-    document.getElementById('invImportReplaceBtn').onclick = () => { if (confirm('سيُمسح الجرد الحالي بالكامل ويُستبدل. متأكد؟')) importInventory('replace'); };
-    document.getElementById('invImportMergeBtn').onclick   = () => importInventory('merge');
+    // (invImportRunBtn handler defined above with mode logic)
 
     document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', function() {
         let target = this.getAttribute('data-tab');
