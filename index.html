@@ -15,60 +15,56 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0f14;
-            --surface: #13161e;
-            --surface2: #1a1e2a;
-            --surface3: #222736;
-            --border: rgba(255,255,255,0.07);
-            --border-glow: rgba(0,212,170,0.3);
-            --accent: #00d4aa;
-            --accent2: #0096ff;
-            --accent3: #ff6b6b;
-            --accent-glow: rgba(0,212,170,0.15);
-            --text: #e8edf5;
-            --text-muted: #6b7a9a;
-            --text-dim: #3d4a63;
-            --gold: #ffd166;
-            --positive: #00d4aa;
-            --negative: #ff6b6b;
-            --neutral: #0096ff;
-            --shadow: rgba(0,0,0,0.35);
+            --bg:          #0f0814;
+            --surface:     #0d1520;
+            --surface2:    #112030;
+            --surface3:    #162a3e;
+            --border:      rgba(255,255,255,0.07);
+            --border-glow: rgba(6,182,212,0.3);
+            --accent:      #ec4899;
+            --accent2:     #f43f5e;
+            --accent3:     #f43f5e;
+            --accent-glow: rgba(236,72,153,0.15);
+            --text:        #e8edf5;
+            --text-muted:  #6b7a9a;
+            --text-dim:    #3d4a63;
+            --gold:        #fbbf24;
+            --positive:    #34d399;
+            --negative:    #fb7185;
+            --neutral:     #60a5fa;
+            --shadow:      rgba(0,0,0,0.35);
         }
 
         /* ── الثيم الفاتح ── */
         body.light-theme {
-            --bg: #f0f4f8;
-            --surface: #ffffff;
-            --surface2: #f4f7fb;
-            --surface3: #e8eef5;
-            --border: rgba(0,0,0,0.08);
-            --border-glow: rgba(0,150,120,0.25);
-            --accent: #00a885;
-            --accent2: #0070cc;
-            --accent3: #e05555;
-            --accent-glow: rgba(0,168,133,0.12);
-            --text: #1a202c;
-            --text-muted: #4a5568;
-            --text-dim: #a0aec0;
-            --gold: #d4900a;
-            --positive: #00a885;
-            --negative: #e05555;
-            --neutral: #0070cc;
-            --shadow: rgba(0,0,0,0.1);
+            --bg:        #ffffff;
+            --surface:   #ffffff;
+            --surface2:  #f9f9f9;
+            --surface3:  #f3f3f3;
+            --border:      rgba(0,0,0,0.11);
+            --accent:      #be185d;
+            --accent2:     #9d174d;
+            --accent3:     #e05555;
+            --text:        #1a1a2e;
+            --text-muted:  #6b7280;
+            --text-dim:    #f9a8d4;
+            --gold:        #d4900a;
+            --positive:    #059669;
+            --negative:    #dc2626;
+            --neutral:     #60a5fa;
+            --shadow:      rgba(0,0,0,0.07);
         }
-        body.light-theme::before {
-            background-image:
-                linear-gradient(rgba(0,168,133,0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,168,133,0.04) 1px, transparent 1px);
-        }
-        body.light-theme::after {
-            background: radial-gradient(circle, rgba(0,168,133,0.05) 0%, transparent 65%);
-        }
+        body.light-theme::before, body.light-theme::after { display: none; }
         body.light-theme .header {
-            background: linear-gradient(135deg,#0a4d3a 0%,#0d6b50 50%,#0a4d3a 100%) !important;
+            background: linear-gradient(145deg, #be185d 0%, #ec4899 40%, #f43f5e 70%, #be185d 100%) !important;
+            border: none !important;
+            box-shadow: 0 8px 28px rgba(236,72,153,0.35), 0 16px 40px rgba(0,0,0,0.1) !important;
         }
-        body.light-theme .data-table th { background: #edf2f7; color: #4a5568; }
-        body.light-theme .data-table tbody tr:hover { background: rgba(0,0,0,0.02); }
+        body.light-theme .data-table th { background: #ece9ff; color: #6b7280; }
+        body.light-theme .data-table tbody tr:hover { background: rgba(236,72,153,0.025); }
+        body.light-theme .card { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+        body.light-theme .stat-card { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        body.light-theme .tab-btn { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 
         /* زر تبديل الثيم */
         #themeToggle {
@@ -93,30 +89,10 @@
             overflow-x: hidden;
         }
 
-        /* Background grid pattern */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(0,212,170,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,212,170,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
-        }
+        /* No background pattern — pure white */
+        body::before { display: none; }
 
-        body::after {
-            content: '';
-            position: fixed;
-            top: -30%;
-            right: -20%;
-            width: 60vw;
-            height: 60vw;
-            background: radial-gradient(circle, rgba(0,212,170,0.06) 0%, transparent 65%);
-            pointer-events: none;
-            z-index: 0;
-        }
+        body::after { display: none; }
 
         .app-container {
             max-width: 580px;
@@ -127,23 +103,38 @@
 
         /* ── HEADER ── */
         .header {
-            background: linear-gradient(135deg, #0d1f2d 0%, #0a1628 50%, #0d1f2d 100%);
-            border-radius: 24px;
-            padding: 22px 20px 18px;
+            background: linear-gradient(145deg, #be185d 0%, #ec4899 40%, #f43f5e 70%, #be185d 100%);
+            border-radius: 28px;
+            padding: 24px 20px 20px;
             margin-bottom: 18px;
             color: white;
-            border: 1px solid rgba(0,212,170,0.2);
-            box-shadow: 0 0 40px rgba(0,212,170,0.08), 0 20px 40px rgba(0,0,0,0.4);
+            border: none;
+            box-shadow:
+                0 8px 32px rgba(236,72,153,0.4),
+                0 20px 50px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.25),
+                inset 0 -1px 0 rgba(0,0,0,0.15);
             position: relative;
             overflow: hidden;
         }
 
+        /* شعاع ضوء داخلي */
         .header::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+            top: -40%; left: 20%; right: 20%;
+            height: 80%;
+            background: radial-gradient(ellipse, rgba(255,255,255,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* خط لمعة سفلي */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
         }
 
         .header h1 {
@@ -155,35 +146,42 @@
             font-weight: 900;
             letter-spacing: -0.5px;
             font-family: 'Tajawal', sans-serif;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .header h1 i {
-            color: var(--accent);
-            filter: drop-shadow(0 0 8px var(--accent));
+            color: #fde68a;
+            filter: drop-shadow(0 0 10px rgba(253,230,138,0.6));
         }
 
         .header-subtitle {
             text-align: center;
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.4);
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.55);
             margin-top: 4px;
-            letter-spacing: 2px;
+            letter-spacing: 4px;
             text-transform: uppercase;
         }
 
-        /* Header buttons */
+        /* Header buttons — شفافة بيضاء */
         .header > div button {
-            background: rgba(0,212,170,0.1) !important;
-            border: 1px solid rgba(0,212,170,0.25) !important;
-            color: var(--accent) !important;
+            background: rgba(255,255,255,0.18) !important;
+            border: 1px solid rgba(255,255,255,0.28) !important;
+            color: rgba(255,255,255,0.95) !important;
             font-family: 'Cairo', sans-serif;
             font-size: 0.78rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.2s ease;
+            backdrop-filter: blur(12px);
+            transition: all 0.2s cubic-bezier(.34,1.4,.64,1) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
         }
         .header > div button:hover {
-            background: rgba(0,212,170,0.2) !important;
-            box-shadow: 0 0 16px rgba(0,212,170,0.2);
+            background: rgba(255,255,255,0.28) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2) !important;
+        }
+        .header > div button:active {
+            transform: translateY(1px) scale(0.97) !important;
         }
 
         /* ── STATS ── */
@@ -196,215 +194,215 @@
 
         .stat-card {
             background: var(--surface);
-            border-radius: 16px;
-            padding: 16px 8px 12px;
+            border-radius: 20px;
+            padding: 18px 8px 14px;
             text-align: center;
-            border: 1px solid var(--border);
+            border: 2px solid rgba(0,0,0,0.08);
             position: relative;
             overflow: hidden;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: transform 0.25s cubic-bezier(.34,1.4,.64,1), border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
         }
 
         .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(0,212,170,0.3);
+            transform: translateY(-3px);
+            border-color: rgba(236,72,153,0.25);
+            box-shadow: 0 8px 28px rgba(236,72,153,0.08);
         }
 
         .stat-card::after {
             content: '';
             position: absolute;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0; left: 15%; right: 15%;
             height: 2px;
-            background: linear-gradient(90deg, var(--accent2), var(--accent));
+            background: linear-gradient(90deg, #ec4899, #f43f5e, #ec4899);
+            border-radius: 2px;
             opacity: 0.5;
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 2.1rem;
             font-weight: 900;
-            color: var(--accent);
+            color: #ec4899;
             font-family: 'Tajawal', sans-serif;
             line-height: 1;
-            text-shadow: 0 0 20px rgba(0,212,170,0.4);
+            text-shadow: 0 0 20px rgba(236,72,153,0.3);
         }
 
         .stat-label {
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             color: var(--text-muted);
             font-weight: 600;
-            margin-top: 5px;
-            letter-spacing: 0.5px;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
         }
 
-        /* ── TABS ── */
-        /* ══ TABS — Vertical icon pills ══ */
+        body.light-theme .stat-number { color: #be185d; text-shadow: none; }
+        body.light-theme .stat-card::after { background: linear-gradient(90deg, #ec4899, #f43f5e); opacity: 0.4; }
+
+        /* ── TABS — صف واحد قابل للتمرير ── */
         .tabs {
             display: flex;
+            flex-direction: row;
             gap: 8px;
             margin-bottom: 20px;
-            padding: 0;
-            background: none;
-            border: none;
-            justify-content: center;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
         }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tabs-row { display: contents; }
+        .tabs-row-2 .tab-btn { max-width: 70px; flex: 0 1 70px; }
 
         .tab-btn {
             flex: 1;
-            max-width: 72px;
-            background: var(--surface);
-            border: 1.5px solid var(--border);
-            border-radius: 20px;
-            padding: 14px 4px 10px;
+            max-width: 70px;
+            background: #fff;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: 22px;
+            padding: 12px 4px 10px;
             font-weight: 700;
-            font-size: 0.58rem;
+            font-size: 0.6rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-end;
-            gap: 0;
+            justify-content: center;
+            gap: 7px;
             cursor: pointer;
-            color: var(--text-muted);
+            color: #9ca3af;
             transition: all 0.3s cubic-bezier(.34,1.4,.64,1);
             font-family: 'Cairo', sans-serif;
             position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            overflow: visible;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             letter-spacing: 0.2px;
         }
 
-        /* Icon circle inside each tab */
+        /* الأيقونة — مربع ملون واضح */
         .tab-btn i {
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
-            margin-bottom: 8px;
-            background: var(--surface2);
+            font-size: 1.1rem;
+            background: #f3f4f6;
             transition: all 0.3s cubic-bezier(.34,1.4,.64,1);
-            border: 1.5px solid var(--border);
+            border: none;
             flex-shrink: 0;
+            color: #9ca3af;
         }
 
-        .tab-btn:hover {
-            border-color: rgba(255,255,255,0.12);
-            transform: translateY(-2px);
-        }
-        .tab-btn:hover i {
-            background: var(--surface3);
-            border-color: rgba(255,255,255,0.15);
+        /* النص */
+        .tab-btn span {
+            font-size: 0.6rem;
+            font-weight: 700;
+            line-height: 1;
         }
 
-        /* Active — each tab gets unique color */
-        .tab-btn.active {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 28px rgba(0,0,0,0.3);
-            border-color: transparent;
-        }
+        .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+        .tab-btn:hover i { background: #e5e7eb; color: #6b7280; }
 
-        /* scan = blue */
+        /* ── كل تبويب نشط بلونه ── */
+        /* scan = سماوي */
         .tab-btn.active[data-tab="tab-scan"] {
-            background: linear-gradient(160deg, #0f2a4a 0%, #1a3d66 100%);
-            border-color: rgba(56,189,248,0.35);
-            color: #7dd3fc;
-            box-shadow: 0 10px 28px rgba(56,189,248,0.2);
+            background: linear-gradient(160deg,#e0f7fa,#b2ebf2);
+            border-color: rgba(0,188,212,0.3);
+            color: #00838f;
+            box-shadow: 0 8px 24px rgba(0,188,212,0.2);
+            transform: translateY(-5px) scale(1.04);
         }
         .tab-btn.active[data-tab="tab-scan"] i {
-            background: linear-gradient(135deg,#1e6fa8,#38bdf8);
-            border-color: transparent;
+            background: linear-gradient(135deg,#00838f,#00bcd4);
             color: #fff;
-            box-shadow: 0 4px 16px rgba(56,189,248,0.4);
-        }
-
-        /* inv = emerald */
-        .tab-btn.active[data-tab="tab-inv"] {
-            background: linear-gradient(160deg, #0a2e1f 0%, #133d29 100%);
-            border-color: rgba(52,211,153,0.35);
-            color: #6ee7b7;
-            box-shadow: 0 10px 28px rgba(52,211,153,0.2);
-        }
-        .tab-btn.active[data-tab="tab-inv"] i {
-            background: linear-gradient(135deg,#065f40,#34d399);
-            border-color: transparent;
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(52,211,153,0.4);
-        }
-
-        /* stock = violet */
-        .tab-btn.active[data-tab="tab-stock"] {
-            background: linear-gradient(160deg, #1a0f38 0%, #261650 100%);
-            border-color: rgba(167,139,250,0.35);
-            color: #c4b5fd;
-            box-shadow: 0 10px 28px rgba(167,139,250,0.2);
-        }
-        .tab-btn.active[data-tab="tab-stock"] i {
-            background: linear-gradient(135deg,#5b21b6,#a78bfa);
-            border-color: transparent;
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(167,139,250,0.4);
-        }
-
-        /* cmp = amber */
-        .tab-btn.active[data-tab="tab-cmp"] {
-            background: linear-gradient(160deg, #2a1a05 0%, #3d2608 100%);
-            border-color: rgba(251,191,36,0.35);
-            color: #fde68a;
-            box-shadow: 0 10px 28px rgba(251,191,36,0.2);
-        }
-        .tab-btn.active[data-tab="tab-cmp"] i {
-            background: linear-gradient(135deg,#b45309,#fbbf24);
-            border-color: transparent;
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(251,191,36,0.4);
-        }
-
-        /* products = rose */
-        .tab-btn.active[data-tab="tab-products"] {
-            background: linear-gradient(160deg, #2a0a12 0%, #3d1020 100%);
-            border-color: rgba(251,113,133,0.35);
-            color: #fda4af;
-            box-shadow: 0 10px 28px rgba(251,113,133,0.2);
-        }
-        .tab-btn.active[data-tab="tab-products"] i {
-            background: linear-gradient(135deg,#be123c,#fb7185);
-            border-color: transparent;
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(251,113,133,0.4);
-        }
-
-        /* Icon bounce on activate */
-        .tab-btn.active i {
+            box-shadow: 0 4px 14px rgba(0,188,212,0.45);
             animation: iconBounce 0.4s cubic-bezier(.34,1.7,.64,1);
         }
+
+        /* inv = أخضر نعناعي */
+        .tab-btn.active[data-tab="tab-inv"] {
+            background: linear-gradient(160deg,#e8f5e9,#c8e6c9);
+            border-color: rgba(67,160,71,0.3);
+            color: #2e7d32;
+            box-shadow: 0 8px 24px rgba(67,160,71,0.2);
+            transform: translateY(-5px) scale(1.04);
+        }
+        .tab-btn.active[data-tab="tab-inv"] i {
+            background: linear-gradient(135deg,#2e7d32,#43a047);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(67,160,71,0.45);
+            animation: iconBounce 0.4s cubic-bezier(.34,1.7,.64,1);
+        }
+
+        /* stock = أزرق */
+        .tab-btn.active[data-tab="tab-stock"] {
+            background: linear-gradient(160deg,#e3f2fd,#bbdefb);
+            border-color: rgba(33,150,243,0.3);
+            color: #1565c0;
+            box-shadow: 0 8px 24px rgba(33,150,243,0.2);
+            transform: translateY(-5px) scale(1.04);
+        }
+        .tab-btn.active[data-tab="tab-stock"] i {
+            background: linear-gradient(135deg,#1565c0,#2196f3);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(33,150,243,0.45);
+            animation: iconBounce 0.4s cubic-bezier(.34,1.7,.64,1);
+        }
+
+        /* cmp = برتقالي عنبري */
+        .tab-btn.active[data-tab="tab-cmp"] {
+            background: linear-gradient(160deg,#fff8e1,#ffecb3);
+            border-color: rgba(255,160,0,0.3);
+            color: #e65100;
+            box-shadow: 0 8px 24px rgba(255,160,0,0.2);
+            transform: translateY(-5px) scale(1.04);
+        }
+        .tab-btn.active[data-tab="tab-cmp"] i {
+            background: linear-gradient(135deg,#e65100,#ffa000);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(255,160,0,0.45);
+            animation: iconBounce 0.4s cubic-bezier(.34,1.7,.64,1);
+        }
+
+        /* products = وردي 🌸 */
+        .tab-btn.active[data-tab="tab-products"] {
+            background: linear-gradient(160deg,#fce4ec,#f8bbd0);
+            border-color: rgba(233,30,99,0.3);
+            color: #880e4f;
+            box-shadow: 0 8px 24px rgba(233,30,99,0.2);
+            transform: translateY(-5px) scale(1.04);
+        }
+        .tab-btn.active[data-tab="tab-products"] i {
+            background: linear-gradient(135deg,#880e4f,#e91e63);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(233,30,99,0.45);
+            animation: iconBounce 0.4s cubic-bezier(.34,1.7,.64,1);
+        }
+
         @keyframes iconBounce {
             0%   { transform: scale(0.6) rotate(-10deg); }
             60%  { transform: scale(1.15) rotate(4deg); }
             100% { transform: scale(1) rotate(0deg); }
         }
 
-        /* Light theme tab overrides */
-        body.light-theme .tab-btn {
-            background: #fff;
-            border-color: rgba(0,0,0,0.08);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        /* Dark theme override */
+        body:not(.light-theme) .tab-btn {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text-muted);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
         }
-        body.light-theme .tab-btn i {
-            background: #f1f5f9;
-            border-color: rgba(0,0,0,0.06);
+        body:not(.light-theme) .tab-btn i {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
         }
-        body.light-theme .tab-btn.active[data-tab="tab-scan"]     { background: linear-gradient(160deg,#e0f2fe,#bae6fd); }
-        body.light-theme .tab-btn.active[data-tab="tab-inv"]      { background: linear-gradient(160deg,#d1fae5,#a7f3d0); }
-        body.light-theme .tab-btn.active[data-tab="tab-stock"]    { background: linear-gradient(160deg,#ede9fe,#ddd6fe); }
-        body.light-theme .tab-btn.active[data-tab="tab-cmp"]      { background: linear-gradient(160deg,#fef3c7,#fde68a); }
-        body.light-theme .tab-btn.active[data-tab="tab-products"] { background: linear-gradient(160deg,#ffe4e6,#fecdd3); }
-
-        @keyframes iconBounce {
-            0%   { transform: scale(0.6) rotate(-10deg); }
-            60%  { transform: scale(1.15) rotate(4deg); }
-            100% { transform: scale(1) rotate(0deg); }
-        }
+        body:not(.light-theme) .tab-btn.active[data-tab="tab-scan"]     { background: linear-gradient(160deg,#0c3040,#0e4f63); color:#67e8f9; }
+        body:not(.light-theme) .tab-btn.active[data-tab="tab-inv"]      { background: linear-gradient(160deg,#0a2e1a,#133d24); color:#6ee7b7; }
+        body:not(.light-theme) .tab-btn.active[data-tab="tab-stock"]    { background: linear-gradient(160deg,#0a1f40,#0e2d5e); color:#93c5fd; }
+        body:not(.light-theme) .tab-btn.active[data-tab="tab-cmp"]      { background: linear-gradient(160deg,#2a1800,#3d2400); color:#fde68a; }
+        body:not(.light-theme) .tab-btn.active[data-tab="tab-products"] { background: linear-gradient(160deg,#2a0818,#3d0f24); color:#fda4af; }
 
         /* ── CARD ── */
         .card {
@@ -412,8 +410,8 @@
             border-radius: 20px;
             padding: 18px 16px;
             margin-bottom: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 2px solid rgba(0,0,0,0.09);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
 
         /* ── PANEL ── */
@@ -429,9 +427,9 @@
             width: 100%;
             padding: 13px 18px;
             font-size: 0.95rem;
-            border: 1px solid var(--border);
+            border: 2px solid rgba(0,0,0,0.12);
             border-radius: 12px;
-            background: var(--surface2);
+            background: #ffffff;
             margin-bottom: 12px;
             color: var(--text);
             font-family: 'Cairo', sans-serif;
@@ -441,7 +439,7 @@
         .input-field:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0,212,170,0.12);
+            box-shadow: 0 0 0 3px rgba(236,72,153,0.1);
             background: var(--surface3);
         }
 
@@ -463,20 +461,44 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #00b894, #00d4aa);
-            color: #021a14;
+            background: linear-gradient(135deg, #be185d 0%, #ec4899 50%, #f43f5e 100%);
+            color: #fff;
             font-weight: 800;
-            box-shadow: 0 4px 20px rgba(0,212,170,0.3);
+            box-shadow: 0 4px 20px rgba(236,72,153,0.4),
+                        inset 0 1px 0 rgba(255,255,255,0.25);
+            position: relative; overflow: hidden;
         }
-        .btn-primary:hover { box-shadow: 0 6px 28px rgba(0,212,170,0.45); transform: translateY(-1px); }
-        .btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(0,212,170,0.2); }
+        .btn-primary::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 8px 28px rgba(236,72,153,0.55);
+            transform: translateY(-2px) scale(1.01);
+        }
+        .btn-primary:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 0 2px 10px rgba(236,72,153,0.3);
+        }
 
         .btn-secondary {
-            background: var(--surface2);
-            color: var(--text);
-            border: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(236,72,153,0.08), rgba(14,165,233,0.08));
+            color: var(--accent);
+            border: 1.5px solid rgba(236,72,153,0.25);
+            font-weight: 700;
+            position: relative; overflow: hidden;
         }
-        .btn-secondary:hover { border-color: rgba(0,212,170,0.3); color: var(--accent); }
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(14,165,233,0.14));
+            border-color: rgba(236,72,153,0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(236,72,153,0.2);
+        }
+        .btn-secondary:active { transform: translateY(1px) scale(0.98); }
+        body.light-theme .btn-secondary { color: #4f46e5; }
 
         /* ── FLEX 2 COLS ── */
         .flex-2cols { display: flex; gap: 10px; margin: 10px 0; }
@@ -490,10 +512,10 @@
             border-radius: 14px;
             padding: 14px;
             margin-bottom: 10px;
-            border: 1px solid var(--border);
+            border: 2px solid rgba(0,0,0,0.08);
             transition: border-color 0.2s;
         }
-        .product-card:hover { border-color: rgba(0,212,170,0.2); }
+        .product-card:hover { border-color: rgba(236,72,153,0.2); }
 
         .product-info {
             display: flex;
@@ -510,12 +532,12 @@
             font-size: 1.6rem;
             font-weight: 900;
             color: var(--accent);
-            background: rgba(0,212,170,0.1);
+            background: rgba(236,72,153,0.08);
             padding: 4px 16px;
             border-radius: 10px;
-            border: 1px solid rgba(0,212,170,0.2);
+            border: 1px solid rgba(236,72,153,0.2);
             font-family: 'Tajawal', sans-serif;
-            text-shadow: 0 0 12px rgba(0,212,170,0.4);
+            text-shadow: 0 0 12px rgba(6,182,212,0.35);
         }
 
         .product-time {
@@ -540,7 +562,7 @@
             font-family: 'Cairo', sans-serif;
             transition: all 0.15s;
         }
-        .icon-btn:hover { color: var(--accent); border-color: rgba(0,212,170,0.3); }
+        .icon-btn:hover { color: var(--accent); border-color: rgba(99,102,241,0.3); }
 
         /* ── TABLES ── */
         .data-wrapper {
@@ -548,8 +570,8 @@
             overflow-y: auto;
             max-height: 420px;
             border-radius: 14px;
-            border: 1px solid var(--border);
-            background: var(--surface2);
+            border: 2px solid rgba(0,0,0,0.09);
+            background: #ffffff;
             margin-top: 12px;
             scrollbar-width: thin;
             scrollbar-color: var(--surface3) transparent;
@@ -576,7 +598,7 @@
             text-align: center;
             font-size: 0.72rem;
             letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid rgba(0,0,0,0.08);
         }
 
         .data-table td {
@@ -588,7 +610,7 @@
 
         .data-table tbody tr:hover { background: rgba(255,255,255,0.03); }
 
-        .diff-positive { background: rgba(0,212,170,0.12); color: var(--positive); font-weight: 700; }
+        .diff-positive { background: rgba(236,72,153,0.1); color: var(--positive); font-weight: 700; }
         .diff-negative { background: rgba(255,107,107,0.12); color: var(--negative); font-weight: 700; }
         .diff-zero { background: rgba(0,150,255,0.1); color: var(--neutral); font-weight: 700; }
 
@@ -597,15 +619,15 @@
             width: 100%;
             padding: 11px 16px;
             border-radius: 12px;
-            border: 1px solid var(--border);
+            border: 2px solid rgba(0,0,0,0.1);
             margin-bottom: 12px;
-            background: var(--surface2);
+            background: #ffffff;
             color: var(--text);
             font-family: 'Cairo', sans-serif;
             font-size: 0.88rem;
         }
         .search-input::placeholder { color: var(--text-dim); }
-        .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,170,0.1); }
+        .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(236,72,153,0.08); }
 
         /* ── FILE UPLOAD ── */
         .file-label {
@@ -614,7 +636,7 @@
             padding: 14px;
             text-align: center;
             cursor: pointer;
-            border: 1px dashed rgba(0,212,170,0.3);
+            border: 1px dashed rgba(99,102,241,0.3);
             margin-bottom: 14px;
             color: var(--text-muted);
             font-size: 0.9rem;
@@ -623,7 +645,7 @@
         .file-label:hover {
             border-color: var(--accent);
             color: var(--accent);
-            background: rgba(0,212,170,0.05);
+            background: rgba(236,72,153,0.04);
         }
 
         /* ── CAMERA ── */
@@ -636,7 +658,7 @@
             max-width: 400px;
             margin-left: auto;
             margin-right: auto;
-            border: 1px solid rgba(0,212,170,0.2);
+            border: 1px solid rgba(236,72,153,0.2);
         }
 
         .camera-selector {
@@ -673,7 +695,7 @@
             border: 1px solid var(--border);
             transition: border-color 0.2s;
         }
-        .compare-stat-card:hover { border-color: rgba(0,212,170,0.25); }
+        .compare-stat-card:hover { border-color: rgba(236,72,153,0.25); }
 
         .compare-stat-number {
             font-size: 1.4rem;
@@ -706,7 +728,7 @@
             font-size: 0.85rem;
             z-index: 2100;
             box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            border: 1px solid rgba(0,212,170,0.2);
+            border: 1px solid rgba(236,72,153,0.2);
             font-family: 'Cairo', sans-serif;
             animation: slideUp 0.3s ease;
         }
@@ -719,8 +741,8 @@
         /* ── FLASH EFFECTS ── */
         .flash-green {
             border-color: var(--accent) !important;
-            box-shadow: 0 0 0 3px rgba(0,212,170,0.3) !important;
-            background: rgba(0,212,170,0.08) !important;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.3) !important;
+            background: rgba(236,72,153,0.08) !important;
             transition: 0.08s;
         }
         .flash-red {
@@ -733,7 +755,7 @@
         /* ── MODAL ── */
         #productModal > div {
             background: var(--surface) !important;
-            border: 1px solid rgba(0,212,170,0.2) !important;
+            border: 1px solid rgba(236,72,153,0.2) !important;
             color: var(--text) !important;
         }
         #productModal h3 { color: var(--accent); margin-bottom: 16px; font-family: 'Tajawal', sans-serif; }
@@ -751,7 +773,7 @@
         #productModal input:focus { outline: none; border-color: var(--accent); }
         #productModal input::placeholder { color: var(--text-dim); }
         #saveProductBtn {
-            background: linear-gradient(135deg, #00b894, #00d4aa) !important;
+            background: linear-gradient(135deg, #0891b2, #06b6d4) !important;
             color: #021a14 !important;
             font-weight: 800 !important;
             font-family: 'Cairo', sans-serif;
@@ -765,9 +787,9 @@
 
         /* ── INVENTORY COUNT BADGE ── */
         #inventoryCount {
-            background: rgba(0,212,170,0.15) !important;
+            background: rgba(236,72,153,0.15) !important;
             color: var(--accent) !important;
-            border: 1px solid rgba(0,212,170,0.3) !important;
+            border: 1px solid rgba(99,102,241,0.3) !important;
             font-family: 'Tajawal', sans-serif;
         }
 
@@ -805,7 +827,7 @@
         }
         #progressOverlay.show { display: flex; }
         #progressBox {
-            background: var(--surface); border: 1px solid rgba(0,212,170,0.25);
+            background: var(--surface); border: 1px solid rgba(236,72,153,0.25);
             border-radius: 20px; padding: 26px 24px 20px;
             width: 88%; max-width: 360px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
@@ -813,7 +835,7 @@
         #progressTitle { font-size:0.92rem; font-weight:800; color:var(--text); margin-bottom:5px; font-family:'Tajawal',sans-serif; }
         #progressSub   { font-size:0.72rem; color:var(--text-muted); margin-bottom:14px; min-height:16px; }
         #progressTrack { height:9px; background:var(--surface3); border-radius:99px; overflow:hidden; margin-bottom:8px; }
-        #progressFill  { height:100%; width:0%; background:linear-gradient(90deg,#00b894,#00d4aa); border-radius:99px; transition:width 0.2s ease; box-shadow:0 0 10px rgba(0,212,170,0.4); }
+        #progressFill  { height:100%; width:0%; background:linear-gradient(90deg,#0891b2,#06b6d4); border-radius:99px; transition:width 0.2s ease; box-shadow:0 0 12px rgba(236,72,153,0.4); }
         #progressPct   { text-align:left; font-size:0.8rem; color:var(--accent); font-weight:800; font-family:'Tajawal',sans-serif; }
 
         /* ══ COMPARE STAT CARDS ══ */
@@ -926,11 +948,15 @@
         <div class="stat-card"><div class="stat-number" id="sessionScansStat">0</div><div class="stat-label">عمليات الجرد</div></div>
     </div>
     <div class="tabs">
-        <button class="tab-btn active" data-tab="tab-scan"><i class="fas fa-camera"></i> المسح</button>
-        <button class="tab-btn" data-tab="tab-inv"><i class="fas fa-clipboard-list"></i> الجرد</button>
-        <button class="tab-btn" data-tab="tab-stock"><i class="fas fa-database"></i> المرجع</button>
-        <button class="tab-btn" data-tab="tab-cmp"><i class="fas fa-chart-line"></i> المقارنة</button>
-        <button class="tab-btn" data-tab="tab-products"><i class="fas fa-archive"></i> المنتجات</button>
+        <div class="tabs-row">
+            <button class="tab-btn active" data-tab="tab-scan"><i class="fas fa-camera"></i><span>المسح</span></button>
+            <button class="tab-btn" data-tab="tab-inv"><i class="fas fa-clipboard-list"></i><span>الجرد</span></button>
+            <button class="tab-btn" data-tab="tab-stock"><i class="fas fa-database"></i><span>المرجع</span></button>
+        </div>
+        <div class="tabs-row tabs-row-2">
+            <button class="tab-btn" data-tab="tab-cmp"><i class="fas fa-chart-line"></i><span>المقارنة</span></button>
+            <button class="tab-btn" data-tab="tab-products"><i class="fas fa-archive"></i><span>المنتجات</span></button>
+        </div>
     </div>
     <div id="tab-scan" class="panel active-pane">
         <div class="card" id="scanCard">
@@ -945,7 +971,7 @@
             <!-- حقل الإدخال اليدوي -->
             <div style="position:relative; margin-bottom:12px;">
                 <input type="text" id="barcodeInput" class="input-field" style="margin-bottom:0; padding-left:48px;" placeholder="✍️ اكتب باركود أو رقم صنف ثم Enter" autocomplete="off" inputmode="text">
-                <button id="addOneBtn" style="position:absolute; left:6px; top:50%; transform:translateY(-50%); background:var(--accent); border:none; width:36px; height:36px; border-radius:8px; color:#021a14; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                <button id="addOneBtn" style="background:linear-gradient(135deg,#0891b2,#06b6d4);color:#fff;border:none;padding:10px 16px;border-radius:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'Cairo',sans-serif;font-size:0.85rem;box-shadow:0 4px 16px rgba(6,182,212,0.4);transition:all 0.2s;">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -991,7 +1017,7 @@
             <div style="display:flex; align-items:center; justify-content:space-between; margin-top:20px; margin-bottom:10px;">
                 <h4 style="display:flex; align-items:center; gap:8px; color:var(--text-muted); font-size:0.82rem;">
                     <i class="fas fa-list-ol" style="color:var(--accent);"></i> سجل المسحات التفصيلي
-                    <span id="inventoryCount" style="background:rgba(0,212,170,0.12); color:var(--accent); border:1px solid rgba(0,212,170,0.25); border-radius:8px; padding:1px 10px; font-size:0.78rem;">0</span>
+                    <span id="inventoryCount" style="background:rgba(236,72,153,0.1); color:var(--accent); border:1px solid rgba(236,72,153,0.25); border-radius:8px; padding:1px 10px; font-size:0.78rem;">0</span>
                 </h4>
                 <span id="lastScanInfo" style="font-size:0.68rem; color:var(--text-dim);"></span>
             </div>
@@ -1009,20 +1035,20 @@
             <input type="file" id="invImportFile" style="display:none;">
             <button id="invImportFileBtn" onclick="document.getElementById('invImportFile').click()"
                 style="display:block; width:100%; padding:12px; border-radius:10px;
-                    border:1px dashed rgba(0,212,170,0.3); text-align:center; cursor:pointer;
+                    border:1px dashed rgba(99,102,241,0.3); text-align:center; cursor:pointer;
                     color:var(--text-muted); font-size:0.82rem; margin-bottom:10px;
                     background:transparent; font-family:'Cairo',sans-serif; transition:all 0.2s;">
                 <i class="fas fa-upload" style="color:var(--accent); margin-left:6px;"></i> اختر ملف Excel للجرد
             </button>
             <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
-                <button id="invModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12)); color:var(--accent); border:1px solid rgba(0,212,170,0.3); transition:all 0.18s;">
+                <button id="invModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
                     <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
                 </button>
                 <button id="invModeMerge" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:transparent; color:var(--text-muted); border:1px solid transparent; transition:all 0.18s;">
                     <i class="fas fa-layer-group" style="margin-left:5px;"></i> دمج
                 </button>
             </div>
-            <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(0,212,170,0.06); border:1px solid rgba(0,212,170,0.15);">
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(236,72,153,0.05); border:1px solid rgba(236,72,153,0.15);">
                 <i class="fas fa-info-circle" style="color:var(--accent); margin-left:5px;"></i>
                 <span id="invModeDescText">تحديث: يحذف الجرد القديم بالكامل ويستبدله بالجديد</span>
             </div>
@@ -1042,14 +1068,14 @@
 
         <div class="file-label" id="stockUploadArea"><i class="fas fa-upload"></i> اختر ملف Excel <input type="file" id="stockFileInput" style="display:none;"></div>
         <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
-            <button id="stockModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12)); color:var(--accent); border:1px solid rgba(0,212,170,0.3); transition:all 0.18s;">
+            <button id="stockModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
                 <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
             </button>
             <button id="stockModeMerge" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:transparent; color:var(--text-muted); border:1px solid transparent; transition:all 0.18s;">
                 <i class="fas fa-layer-group" style="margin-left:5px;"></i> دمج
             </button>
         </div>
-        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(0,212,170,0.06); border:1px solid rgba(0,212,170,0.15);">
+        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(236,72,153,0.05); border:1px solid rgba(236,72,153,0.15);">
             <i class="fas fa-info-circle" style="color:var(--accent); margin-left:5px;"></i>
             <span id="stockModeDescText">تحديث: يحذف بيانات المرجع القديمة ويستبدلها بالجديدة</span>
         </div>
@@ -1136,17 +1162,21 @@
             display: flex;
             gap: 8px;
             margin-bottom: 16px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
         }
+        .filter-grid::-webkit-scrollbar { display: none; }
 
         .filter-btn {
-            flex: 1;
-            min-width: calc(33% - 6px);
+            flex: 0 0 auto;
+            min-width: 76px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            padding: 13px 6px 10px;
+            padding: 13px 10px 10px;
             border-radius: 18px;
             border: 1.5px solid rgba(255,255,255,0.07);
             background: var(--surface2);
@@ -1253,14 +1283,14 @@
 
         <div class="file-label" id="dbUploadArea"><i class="fas fa-upload"></i> رفع ملف المنتجات <input type="file" id="dbFileInput" style="display:none;" multiple></div>
         <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
-            <button id="dbModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12)); color:var(--accent); border:1px solid rgba(0,212,170,0.3); transition:all 0.18s;">
+            <button id="dbModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
                 <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
             </button>
             <button id="dbModeMerge" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:transparent; color:var(--text-muted); border:1px solid transparent; transition:all 0.18s;">
                 <i class="fas fa-layer-group" style="margin-left:5px;"></i> دمج
             </button>
         </div>
-        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(0,212,170,0.06); border:1px solid rgba(0,212,170,0.15);">
+        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(236,72,153,0.05); border:1px solid rgba(236,72,153,0.15);">
             <i class="fas fa-info-circle" style="color:var(--accent); margin-left:5px;"></i>
             <span id="dbModeDescText">تحديث: يحذف المنتجات القديمة ويستبدلها بالجديدة</span>
         </div>
@@ -1274,7 +1304,7 @@
 </div>
 <!-- نافذة تعيين الأعمدة -->
 <div id="colMapModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);justify-content:center;align-items:flex-start;z-index:5000;padding:10px;overflow-y:auto;">
-  <div style="background:var(--surface);border-radius:24px;padding:24px 20px 20px;width:100%;max-width:520px;border:1px solid rgba(0,212,170,0.3);box-shadow:0 30px 80px rgba(0,0,0,0.8);position:relative;margin:20px auto;min-height:min-content;">
+  <div style="background:var(--surface);border-radius:24px;padding:24px 20px 20px;width:100%;max-width:520px;border:1px solid rgba(99,102,241,0.3);box-shadow:0 30px 80px rgba(0,0,0,0.8);position:relative;margin:20px auto;min-height:min-content;">
     <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:24px 24px 0 0;"></div>
     <h3 id="colMapTitle" style="color:var(--accent);margin-bottom:6px;font-family:'Tajawal',sans-serif;font-size:1.1rem;display:flex;align-items:center;gap:10px;"><i class="fas fa-table-columns"></i> تعيين الأعمدة</h3>
     <p id="colMapFileName" style="font-size:0.75rem;color:var(--text-muted);margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid var(--border);"></p>
@@ -1297,10 +1327,10 @@
 </div>
 
 <div id="productModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); justify-content:center; align-items:center; z-index:3000;">
-    <div style="background:#13161e; border-radius:20px; padding:24px; width:90%; max-width:380px; border:1px solid rgba(0,212,170,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-        <h3 style="color:#00d4aa; margin-bottom:16px; font-family:'Tajawal',sans-serif;">➕ إضافة منتج</h3>
+    <div style="background:#13161e; border-radius:20px; padding:24px; width:90%; max-width:380px; border:1px solid rgba(236,72,153,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+        <h3 style="color:#06b6d4; margin-bottom:16px; font-family:'Tajawal',sans-serif;">➕ إضافة منتج</h3>
         <input type="text" id="modalItemNo" placeholder="رقم الصنف *" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;"><input type="text" id="modalName" placeholder="الاسم *" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;"><input type="text" id="modalBarcode" placeholder="الباركود (اختياري)" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;"><input type="number" id="modalQty" placeholder="كمية مرجعية" value="0" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;">
-        <div style="display:flex; gap:12px; margin-top:12px;"><button id="saveProductBtn" style="background:linear-gradient(135deg,#00b894,#00d4aa); color:#021a14; border:none; padding:12px; border-radius:10px; flex:1; font-weight:800; font-family:'Cairo',sans-serif; cursor:pointer;">حفظ</button><button id="closeModalBtn" style="background:#1a1e2a; color:#e8edf5; border:1px solid rgba(255,255,255,0.07); padding:12px; border-radius:10px; flex:1; cursor:pointer; font-family:'Cairo',sans-serif;">إلغاء</button></div>
+        <div style="display:flex; gap:12px; margin-top:12px;"><button id="saveProductBtn" style="background:linear-gradient(135deg,#0891b2,#06b6d4); color:#fff; border:none; padding:12px; border-radius:10px; flex:1; font-weight:800; font-family:'Cairo',sans-serif; cursor:pointer;">حفظ</button><button id="closeModalBtn" style="background:var(--surface2); color:var(--text); border:1px solid var(--border); padding:12px; border-radius:10px; flex:1; cursor:pointer; font-family:'Cairo',sans-serif;">إلغاء</button></div>
     </div>
 </div>
 <script>
@@ -1405,7 +1435,7 @@
             ready:    'var(--accent)',
             scanning: '#ffd166',
             locked:   'var(--negative)',
-            confirm:  '#a78bfa'   // بنفسجي: انتظار التأكيد
+            confirm:  '#ec4899'   // سيان: انتظار التأكيد
         };
         dot.style.background = colors[state] || colors.idle;
         text.textContent = msg || 'جاهز للمسح';
@@ -1459,8 +1489,8 @@
     function showToast(msg, isErr = false, duration = 3000) {
         let t = document.querySelector('.toast'); if (t) t.remove();
         const toast = document.createElement('div'); toast.className = 'toast';
-        toast.style.background = isErr ? 'rgba(255,107,107,0.15)' : 'rgba(0,212,170,0.12)';
-        toast.style.border = isErr ? '1px solid rgba(255,107,107,0.3)' : '1px solid rgba(0,212,170,0.3)';
+        toast.style.background = isErr ? 'rgba(255,107,107,0.15)' : 'rgba(236,72,153,0.1)';
+        toast.style.border = isErr ? '1px solid rgba(255,107,107,0.3)' : '1px solid rgba(99,102,241,0.3)';
         toast.style.color = isErr ? 'var(--negative)' : 'var(--accent)';
         toast.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
         document.body.appendChild(toast);
@@ -1616,7 +1646,7 @@
                         idx: i
                     }));
                     document.getElementById('colMapPreview').innerHTML = hdrs.map(h =>
-                        '<span style="background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.2);border-radius:6px;padding:2px 8px;font-size:0.68rem;color:var(--accent);white-space:nowrap;">' + h.label + '</span>'
+                        '<span style="background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);border-radius:6px;padding:2px 8px;font-size:0.68rem;color:var(--accent);white-space:nowrap;">' + h.label + '</span>'
                     ).join('');
                     const fieldsDiv = document.getElementById('colMapFields');
                     fieldsDiv.innerHTML = '';
@@ -1913,18 +1943,19 @@
             await html5QrScanner.start(
                 { deviceId: { exact: targetId } },
                 {
-                    fps: 15,                        // أسرع من 10
-                    qrbox: { width: 260, height: 180 },
-                    aspectRatio: 1.5,
+                    fps: 25,
+                    qrbox: { width: 300, height: 100 },   // عرض أكبر للـ EAN-13
+                    aspectRatio: 1.7778,
                     disableFlip: false,
+                    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
                     formatsToSupport: [
-                        Html5QrcodeSupportedFormats?.CODE_128,
-                        Html5QrcodeSupportedFormats?.CODE_39,
-                        Html5QrcodeSupportedFormats?.CODE_93,
                         Html5QrcodeSupportedFormats?.EAN_13,
                         Html5QrcodeSupportedFormats?.EAN_8,
                         Html5QrcodeSupportedFormats?.UPC_A,
                         Html5QrcodeSupportedFormats?.UPC_E,
+                        Html5QrcodeSupportedFormats?.CODE_128,
+                        Html5QrcodeSupportedFormats?.CODE_39,
+                        Html5QrcodeSupportedFormats?.CODE_93,
                         Html5QrcodeSupportedFormats?.ITF,
                         Html5QrcodeSupportedFormats?.CODABAR,
                     ].filter(Boolean)
@@ -2023,8 +2054,8 @@
                 <div style="display:flex; align-items:center; gap:9px; padding:11px 12px 8px;">
 
                     <div style="min-width:26px; height:26px; border-radius:7px; flex-shrink:0;
-                        background:linear-gradient(135deg,rgba(0,212,170,0.15),rgba(0,150,255,0.08));
-                        border:1px solid rgba(0,212,170,0.22);
+                        background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.08));
+                        border:1px solid rgba(6,182,212,0.22);
                         display:flex; align-items:center; justify-content:center;
                         font-size:0.68rem; font-weight:900; color:var(--accent); font-family:'Tajawal',sans-serif;">
                         ${rowNum}
@@ -2073,7 +2104,7 @@
                         title="زيادة مسحة"
                         style="flex:1; border:none; padding:9px 4px; cursor:pointer; font-family:'Cairo',sans-serif;
                             background:linear-gradient(145deg,#0c2a1d,#071410);
-                            color:#00d4aa; font-size:0.72rem; font-weight:700;
+                            color:#06b6d4; font-size:0.72rem; font-weight:700;
                             display:flex; align-items:center; justify-content:center; gap:4px;
                             border-left:1px solid rgba(255,255,255,0.04); transition:opacity 0.12s;">
                         <i class="fas fa-plus" style="font-size:0.62rem;"></i> زيادة
@@ -2142,7 +2173,7 @@
             const isPos  = r.diff > 0, isNeg = r.diff < 0, isZero = r.diff === 0 && r.qi > 0;
             const rowBg  = isPos  ? 'rgba(0,180,100,0.09)'   : isNeg  ? 'rgba(220,60,60,0.09)'  : isZero ? 'rgba(0,120,220,0.09)'  : '';
             const rowBdr = isPos  ? 'rgba(0,200,120,0.18)'   : isNeg  ? 'rgba(220,60,60,0.18)'  : isZero ? 'rgba(0,120,220,0.18)' : 'transparent';
-            const numClr = isPos  ? '#00d4aa' : isNeg ? '#ff6b6b' : isZero ? '#38bdf8' : 'var(--text)';
+            const numClr = isPos  ? '#ec4899' : isNeg ? '#fb7185' : isZero ? '#60a5fa' : 'var(--text)';
             const icon   = isPos  ? '⬆' : isNeg ? '⬇' : isZero ? '✓' : '—';
             const diffTxt = (r.diff > 0 ? '+' : '') + r.diff;
             return `<tr style="background:${rowBg}; border-bottom:1px solid ${rowBdr};">
@@ -2605,15 +2636,15 @@
     let invUploadMode = 'replace';
     function setInvMode(mode) {
         invUploadMode = mode;
-        const on = 'linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
+        const on = 'linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12))';
         const btnU = document.getElementById('invModeUpdate'), btnM = document.getElementById('invModeMerge');
         const desc = document.getElementById('invModeDescText');
         if (mode === 'replace') {
-            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(0,212,170,0.3)';
+            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(99,102,241,0.3)';
             btnM.style.background='transparent'; btnM.style.color='var(--text-muted)'; btnM.style.borderColor='transparent';
             desc.textContent='تحديث: يحذف الجرد القديم بالكامل ويستبدله بالجديد';
         } else {
-            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(0,212,170,0.3)';
+            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(99,102,241,0.3)';
             btnU.style.background='transparent'; btnU.style.color='var(--text-muted)'; btnU.style.borderColor='transparent';
             desc.textContent='دمج: يضيف الجرد الجديد فوق الموجود دون حذف';
         }
@@ -2633,15 +2664,15 @@
     let stockUploadMode = 'replace';
     function setStockMode(mode) {
         stockUploadMode = mode;
-        const on = 'linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
+        const on = 'linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12))';
         const btnU = document.getElementById('stockModeUpdate'), btnM = document.getElementById('stockModeMerge');
         const desc = document.getElementById('stockModeDescText');
         if (mode === 'replace') {
-            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(0,212,170,0.3)';
+            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(99,102,241,0.3)';
             btnM.style.background='transparent'; btnM.style.color='var(--text-muted)'; btnM.style.borderColor='transparent';
             desc.textContent='تحديث: يحذف بيانات المرجع القديمة ويستبدلها بالجديدة';
         } else {
-            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(0,212,170,0.3)';
+            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(99,102,241,0.3)';
             btnU.style.background='transparent'; btnU.style.color='var(--text-muted)'; btnU.style.borderColor='transparent';
             desc.textContent='دمج: يضيف بيانات المرجع الجديدة فوق الموجودة دون حذف';
         }
@@ -2653,15 +2684,15 @@
     let dbUploadMode = 'update';
     function setDbMode(mode) {
         dbUploadMode = mode;
-        const on = 'linear-gradient(135deg,rgba(0,212,170,0.18),rgba(0,150,255,0.12))';
+        const on = 'linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12))';
         const btnU = document.getElementById('dbModeUpdate'), btnM = document.getElementById('dbModeMerge');
         const desc = document.getElementById('dbModeDescText');
         if (mode === 'update') {
-            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(0,212,170,0.3)';
+            btnU.style.background=on; btnU.style.color='var(--accent)'; btnU.style.borderColor='rgba(99,102,241,0.3)';
             btnM.style.background='transparent'; btnM.style.color='var(--text-muted)'; btnM.style.borderColor='transparent';
             desc.textContent='تحديث: يحذف المنتجات القديمة ويستبدلها بالجديدة';
         } else {
-            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(0,212,170,0.3)';
+            btnM.style.background=on; btnM.style.color='var(--accent)'; btnM.style.borderColor='rgba(99,102,241,0.3)';
             btnU.style.background='transparent'; btnU.style.color='var(--text-muted)'; btnU.style.borderColor='transparent';
             desc.textContent='دمج: يضيف المنتجات الجديدة بجانب القديمة دون حذف';
         }
