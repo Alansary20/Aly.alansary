@@ -21,10 +21,10 @@
             --surface3:    #162a3e;
             --border:      rgba(255,255,255,0.07);
             --border-glow: rgba(6,182,212,0.3);
-            --accent:      #ec4899;
-            --accent2:     #f43f5e;
-            --accent3:     #f43f5e;
-            --accent-glow: rgba(236,72,153,0.15);
+            --accent:      #10b981;
+            --accent2:     #059669;
+            --accent3:     #dc2626;
+            --accent-glow: rgba(16,185,129,0.15);
             --text:        #e8edf5;
             --text-muted:  #6b7a9a;
             --text-dim:    #3d4a63;
@@ -42,8 +42,8 @@
             --surface2:  #f9f9f9;
             --surface3:  #f3f3f3;
             --border:      rgba(0,0,0,0.11);
-            --accent:      #be185d;
-            --accent2:     #9d174d;
+            --accent:      #059669;
+            --accent2:     #047857;
             --accent3:     #e05555;
             --text:        #1a1a2e;
             --text-muted:  #6b7280;
@@ -56,12 +56,12 @@
         }
         body.light-theme::before, body.light-theme::after { display: none; }
         body.light-theme .header {
-            background: linear-gradient(145deg, #be185d 0%, #ec4899 40%, #f43f5e 70%, #be185d 100%) !important;
+            background: linear-gradient(145deg, #047857 0%, #10b981 40%, #34d399 70%, #047857 100%) !important;
             border: none !important;
-            box-shadow: 0 8px 28px rgba(236,72,153,0.35), 0 16px 40px rgba(0,0,0,0.1) !important;
+            box-shadow: 0 8px 28px rgba(16,185,129,0.35), 0 16px 40px rgba(0,0,0,0.1) !important;
         }
-        body.light-theme .data-table th { background: #ece9ff; color: #6b7280; }
-        body.light-theme .data-table tbody tr:hover { background: rgba(236,72,153,0.025); }
+        body.light-theme .data-table th { background: #ecfdf5; color: #374151; }
+        body.light-theme .data-table tbody tr:hover { background: rgba(16,185,129,0.02); }
         body.light-theme .card { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
         body.light-theme .stat-card { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
         body.light-theme .tab-btn { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
@@ -83,7 +83,7 @@
             background: var(--bg);
             color: var(--text);
             direction: rtl;
-            padding: 16px 14px 60px;
+            padding: 12px 10px 60px;
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
@@ -95,22 +95,23 @@
         body::after { display: none; }
 
         .app-container {
-            max-width: 580px;
-            margin: 0 auto;
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
             position: relative;
             z-index: 1;
         }
 
         /* ── HEADER ── */
         .header {
-            background: linear-gradient(145deg, #be185d 0%, #ec4899 40%, #f43f5e 70%, #be185d 100%);
+            background: linear-gradient(145deg, #047857 0%, #10b981 40%, #34d399 70%, #047857 100%);
             border-radius: 28px;
             padding: 24px 20px 20px;
             margin-bottom: 18px;
             color: white;
             border: none;
             box-shadow:
-                0 8px 32px rgba(236,72,153,0.4),
+                0 8px 32px rgba(16,185,129,0.35),
                 0 20px 50px rgba(0,0,0,0.2),
                 inset 0 1px 0 rgba(255,255,255,0.25),
                 inset 0 -1px 0 rgba(0,0,0,0.15);
@@ -151,7 +152,7 @@
 
         .header h1 i {
             color: #fde68a;
-            filter: drop-shadow(0 0 10px rgba(253,230,138,0.6));
+            filter: drop-shadow(0 0 10px rgba(110,231,183,0.7));
         }
 
         .header-subtitle {
@@ -206,8 +207,8 @@
 
         .stat-card:hover {
             transform: translateY(-3px);
-            border-color: rgba(236,72,153,0.25);
-            box-shadow: 0 8px 28px rgba(236,72,153,0.08);
+            border-color: rgba(16,185,129,0.25);
+            box-shadow: 0 8px 28px rgba(16,185,129,0.08);
         }
 
         .stat-card::after {
@@ -215,7 +216,7 @@
             position: absolute;
             bottom: 0; left: 15%; right: 15%;
             height: 2px;
-            background: linear-gradient(90deg, #ec4899, #f43f5e, #ec4899);
+            background: linear-gradient(90deg, #10b981, #34d399, #10b981);
             border-radius: 2px;
             opacity: 0.5;
         }
@@ -223,10 +224,10 @@
         .stat-number {
             font-size: 2.1rem;
             font-weight: 900;
-            color: #ec4899;
+            color: #10b981;
             font-family: 'Tajawal', sans-serif;
             line-height: 1;
-            text-shadow: 0 0 20px rgba(236,72,153,0.3);
+            text-shadow: 0 0 20px rgba(16,185,129,0.3);
         }
 
         .stat-label {
@@ -237,56 +238,54 @@
             letter-spacing: 0.3px;
         }
 
-        body.light-theme .stat-number { color: #be185d; text-shadow: none; }
-        body.light-theme .stat-card::after { background: linear-gradient(90deg, #ec4899, #f43f5e); opacity: 0.4; }
+        body.light-theme .stat-number { color: #059669; text-shadow: none; }
+        body.light-theme .stat-card::after { background: linear-gradient(90deg, #10b981, #34d399); opacity: 0.4; }
 
         /* ── TABS — صف واحد قابل للتمرير ── */
         .tabs {
             display: flex;
             flex-direction: row;
-            gap: 8px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scrollbar-width: none;
+            gap: 6px;
+            margin-bottom: 16px;
+            overflow-x: visible;
         }
         .tabs::-webkit-scrollbar { display: none; }
         .tabs-row { display: contents; }
-        .tabs-row-2 .tab-btn { max-width: 70px; flex: 0 1 70px; }
+        .tabs-row-2 .tab-btn { max-width: none; flex: 1; }
 
         .tab-btn {
             flex: 1;
-            max-width: 70px;
+            min-width: 0;
+            max-width: none;
             background: #fff;
             border: 2px solid rgba(0,0,0,0.1);
-            border-radius: 22px;
-            padding: 12px 4px 10px;
+            border-radius: 18px;
+            padding: 10px 4px 8px;
             font-weight: 700;
-            font-size: 0.6rem;
+            font-size: 0.58rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 7px;
+            gap: 5px;
             cursor: pointer;
             color: #9ca3af;
             transition: all 0.3s cubic-bezier(.34,1.4,.64,1);
             font-family: 'Cairo', sans-serif;
             position: relative;
             overflow: visible;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
             letter-spacing: 0.2px;
         }
 
-        /* الأيقونة — مربع ملون واضح */
         .tab-btn i {
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             background: #f3f4f6;
             transition: all 0.3s cubic-bezier(.34,1.4,.64,1);
             border: none;
@@ -294,9 +293,8 @@
             color: #9ca3af;
         }
 
-        /* النص */
         .tab-btn span {
-            font-size: 0.6rem;
+            font-size: 0.58rem;
             font-weight: 700;
             line-height: 1;
         }
@@ -439,7 +437,7 @@
         .input-field:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(236,72,153,0.1);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.08);
             background: var(--surface3);
         }
 
@@ -461,10 +459,10 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #be185d 0%, #ec4899 50%, #f43f5e 100%);
+            background: linear-gradient(135deg, #047857 0%, #10b981 50%, #34d399 100%);
             color: #fff;
             font-weight: 800;
-            box-shadow: 0 4px 20px rgba(236,72,153,0.4),
+            box-shadow: 0 4px 20px rgba(16,185,129,0.4),
                         inset 0 1px 0 rgba(255,255,255,0.25);
             position: relative; overflow: hidden;
         }
@@ -476,26 +474,26 @@
             pointer-events: none;
         }
         .btn-primary:hover {
-            box-shadow: 0 8px 28px rgba(236,72,153,0.55);
+            box-shadow: 0 8px 28px rgba(16,185,129,0.5);
             transform: translateY(-2px) scale(1.01);
         }
         .btn-primary:active {
             transform: translateY(2px) scale(0.98);
-            box-shadow: 0 2px 10px rgba(236,72,153,0.3);
+            box-shadow: 0 2px 10px rgba(16,185,129,0.25);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, rgba(236,72,153,0.08), rgba(14,165,233,0.08));
+            background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(14,165,233,0.08));
             color: var(--accent);
-            border: 1.5px solid rgba(236,72,153,0.25);
+            border: 1.5px solid rgba(16,185,129,0.25);
             font-weight: 700;
             position: relative; overflow: hidden;
         }
         .btn-secondary:hover {
-            background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(14,165,233,0.14));
-            border-color: rgba(236,72,153,0.4);
+            background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(14,165,233,0.14));
+            border-color: rgba(16,185,129,0.35);
             transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(236,72,153,0.2);
+            box-shadow: 0 4px 16px rgba(16,185,129,0.2);
         }
         .btn-secondary:active { transform: translateY(1px) scale(0.98); }
         body.light-theme .btn-secondary { color: #4f46e5; }
@@ -515,7 +513,7 @@
             border: 2px solid rgba(0,0,0,0.08);
             transition: border-color 0.2s;
         }
-        .product-card:hover { border-color: rgba(236,72,153,0.2); }
+        .product-card:hover { border-color: rgba(16,185,129,0.2); }
 
         .product-info {
             display: flex;
@@ -532,10 +530,10 @@
             font-size: 1.6rem;
             font-weight: 900;
             color: var(--accent);
-            background: rgba(236,72,153,0.08);
+            background: rgba(16,185,129,0.08);
             padding: 4px 16px;
             border-radius: 10px;
-            border: 1px solid rgba(236,72,153,0.2);
+            border: 1px solid rgba(16,185,129,0.2);
             font-family: 'Tajawal', sans-serif;
             text-shadow: 0 0 12px rgba(6,182,212,0.35);
         }
@@ -610,7 +608,7 @@
 
         .data-table tbody tr:hover { background: rgba(255,255,255,0.03); }
 
-        .diff-positive { background: rgba(236,72,153,0.1); color: var(--positive); font-weight: 700; }
+        .diff-positive { background: rgba(16,185,129,0.08); color: var(--positive); font-weight: 700; }
         .diff-negative { background: rgba(255,107,107,0.12); color: var(--negative); font-weight: 700; }
         .diff-zero { background: rgba(0,150,255,0.1); color: var(--neutral); font-weight: 700; }
 
@@ -627,7 +625,7 @@
             font-size: 0.88rem;
         }
         .search-input::placeholder { color: var(--text-dim); }
-        .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(236,72,153,0.08); }
+        .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(16,185,129,0.08); }
 
         /* ── FILE UPLOAD ── */
         .file-label {
@@ -645,7 +643,7 @@
         .file-label:hover {
             border-color: var(--accent);
             color: var(--accent);
-            background: rgba(236,72,153,0.04);
+            background: rgba(16,185,129,0.03);
         }
 
         /* ── CAMERA ── */
@@ -655,25 +653,11 @@
             margin-top: 12px;
             background: #000;
             position: relative;
-            width: 260px;
-            height: 260px;
+            max-width: 400px;
             margin-left: auto;
             margin-right: auto;
-            border: 1px solid rgba(236,72,153,0.25);
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(16,185,129,0.2);
         }
-
-        /* إخفاء الإطار الأبيض الافتراضي لـ Html5Qrcode */
-        #reader2 { width:100% !important; height:100% !important; }
-        #reader2 video { width:100% !important; height:100% !important; object-fit:cover !important; }
-        #reader2 img { display:none !important; }
-        #reader2 > div[style*="border"] { display:none !important; }
-        /* إخفاء كل الإطارات والـ shading */
-        #reader2__scan_region > img,
-        #reader2__scan_region > div { display:none !important; }
-        #reader2__dashboard { display:none !important; }
-        #reader2__header_message { display:none !important; }
-        [id^="reader2"] svg, [id^="reader2"] canvas:not([id*="qr"]) { display:none !important; }
 
         .camera-selector {
             display: flex;
@@ -709,7 +693,7 @@
             border: 1px solid var(--border);
             transition: border-color 0.2s;
         }
-        .compare-stat-card:hover { border-color: rgba(236,72,153,0.25); }
+        .compare-stat-card:hover { border-color: rgba(16,185,129,0.25); }
 
         .compare-stat-number {
             font-size: 1.4rem;
@@ -742,7 +726,7 @@
             font-size: 0.85rem;
             z-index: 2100;
             box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            border: 1px solid rgba(236,72,153,0.2);
+            border: 1px solid rgba(16,185,129,0.2);
             font-family: 'Cairo', sans-serif;
             animation: slideUp 0.3s ease;
         }
@@ -756,7 +740,7 @@
         .flash-green {
             border-color: var(--accent) !important;
             box-shadow: 0 0 0 3px rgba(99,102,241,0.3) !important;
-            background: rgba(236,72,153,0.08) !important;
+            background: rgba(16,185,129,0.08) !important;
             transition: 0.08s;
         }
         .flash-red {
@@ -769,7 +753,7 @@
         /* ── MODAL ── */
         #productModal > div {
             background: var(--surface) !important;
-            border: 1px solid rgba(236,72,153,0.2) !important;
+            border: 1px solid rgba(16,185,129,0.2) !important;
             color: var(--text) !important;
         }
         #productModal h3 { color: var(--accent); margin-bottom: 16px; font-family: 'Tajawal', sans-serif; }
@@ -801,7 +785,7 @@
 
         /* ── INVENTORY COUNT BADGE ── */
         #inventoryCount {
-            background: rgba(236,72,153,0.15) !important;
+            background: rgba(16,185,129,0.15) !important;
             color: var(--accent) !important;
             border: 1px solid rgba(99,102,241,0.3) !important;
             font-family: 'Tajawal', sans-serif;
@@ -841,7 +825,7 @@
         }
         #progressOverlay.show { display: flex; }
         #progressBox {
-            background: var(--surface); border: 1px solid rgba(236,72,153,0.25);
+            background: var(--surface); border: 1px solid rgba(16,185,129,0.25);
             border-radius: 20px; padding: 26px 24px 20px;
             width: 88%; max-width: 360px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
@@ -849,7 +833,7 @@
         #progressTitle { font-size:0.92rem; font-weight:800; color:var(--text); margin-bottom:5px; font-family:'Tajawal',sans-serif; }
         #progressSub   { font-size:0.72rem; color:var(--text-muted); margin-bottom:14px; min-height:16px; }
         #progressTrack { height:9px; background:var(--surface3); border-radius:99px; overflow:hidden; margin-bottom:8px; }
-        #progressFill  { height:100%; width:0%; background:linear-gradient(90deg,#0891b2,#06b6d4); border-radius:99px; transition:width 0.2s ease; box-shadow:0 0 12px rgba(236,72,153,0.4); }
+        #progressFill  { height:100%; width:0%; background:linear-gradient(90deg,#0891b2,#06b6d4); border-radius:99px; transition:width 0.2s ease; box-shadow:0 0 12px rgba(16,185,129,0.35); }
         #progressPct   { text-align:left; font-size:0.8rem; color:var(--accent); font-weight:800; font-family:'Tajawal',sans-serif; }
 
         /* ══ COMPARE STAT CARDS ══ */
@@ -932,6 +916,11 @@
         body.light-theme .cmp-amber .cmp-stat-num { color:#b45309; }
         body.light-theme .cmp-violet { background:#faf5ff; border-color:rgba(168,85,247,0.2); }
         body.light-theme .cmp-violet .cmp-stat-num { color:#7e22ce; }
+    <style>
+        .flash-green { border-color:#10b981!important; box-shadow:0 0 0 6px rgba(16,185,129,0.35),0 0 40px rgba(16,185,129,0.25)!important; background:rgba(16,185,129,0.12)!important; animation:flashPulseGreen 0.5s ease!important; }
+        .flash-red   { border-color:#dc2626!important; box-shadow:0 0 0 6px rgba(220,38,38,0.35),0 0 40px rgba(220,38,38,0.2)!important;  background:rgba(220,38,38,0.1)!important;  animation:flashPulseRed  0.5s ease!important; }
+        @keyframes flashPulseGreen { 0%{box-shadow:0 0 0 2px rgba(16,185,129,0.5)} 40%{box-shadow:0 0 0 8px rgba(16,185,129,0.4),0 0 60px rgba(16,185,129,0.3)} 100%{box-shadow:0 0 0 4px rgba(16,185,129,0.2)} }
+        @keyframes flashPulseRed   { 0%{box-shadow:0 0 0 2px rgba(220,38,38,0.5)}  40%{box-shadow:0 0 0 8px rgba(220,38,38,0.4),0 0 60px rgba(220,38,38,0.25)} 100%{box-shadow:0 0 0 4px rgba(220,38,38,0.2)} }
     </style>
 </head>
 <body>
@@ -950,7 +939,7 @@
         <button id="themeToggle" title="تبديل الثيم"><i class="fas fa-moon"></i></button>
         <h1><i class="fas fa-cube"></i> نظام الجرد الذكي</h1>
         <div class="header-subtitle">SMART INVENTORY SYSTEM</div>
-        <div style="text-align:center;font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:2px;letter-spacing:2px;font-style:italic;">by Aly Alansary</div>
+        <div style="text-align:center;font-size:0.72rem;color:rgba(255,255,255,0.85);margin-top:4px;letter-spacing:2px;font-style:italic;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,0.3);">by Aly Alansary</div>
         <div style="display: flex; justify-content: center; gap: 10px; margin-top: 14px;">
             <button id="globalResetBtn" style="border: none; padding: 7px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.8rem;"><i class="fas fa-sync-alt"></i> إعادة تعيين</button>
             <button id="globalManualBtn" style="border: none; padding: 7px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.8rem;"><i class="fas fa-plus-circle"></i> إضافة منتج</button>
@@ -984,7 +973,7 @@
 
             <!-- حقل الإدخال اليدوي -->
             <div style="position:relative; margin-bottom:12px;">
-                <input type="text" id="barcodeInput" class="input-field" style="margin-bottom:0; padding-left:48px;" placeholder="✍️ اكتب باركود أو رقم صنف ثم Enter" autocomplete="off" inputmode="text">
+                <input type="text" id="barcodeInput" class="input-field" style="margin-bottom:0; padding-left:48px; color:#1e3a5f; font-weight:600;" placeholder="✍️ اكتب باركود أو رقم صنف ثم Enter" autocomplete="off" inputmode="text">
                 <button id="addOneBtn" style="background:linear-gradient(135deg,#0891b2,#06b6d4);color:#fff;border:none;padding:10px 16px;border-radius:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'Cairo',sans-serif;font-size:0.85rem;box-shadow:0 4px 16px rgba(6,182,212,0.4);transition:all 0.2s;">
                     <i class="fas fa-plus"></i>
                 </button>
@@ -1031,7 +1020,7 @@
             <div style="display:flex; align-items:center; justify-content:space-between; margin-top:20px; margin-bottom:10px;">
                 <h4 style="display:flex; align-items:center; gap:8px; color:var(--text-muted); font-size:0.82rem;">
                     <i class="fas fa-list-ol" style="color:var(--accent);"></i> سجل المسحات التفصيلي
-                    <span id="inventoryCount" style="background:rgba(236,72,153,0.1); color:var(--accent); border:1px solid rgba(236,72,153,0.25); border-radius:8px; padding:1px 10px; font-size:0.78rem;">0</span>
+                    <span id="inventoryCount" style="background:rgba(16,185,129,0.08); color:var(--accent); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:1px 10px; font-size:0.78rem;">0</span>
                 </h4>
                 <span id="lastScanInfo" style="font-size:0.68rem; color:var(--text-dim);"></span>
             </div>
@@ -1055,14 +1044,14 @@
                 <i class="fas fa-upload" style="color:var(--accent); margin-left:6px;"></i> اختر ملف Excel للجرد
             </button>
             <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
-                <button id="invModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
+                <button id="invModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
                     <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
                 </button>
                 <button id="invModeMerge" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:transparent; color:var(--text-muted); border:1px solid transparent; transition:all 0.18s;">
                     <i class="fas fa-layer-group" style="margin-left:5px;"></i> دمج
                 </button>
             </div>
-            <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(236,72,153,0.05); border:1px solid rgba(236,72,153,0.15);">
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.15);">
                 <i class="fas fa-info-circle" style="color:var(--accent); margin-left:5px;"></i>
                 <span id="invModeDescText">تحديث: يحذف الجرد القديم بالكامل ويستبدله بالجديد</span>
             </div>
@@ -1082,14 +1071,14 @@
 
         <div class="file-label" id="stockUploadArea"><i class="fas fa-upload"></i> اختر ملف Excel <input type="file" id="stockFileInput" style="display:none;"></div>
         <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
-            <button id="stockModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
+            <button id="stockModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
                 <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
             </button>
             <button id="stockModeMerge" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:transparent; color:var(--text-muted); border:1px solid transparent; transition:all 0.18s;">
                 <i class="fas fa-layer-group" style="margin-left:5px;"></i> دمج
             </button>
         </div>
-        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(236,72,153,0.05); border:1px solid rgba(236,72,153,0.15);">
+        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.15);">
             <i class="fas fa-info-circle" style="color:var(--accent); margin-left:5px;"></i>
             <span id="stockModeDescText">تحديث: يحذف بيانات المرجع القديمة ويستبدلها بالجديدة</span>
         </div>
@@ -1174,45 +1163,42 @@
         /* ══ FILTER GRID ══ */
         .filter-grid {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             margin-bottom: 16px;
             flex-wrap: nowrap;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scrollbar-width: none;
+            overflow-x: visible;
         }
-        .filter-grid::-webkit-scrollbar { display: none; }
 
         .filter-btn {
-            flex: 0 0 auto;
-            min-width: 76px;
+            flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            padding: 13px 10px 10px;
-            border-radius: 18px;
-            border: 1.5px solid rgba(255,255,255,0.07);
-            background: var(--surface2);
-            color: rgba(160,150,185,0.65);
+            gap: 5px;
+            padding: 10px 4px 8px;
+            border-radius: 16px;
+            border: 1.5px solid rgba(0,0,0,0.08);
+            background: #f9f9f9;
+            color: #9ca3af;
             font-family: 'Cairo', sans-serif;
-            font-size: 0.72rem;
+            font-size: 0.62rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(.34,1.4,.64,1);
         }
 
         .fbtn-icon {
-            width: 42px; height: 42px;
-            border-radius: 14px;
+            width: 34px; height: 34px;
+            border-radius: 11px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.05rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.07);
+            font-size: 0.88rem;
+            background: #f0f0f0;
+            border: none;
             transition: all 0.25s cubic-bezier(.34,1.4,.64,1);
         }
 
-        .fbtn-label { font-size: 0.68rem; transition: all 0.2s; }
+        .fbtn-label { font-size: 0.6rem; transition: all 0.2s; }
 
         .filter-btn:hover { transform: translateY(-2px); color: rgba(230,225,245,0.9); }
         .filter-btn:hover .fbtn-icon { background: rgba(255,255,255,0.09); }
@@ -1297,14 +1283,14 @@
 
         <div class="file-label" id="dbUploadArea"><i class="fas fa-upload"></i> رفع ملف المنتجات <input type="file" id="dbFileInput" style="display:none;" multiple></div>
         <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
-            <button id="dbModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
+            <button id="dbModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
                 <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
             </button>
             <button id="dbModeMerge" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:transparent; color:var(--text-muted); border:1px solid transparent; transition:all 0.18s;">
                 <i class="fas fa-layer-group" style="margin-left:5px;"></i> دمج
             </button>
         </div>
-        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(236,72,153,0.05); border:1px solid rgba(236,72,153,0.15);">
+        <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:10px; padding:7px 12px; border-radius:9px; background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.15);">
             <i class="fas fa-info-circle" style="color:var(--accent); margin-left:5px;"></i>
             <span id="dbModeDescText">تحديث: يحذف المنتجات القديمة ويستبدلها بالجديدة</span>
         </div>
@@ -1341,7 +1327,7 @@
 </div>
 
 <div id="productModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); justify-content:center; align-items:center; z-index:3000;">
-    <div style="background:#13161e; border-radius:20px; padding:24px; width:90%; max-width:380px; border:1px solid rgba(236,72,153,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div style="background:#13161e; border-radius:20px; padding:24px; width:90%; max-width:380px; border:1px solid rgba(16,185,129,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.6);">
         <h3 style="color:#06b6d4; margin-bottom:16px; font-family:'Tajawal',sans-serif;">➕ إضافة منتج</h3>
         <input type="text" id="modalItemNo" placeholder="رقم الصنف *" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;"><input type="text" id="modalName" placeholder="الاسم *" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;"><input type="text" id="modalBarcode" placeholder="الباركود (اختياري)" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;"><input type="number" id="modalQty" placeholder="كمية مرجعية" value="0" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;">
         <div style="display:flex; gap:12px; margin-top:12px;"><button id="saveProductBtn" style="background:linear-gradient(135deg,#0891b2,#06b6d4); color:#fff; border:none; padding:12px; border-radius:10px; flex:1; font-weight:800; font-family:'Cairo',sans-serif; cursor:pointer;">حفظ</button><button id="closeModalBtn" style="background:var(--surface2); color:var(--text); border:1px solid var(--border); padding:12px; border-radius:10px; flex:1; cursor:pointer; font-family:'Cairo',sans-serif;">إلغاء</button></div>
@@ -1449,7 +1435,7 @@
             ready:    'var(--accent)',
             scanning: '#ffd166',
             locked:   'var(--negative)',
-            confirm:  '#ec4899'   // سيان: انتظار التأكيد
+            confirm:  '#10b981'   // سيان: انتظار التأكيد
         };
         dot.style.background = colors[state] || colors.idle;
         text.textContent = msg || 'جاهز للمسح';
@@ -1466,29 +1452,29 @@
         try {
             const now = audioCtx.currentTime;
             if (success) {
-                // نغمتان صاعدتان قصيرتان
-                [880, 1100].forEach((freq, i) => {
-                    const osc = audioCtx.createOscillator();
+                // ✅ صوت نجاح: 3 نغمات صاعدة عالية وواضحة
+                [700, 900, 1200].forEach((freq, i) => {
+                    const osc  = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.connect(gain); gain.connect(audioCtx.destination);
-                    const t = now + i * 0.12;
+                    const t = now + i * 0.1;
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(freq, t);
-                    gain.gain.setValueAtTime(0.22, t);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-                    osc.start(t); osc.stop(t + 0.18);
+                    gain.gain.setValueAtTime(0.55, t);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+                    osc.start(t); osc.stop(t + 0.22);
                 });
             } else {
-                // نغمة هابطة للخطأ
-                const osc = audioCtx.createOscillator();
+                // ❌ صوت خطأ: نغمة هابطة حادة وعالية
+                const osc  = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(320, now);
-                osc.frequency.exponentialRampToValueAtTime(140, now + 0.35);
-                gain.gain.setValueAtTime(0.18, now);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-                osc.start(now); osc.stop(now + 0.4);
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(120, now + 0.45);
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
             }
         } catch(e) {}
     }
@@ -1503,8 +1489,8 @@
     function showToast(msg, isErr = false, duration = 3000) {
         let t = document.querySelector('.toast'); if (t) t.remove();
         const toast = document.createElement('div'); toast.className = 'toast';
-        toast.style.background = isErr ? 'rgba(255,107,107,0.15)' : 'rgba(236,72,153,0.1)';
-        toast.style.border = isErr ? '1px solid rgba(255,107,107,0.3)' : '1px solid rgba(99,102,241,0.3)';
+        toast.style.background = isErr ? 'rgba(255,107,107,0.15)' : 'rgba(16,185,129,0.08)';
+        toast.style.border = isErr ? '1px solid rgba(220,38,38,0.3)' : '1px solid rgba(16,185,129,0.3)';
         toast.style.color = isErr ? 'var(--negative)' : 'var(--accent)';
         toast.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
         document.body.appendChild(toast);
@@ -1660,7 +1646,7 @@
                         idx: i
                     }));
                     document.getElementById('colMapPreview').innerHTML = hdrs.map(h =>
-                        '<span style="background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);border-radius:6px;padding:2px 8px;font-size:0.68rem;color:var(--accent);white-space:nowrap;">' + h.label + '</span>'
+                        '<span style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:6px;padding:2px 8px;font-size:0.68rem;color:var(--accent);white-space:nowrap;">' + h.label + '</span>'
                     ).join('');
                     const fieldsDiv = document.getElementById('colMapFields');
                     fieldsDiv.innerHTML = '';
@@ -1926,11 +1912,11 @@
                 let selectedCam = savedCamId
                     ? devices.find(d => d.id === savedCamId)
                     : null;
-                // إذا لم توجد المحفوظة، تفضيل الخلفية
+                // الأولوية: الكاميرا رقم 3 (index 2)، ثم الخلفية، ثم الأخيرة
                 if (!selectedCam) {
-                    selectedCam = devices.find(d =>
-                        /back|rear|خلفية|environment/i.test(d.label)
-                    ) || devices[devices.length - 1];
+                    selectedCam = devices[2]   // كاميرا 3
+                        || devices.find(d => /back|rear|خلفية|environment/i.test(d.label))
+                        || devices[devices.length - 1];
                 }
                 currentCameraId = selectedCam.id;
                 select.value = currentCameraId;
@@ -1943,44 +1929,23 @@
         } catch (err) { console.warn(err); }
     }
 
-    // إغلاق شامل — يقتل المسح + stream الفيديو + يمسح reader2
-    async function forceCloseCamera() {
-        scanningActive = false;
-        if (html5QrScanner) {
-            try { await html5QrScanner.stop(); } catch(e) {}
-            try { html5QrScanner.clear(); } catch(e) {}
-            html5QrScanner = null;
-        }
-        try {
-            document.querySelectorAll('#reader2 video, #cameraDiv video').forEach(v => {
-                if (v.srcObject) { v.srcObject.getTracks().forEach(t => { try{t.stop();}catch(e){} }); v.srcObject = null; }
-                v.load();
-            });
-        } catch(e) {}
-        const reader = document.getElementById('reader2');
-        if (reader) reader.innerHTML = '';
-        const cameraDiv = document.getElementById('cameraDiv');
-        const scanLine  = document.getElementById('scanLine');
-        if (cameraDiv) cameraDiv.classList.add('hidden');
-        if (scanLine)  scanLine.style.display = 'none';
-    }
-
     async function startCamera(cameraId = null) {
-        await forceCloseCamera();
+        if (html5QrScanner) { await html5QrScanner.stop().catch(() => {}); html5QrScanner = null; }
+        scanningActive = false;
         const cameraDiv = document.getElementById('cameraDiv');
-        const scanLine  = document.getElementById('scanLine');
+        const scanLine = document.getElementById('scanLine');
         cameraDiv.classList.remove('hidden');
         setScanStatus('scanning', 'جاري تشغيل الكاميرا...');
         try {
             const targetId = cameraId || currentCameraId || (availableCameras[0]?.id);
             if (!targetId) throw new Error("لا توجد كاميرا متاحة");
-            html5QrScanner = new Html5Qrcode("reader2", { verbose: false });
+            html5QrScanner = new Html5Qrcode("reader2");
             await html5QrScanner.start(
                 { deviceId: { exact: targetId } },
                 {
-                    fps: 30,
-                    qrbox: { width: 160, height: 160 },
-                    aspectRatio: 1.0,
+                    fps: 25,
+                    qrbox: { width: 300, height: 100 },   // عرض أكبر للـ EAN-13
+                    aspectRatio: 1.7778,
                     disableFlip: false,
                     experimentalFeatures: { useBarCodeDetectorIfSupported: true },
                     formatsToSupport: [
@@ -1993,9 +1958,6 @@
                         Html5QrcodeSupportedFormats?.CODE_93,
                         Html5QrcodeSupportedFormats?.ITF,
                         Html5QrcodeSupportedFormats?.CODABAR,
-                        Html5QrcodeSupportedFormats?.QR_CODE,
-                        Html5QrcodeSupportedFormats?.DATA_MATRIX,
-                        Html5QrcodeSupportedFormats?.PDF_417,
                     ].filter(Boolean)
                 },
                 async (decoded) => {
@@ -2021,7 +1983,11 @@
     }
 
     async function closeCamera() {
-        await forceCloseCamera();
+        if (html5QrScanner) { await html5QrScanner.stop().catch(() => {}); html5QrScanner = null; }
+        scanningActive = false;
+        document.getElementById('cameraDiv').classList.add('hidden');
+        const scanLine = document.getElementById('scanLine');
+        if (scanLine) scanLine.style.display = 'none';
         setScanStatus('idle', 'جاهز للمسح');
     }
 
@@ -2088,7 +2054,7 @@
                 <div style="display:flex; align-items:center; gap:9px; padding:11px 12px 8px;">
 
                     <div style="min-width:26px; height:26px; border-radius:7px; flex-shrink:0;
-                        background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.08));
+                        background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.08));
                         border:1px solid rgba(6,182,212,0.22);
                         display:flex; align-items:center; justify-content:center;
                         font-size:0.68rem; font-weight:900; color:var(--accent); font-family:'Tajawal',sans-serif;">
@@ -2207,7 +2173,7 @@
             const isPos  = r.diff > 0, isNeg = r.diff < 0, isZero = r.diff === 0 && r.qi > 0;
             const rowBg  = isPos  ? 'rgba(0,180,100,0.09)'   : isNeg  ? 'rgba(220,60,60,0.09)'  : isZero ? 'rgba(0,120,220,0.09)'  : '';
             const rowBdr = isPos  ? 'rgba(0,200,120,0.18)'   : isNeg  ? 'rgba(220,60,60,0.18)'  : isZero ? 'rgba(0,120,220,0.18)' : 'transparent';
-            const numClr = isPos  ? '#ec4899' : isNeg ? '#fb7185' : isZero ? '#60a5fa' : 'var(--text)';
+            const numClr = isPos  ? '#10b981' : isNeg ? '#fb7185' : isZero ? '#60a5fa' : 'var(--text)';
             const icon   = isPos  ? '⬆' : isNeg ? '⬇' : isZero ? '✓' : '—';
             const diffTxt = (r.diff > 0 ? '+' : '') + r.diff;
             return `<tr style="background:${rowBg}; border-bottom:1px solid ${rowBdr};">
@@ -2670,7 +2636,7 @@
     let invUploadMode = 'replace';
     function setInvMode(mode) {
         invUploadMode = mode;
-        const on = 'linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12))';
+        const on = 'linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.12))';
         const btnU = document.getElementById('invModeUpdate'), btnM = document.getElementById('invModeMerge');
         const desc = document.getElementById('invModeDescText');
         if (mode === 'replace') {
@@ -2698,7 +2664,7 @@
     let stockUploadMode = 'replace';
     function setStockMode(mode) {
         stockUploadMode = mode;
-        const on = 'linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12))';
+        const on = 'linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.12))';
         const btnU = document.getElementById('stockModeUpdate'), btnM = document.getElementById('stockModeMerge');
         const desc = document.getElementById('stockModeDescText');
         if (mode === 'replace') {
@@ -2718,7 +2684,7 @@
     let dbUploadMode = 'update';
     function setDbMode(mode) {
         dbUploadMode = mode;
-        const on = 'linear-gradient(135deg,rgba(236,72,153,0.15),rgba(14,165,233,0.12))';
+        const on = 'linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.12))';
         const btnU = document.getElementById('dbModeUpdate'), btnM = document.getElementById('dbModeMerge');
         const desc = document.getElementById('dbModeDescText');
         if (mode === 'update') {
@@ -2843,13 +2809,14 @@
 
     document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', function() {
         let target = this.getAttribute('data-tab');
-        if (target !== 'tab-scan') {
-            forceCloseCamera();
+        // أغلق الكاميرا إذا انتقلنا بعيداً عن تبويب المسح
+        if (target !== 'tab-scan' && html5QrScanner) {
+            html5QrScanner.stop().catch(() => {});
+            html5QrScanner = null;
+            scanningActive = false;
+            const scanLine = document.getElementById('scanLine');
+            if (scanLine) scanLine.style.display = 'none';
             setScanStatus('idle', 'اضغط فتح لبدء المسح');
-            setTimeout(() => {
-                const cd = document.getElementById('cameraDiv');
-                if (cd) cd.classList.add('hidden');
-            }, 400);
         }
         document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
         this.classList.add('active');
@@ -2857,9 +2824,6 @@
         document.getElementById(target).classList.add('active-pane');
         updateAllUI();
     }));
-
-    document.addEventListener('visibilitychange', () => { if (document.hidden) forceCloseCamera(); });
-    window.addEventListener('beforeunload', () => forceCloseCamera());
 
     function initDB() {
         const req = indexedDB.open(DB_NAME, DB_VERSION);
