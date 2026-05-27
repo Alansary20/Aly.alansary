@@ -655,11 +655,25 @@
             margin-top: 12px;
             background: #000;
             position: relative;
-            max-width: 400px;
+            width: 260px;
+            height: 260px;
             margin-left: auto;
             margin-right: auto;
-            border: 1px solid rgba(236,72,153,0.2);
+            border: 1px solid rgba(236,72,153,0.25);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
+
+        /* إخفاء الإطار الأبيض الافتراضي لـ Html5Qrcode */
+        #reader2 { width:100% !important; height:100% !important; }
+        #reader2 video { width:100% !important; height:100% !important; object-fit:cover !important; }
+        #reader2 img { display:none !important; }
+        #reader2 > div[style*="border"] { display:none !important; }
+        /* إخفاء كل الإطارات والـ shading */
+        #reader2__scan_region > img,
+        #reader2__scan_region > div { display:none !important; }
+        #reader2__dashboard { display:none !important; }
+        #reader2__header_message { display:none !important; }
+        [id^="reader2"] svg, [id^="reader2"] canvas:not([id*="qr"]) { display:none !important; }
 
         .camera-selector {
             display: flex;
@@ -1929,8 +1943,30 @@
         } catch (err) { console.warn(err); }
     }
 
+    // إغلاق شامل — يقتل المسح + stream الفيديو + يمسح reader2
+    async function forceCloseCamera() {
+        scanningActive = false;
+        if (html5QrScanner) {
+            try { await html5QrScanner.stop(); } catch(e) {}
+            try { html5QrScanner.clear(); } catch(e) {}
+            html5QrScanner = null;
+        }
+        try {
+            document.querySelectorAll('#reader2 video, #cameraDiv video').forEach(v => {
+                if (v.srcObject) { v.srcObject.getTracks().forEach(t => { try{t.stop();}catch(e){} }); v.srcObject = null; }
+                v.load();
+            });
+        } catch(e) {}
+        const reader = document.getElementById('reader2');
+        if (reader) reader.innerHTML = '';
+        const cameraDiv = document.getElementById('cameraDiv');
+        const scanLine  = document.getElementById('scanLine');
+        if (cameraDiv) cameraDiv.classList.add('hidden');
+        if (scanLine)  scanLine.style.display = 'none';
+    }
+
     async function startCamera(cameraId = null) {
-        await forceCloseCamera(); // إغلاق كامل قبل أي شيء
+        await forceCloseCamera();
         const cameraDiv = document.getElementById('cameraDiv');
         const scanLine  = document.getElementById('scanLine');
         cameraDiv.classList.remove('hidden');
@@ -1938,19 +1974,13 @@
         try {
             const targetId = cameraId || currentCameraId || (availableCameras[0]?.id);
             if (!targetId) throw new Error("لا توجد كاميرا متاحة");
-
             html5QrScanner = new Html5Qrcode("reader2", { verbose: false });
-
-            // حساب منطقة مسح مناسبة — عرض ثابت صغير بغض النظر عن الشاشة
-            const scanW = Math.min(240, Math.round(window.innerWidth * 0.62));
-            const scanH = Math.round(scanW * 0.38); // نسبة مستطيلة مثالية للباركود
-
             await html5QrScanner.start(
                 { deviceId: { exact: targetId } },
                 {
                     fps: 30,
-                    qrbox: { width: scanW, height: scanH },
-                    aspectRatio: 16/9,
+                    qrbox: { width: 160, height: 160 },
+                    aspectRatio: 1.0,
                     disableFlip: false,
                     experimentalFeatures: { useBarCodeDetectorIfSupported: true },
                     formatsToSupport: [
@@ -1970,10 +2000,11 @@
                 },
                 async (decoded) => {
                     onCameraScan(decoded);
+                    // عرض الكود المقروء في الحقل للمراجعة
                     const code = sanitizeBarcode(decoded);
                     if (code) document.getElementById('barcodeInput').value = code;
                 },
-                () => {}
+                () => {} // خطأ مسح عادي، تجاهل
             );
             scanningActive = true;
             currentCameraId = targetId;
@@ -1987,43 +2018,6 @@
             setScanStatus('idle', 'فشل تشغيل الكاميرا');
             scanningActive = false;
         }
-    }
-
-    // إغلاق شامل — يقتل المسح + stream الفيديو + يخفي الواجهة
-    async function forceCloseCamera() {
-        scanningActive = false;
-        // أوقف Html5Qrcode
-        if (html5QrScanner) {
-            try { await html5QrScanner.stop(); } catch(e) {}
-            try { html5QrScanner.clear(); } catch(e) {}
-            html5QrScanner = null;
-        }
-        // أوقف أي MediaStream متبقٍّ في الصفحة
-        try {
-            const videos = document.querySelectorAll('#reader2 video, #cameraDiv video');
-            videos.forEach(v => {
-                if (v.srcObject) {
-                    v.srcObject.getTracks().forEach(t => { try { t.stop(); } catch(e) {} });
-                    v.srcObject = null;
-                }
-                v.load();
-            });
-        } catch(e) {}
-        // أوقف أي stream مفتوح من getUserMedia
-        try {
-            if (window._activeCamStream) {
-                window._activeCamStream.getTracks().forEach(t => { try { t.stop(); } catch(e) {} });
-                window._activeCamStream = null;
-            }
-        } catch(e) {}
-        // أخفِ الواجهة
-        const cameraDiv = document.getElementById('cameraDiv');
-        const scanLine  = document.getElementById('scanLine');
-        if (cameraDiv) cameraDiv.classList.add('hidden');
-        if (scanLine)  scanLine.style.display = 'none';
-        // أعد تعيين محتوى reader2 لمنع بقايا الـ canvas
-        const reader = document.getElementById('reader2');
-        if (reader) reader.innerHTML = '';
     }
 
     async function closeCamera() {
@@ -2849,17 +2843,13 @@
 
     document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', function() {
         let target = this.getAttribute('data-tab');
-        // إغلاق الكاميرا بالكامل عند مغادرة تبويب المسح
         if (target !== 'tab-scan') {
             forceCloseCamera();
             setScanStatus('idle', 'اضغط فتح لبدء المسح');
-            // إخفاء إضافي بعد 300ms للتأكيد
             setTimeout(() => {
                 const cd = document.getElementById('cameraDiv');
                 if (cd) cd.classList.add('hidden');
-                const sl = document.getElementById('scanLine');
-                if (sl) sl.style.display = 'none';
-            }, 300);
+            }, 400);
         }
         document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
         this.classList.add('active');
@@ -2868,10 +2858,7 @@
         updateAllUI();
     }));
 
-    // إغلاق الكاميرا عند إخفاء الصفحة (تبديل التطبيق / قفل الشاشة)
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) forceCloseCamera();
-    });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) forceCloseCamera(); });
     window.addEventListener('beforeunload', () => forceCloseCamera());
 
     function initDB() {
