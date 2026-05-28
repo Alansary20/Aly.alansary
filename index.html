@@ -655,18 +655,19 @@
             margin: 14px auto;
             background: #000;
             position: relative;
-            width: 240px;
-            height: 240px;
+            width: 100%;
+            max-width: 340px;
+            height: 280px;
             border: none;
             box-shadow: none;
         }
 
-        /* Force the video inside to fill the square */
+        /* Force the video inside to fill */
         .camera-wrapper video,
         .camera-wrapper #reader2,
         .camera-wrapper #reader2 > * {
             width: 100% !important;
-            height: 240px !important;
+            height: 280px !important;
             object-fit: cover !important;
         }
 
@@ -1993,9 +1994,7 @@
             await html5QrScanner.start(
                 { deviceId: { exact: targetId } },
                 {
-                    fps: 25,
-                    qrbox: { width: 200, height: 80 },   // مناسب للمربع الصغير
-                    aspectRatio: 1.0,
+                    fps: 30,
                     disableFlip: false,
                     experimentalFeatures: { useBarCodeDetectorIfSupported: true },
                     formatsToSupport: [
@@ -2859,13 +2858,17 @@
 
     document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', function() {
         let target = this.getAttribute('data-tab');
-        // أغلق الكاميرا إذا انتقلنا بعيداً عن تبويب المسح
-        if (target !== 'tab-scan' && html5QrScanner) {
-            html5QrScanner.stop().catch(() => {});
-            html5QrScanner = null;
+        // أغلق الكاميرا فوراً عند مغادرة تبويب المسح
+        if (target !== 'tab-scan') {
+            if (html5QrScanner) {
+                html5QrScanner.stop().catch(() => {});
+                html5QrScanner = null;
+            }
             scanningActive = false;
             const scanLine = document.getElementById('scanLine');
             if (scanLine) scanLine.style.display = 'none';
+            const cameraDiv = document.getElementById('cameraDiv');
+            if (cameraDiv) cameraDiv.classList.add('hidden');
             setScanStatus('idle', 'اضغط فتح لبدء المسح');
         }
         document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
