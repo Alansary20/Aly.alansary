@@ -47,7 +47,7 @@
             --accent3:     #e05555;
             --text:        #1a1a2e;
             --text-muted:  #6b7280;
-            --text-dim:    #f9a8d4;
+            --text-dim:    #6ee7b7;
             --gold:        #d4900a;
             --positive:    #059669;
             --negative:    #dc2626;
@@ -198,7 +198,7 @@
             border-radius: 20px;
             padding: 18px 8px 14px;
             text-align: center;
-            border: 2px solid rgba(0,0,0,0.08);
+            border: none;
             position: relative;
             overflow: hidden;
             transition: transform 0.25s cubic-bezier(.34,1.4,.64,1), border-color 0.2s, box-shadow 0.2s;
@@ -247,7 +247,9 @@
             flex-direction: row;
             gap: 6px;
             margin-bottom: 16px;
-            overflow-x: visible;
+            overflow: visible;
+            padding: 6px 2px 8px;
+            margin-top: -6px;
         }
         .tabs::-webkit-scrollbar { display: none; }
         .tabs-row { display: contents; }
@@ -258,7 +260,7 @@
             min-width: 0;
             max-width: none;
             background: #fff;
-            border: 2px solid rgba(0,0,0,0.1);
+            border: none;
             border-radius: 18px;
             padding: 10px 4px 8px;
             font-weight: 700;
@@ -306,10 +308,10 @@
         /* scan = سماوي */
         .tab-btn.active[data-tab="tab-scan"] {
             background: linear-gradient(160deg,#e0f7fa,#b2ebf2);
-            border-color: rgba(0,188,212,0.3);
+            border: none;
             color: #00838f;
             box-shadow: 0 8px 24px rgba(0,188,212,0.2);
-            transform: translateY(-5px) scale(1.04);
+            
         }
         .tab-btn.active[data-tab="tab-scan"] i {
             background: linear-gradient(135deg,#00838f,#00bcd4);
@@ -321,10 +323,10 @@
         /* inv = أخضر نعناعي */
         .tab-btn.active[data-tab="tab-inv"] {
             background: linear-gradient(160deg,#e8f5e9,#c8e6c9);
-            border-color: rgba(67,160,71,0.3);
+            border: none;
             color: #2e7d32;
             box-shadow: 0 8px 24px rgba(67,160,71,0.2);
-            transform: translateY(-5px) scale(1.04);
+            
         }
         .tab-btn.active[data-tab="tab-inv"] i {
             background: linear-gradient(135deg,#2e7d32,#43a047);
@@ -336,10 +338,10 @@
         /* stock = أزرق */
         .tab-btn.active[data-tab="tab-stock"] {
             background: linear-gradient(160deg,#e3f2fd,#bbdefb);
-            border-color: rgba(33,150,243,0.3);
+            border: none;
             color: #1565c0;
             box-shadow: 0 8px 24px rgba(33,150,243,0.2);
-            transform: translateY(-5px) scale(1.04);
+            
         }
         .tab-btn.active[data-tab="tab-stock"] i {
             background: linear-gradient(135deg,#1565c0,#2196f3);
@@ -351,10 +353,10 @@
         /* cmp = برتقالي عنبري */
         .tab-btn.active[data-tab="tab-cmp"] {
             background: linear-gradient(160deg,#fff8e1,#ffecb3);
-            border-color: rgba(255,160,0,0.3);
+            border: none;
             color: #e65100;
             box-shadow: 0 8px 24px rgba(255,160,0,0.2);
-            transform: translateY(-5px) scale(1.04);
+            
         }
         .tab-btn.active[data-tab="tab-cmp"] i {
             background: linear-gradient(135deg,#e65100,#ffa000);
@@ -365,16 +367,16 @@
 
         /* products = وردي 🌸 */
         .tab-btn.active[data-tab="tab-products"] {
-            background: linear-gradient(160deg,#fce4ec,#f8bbd0);
-            border-color: rgba(233,30,99,0.3);
-            color: #880e4f;
-            box-shadow: 0 8px 24px rgba(233,30,99,0.2);
-            transform: translateY(-5px) scale(1.04);
+            background: linear-gradient(160deg,#d1fae5,#a7f3d0);
+            border-color: rgba(16,185,129,0.3);
+            color: #065f40;
+            box-shadow: 0 8px 24px rgba(16,185,129,0.2);
+            
         }
         .tab-btn.active[data-tab="tab-products"] i {
-            background: linear-gradient(135deg,#880e4f,#e91e63);
+            background: linear-gradient(135deg,#065f40,#10b981);
             color: #fff;
-            box-shadow: 0 4px 14px rgba(233,30,99,0.45);
+            box-shadow: 0 4px 14px rgba(16,185,129,0.45);
             animation: iconBounce 0.4s cubic-bezier(.34,1.7,.64,1);
         }
 
@@ -400,7 +402,7 @@
         body:not(.light-theme) .tab-btn.active[data-tab="tab-inv"]      { background: linear-gradient(160deg,#0a2e1a,#133d24); color:#6ee7b7; }
         body:not(.light-theme) .tab-btn.active[data-tab="tab-stock"]    { background: linear-gradient(160deg,#0a1f40,#0e2d5e); color:#93c5fd; }
         body:not(.light-theme) .tab-btn.active[data-tab="tab-cmp"]      { background: linear-gradient(160deg,#2a1800,#3d2400); color:#fde68a; }
-        body:not(.light-theme) .tab-btn.active[data-tab="tab-products"] { background: linear-gradient(160deg,#2a0818,#3d0f24); color:#fda4af; }
+        body:not(.light-theme) .tab-btn.active[data-tab="tab-products"] { background: linear-gradient(160deg,#0a2e1a,#133d24); color:#6ee7b7; }
 
         /* ── CARD ── */
         .card {
@@ -408,7 +410,7 @@
             border-radius: 20px;
             padding: 18px 16px;
             margin-bottom: 16px;
-            border: 2px solid rgba(0,0,0,0.09);
+            border: none;
             box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
 
@@ -425,7 +427,7 @@
             width: 100%;
             padding: 13px 18px;
             font-size: 0.95rem;
-            border: 2px solid rgba(0,0,0,0.12);
+            border: none;
             border-radius: 12px;
             background: #ffffff;
             margin-bottom: 12px;
@@ -433,7 +435,7 @@
             font-family: 'Cairo', sans-serif;
             transition: all 0.2s;
         }
-        .input-field::placeholder { color: var(--text-dim); }
+        .input-field::placeholder { color: #9ca3af; }
         .input-field:focus {
             outline: none;
             border-color: var(--accent);
@@ -510,7 +512,7 @@
             border-radius: 14px;
             padding: 14px;
             margin-bottom: 10px;
-            border: 2px solid rgba(0,0,0,0.08);
+            border: none;
             transition: border-color 0.2s;
         }
         .product-card:hover { border-color: rgba(16,185,129,0.2); }
@@ -533,7 +535,7 @@
             background: rgba(16,185,129,0.08);
             padding: 4px 16px;
             border-radius: 10px;
-            border: 1px solid rgba(16,185,129,0.2);
+            border: none;
             font-family: 'Tajawal', sans-serif;
             text-shadow: 0 0 12px rgba(6,182,212,0.35);
         }
@@ -568,7 +570,7 @@
             overflow-y: auto;
             max-height: 420px;
             border-radius: 14px;
-            border: 2px solid rgba(0,0,0,0.09);
+            border: none;
             background: #ffffff;
             margin-top: 12px;
             scrollbar-width: thin;
@@ -596,7 +598,7 @@
             text-align: center;
             font-size: 0.72rem;
             letter-spacing: 0.5px;
-            border-bottom: 2px solid rgba(0,0,0,0.08);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
         }
 
         .data-table td {
@@ -617,14 +619,14 @@
             width: 100%;
             padding: 11px 16px;
             border-radius: 12px;
-            border: 2px solid rgba(0,0,0,0.1);
+            border: none;
             margin-bottom: 12px;
             background: #ffffff;
             color: var(--text);
             font-family: 'Cairo', sans-serif;
             font-size: 0.88rem;
         }
-        .search-input::placeholder { color: var(--text-dim); }
+        .search-input::placeholder { color: #9ca3af; }
         .search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(16,185,129,0.08); }
 
         /* ── FILE UPLOAD ── */
@@ -648,15 +650,62 @@
 
         /* ── CAMERA ── */
         .camera-wrapper {
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
-            margin-top: 12px;
+            margin: 14px auto;
             background: #000;
             position: relative;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-            border: 1px solid rgba(16,185,129,0.2);
+            width: 240px;
+            height: 240px;
+            border: none;
+            box-shadow: none;
+        }
+
+        /* Force the video inside to fill the square */
+        .camera-wrapper video,
+        .camera-wrapper #reader2,
+        .camera-wrapper #reader2 > * {
+            width: 100% !important;
+            height: 240px !important;
+            object-fit: cover !important;
+        }
+
+        /* Scan line animation */
+        .camera-wrapper::after {
+            content: '';
+            position: absolute;
+            left: 10%; right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            border-radius: 2px;
+            animation: scanLine 1.8s ease-in-out infinite;
+            pointer-events: none;
+            box-shadow: 0 0 8px rgba(16,185,129,0.6);
+        }
+        @keyframes scanLine {
+            0%   { top: 15%; opacity: 0.4; }
+            50%  { top: 82%; opacity: 1; }
+            100% { top: 15%; opacity: 0.4; }
+        }
+
+        /* Corner guides */
+        .camera-wrapper::before-disabled {
+            content: '';
+            position: absolute;
+            inset: 16px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background:
+                linear-gradient(#10b981, #10b981) top left / 24px 3px no-repeat,
+                linear-gradient(#10b981, #10b981) top left / 3px 24px no-repeat,
+                linear-gradient(#10b981, #10b981) top right / 24px 3px no-repeat,
+                linear-gradient(#10b981, #10b981) top right / 3px 24px no-repeat,
+                linear-gradient(#10b981, #10b981) bottom left / 24px 3px no-repeat,
+                linear-gradient(#10b981, #10b981) bottom left / 3px 24px no-repeat,
+                linear-gradient(#10b981, #10b981) bottom right / 24px 3px no-repeat,
+                linear-gradient(#10b981, #10b981) bottom right / 3px 24px no-repeat;
+            pointer-events: none;
+            z-index: 10;
         }
 
         .camera-selector {
@@ -726,7 +775,7 @@
             font-size: 0.85rem;
             z-index: 2100;
             box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            border: 1px solid rgba(16,185,129,0.2);
+            border: none;
             font-family: 'Cairo', sans-serif;
             animation: slideUp 0.3s ease;
         }
@@ -753,7 +802,7 @@
         /* ── MODAL ── */
         #productModal > div {
             background: var(--surface) !important;
-            border: 1px solid rgba(16,185,129,0.2) !important;
+            border: none !important;
             color: var(--text) !important;
         }
         #productModal h3 { color: var(--accent); margin-bottom: 16px; font-family: 'Tajawal', sans-serif; }
@@ -820,21 +869,22 @@
         /* شريط التقدم */
         #progressOverlay {
             display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
+            background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
             z-index: 4000; align-items: center; justify-content: center;
         }
         #progressOverlay.show { display: flex; }
         #progressBox {
-            background: var(--surface); border: 1px solid rgba(16,185,129,0.25);
-            border-radius: 20px; padding: 26px 24px 20px;
+            background: #ffffff;
+            border: none;
+            border-radius: 24px; padding: 28px 24px 22px;
             width: 88%; max-width: 360px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(16,185,129,0.1);
         }
-        #progressTitle { font-size:0.92rem; font-weight:800; color:var(--text); margin-bottom:5px; font-family:'Tajawal',sans-serif; }
-        #progressSub   { font-size:0.72rem; color:var(--text-muted); margin-bottom:14px; min-height:16px; }
-        #progressTrack { height:9px; background:var(--surface3); border-radius:99px; overflow:hidden; margin-bottom:8px; }
-        #progressFill  { height:100%; width:0%; background:linear-gradient(90deg,#0891b2,#06b6d4); border-radius:99px; transition:width 0.2s ease; box-shadow:0 0 12px rgba(16,185,129,0.35); }
-        #progressPct   { text-align:left; font-size:0.8rem; color:var(--accent); font-weight:800; font-family:'Tajawal',sans-serif; }
+        #progressTitle { font-size:1rem; font-weight:800; color:#1a1a2e; margin-bottom:6px; font-family:'Tajawal',sans-serif; }
+        #progressSub   { font-size:0.75rem; color:#6b7280; margin-bottom:16px; min-height:18px; }
+        #progressTrack { height:10px; background:#f3f4f6; border-radius:99px; overflow:hidden; margin-bottom:10px; border: none; }
+        #progressFill  { height:100%; width:0%; background:linear-gradient(90deg,#047857,#10b981,#34d399); border-radius:99px; transition:width 0.25s ease; box-shadow:0 0 12px rgba(16,185,129,0.4); }
+        #progressPct   { text-align:left; font-size:0.85rem; color:#059669; font-weight:800; font-family:'Tajawal',sans-serif; }
 
         /* ══ COMPARE STAT CARDS ══ */
         .cmp-stats-grid {
@@ -965,16 +1015,16 @@
         <div class="card" id="scanCard">
 
             <!-- مؤشر حالة السكانر -->
-            <div id="scanStatusBar" style="display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; background:var(--surface2); border:1px solid var(--border); margin-bottom:14px;">
+            <div id="scanStatusBar" style="display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; background:var(--surface2); border:none; margin-bottom:14px; background:#f9f9f9;">
                 <div id="scanDot" style="width:10px; height:10px; border-radius:50%; background:var(--text-dim); flex-shrink:0; transition:background 0.3s;"></div>
-                <span id="scanStatusText" style="font-size:0.8rem; color:var(--text-muted); flex:1;">جاهز للمسح</span>
+                <span id="scanStatusText" style="font-size:0.8rem; color:#374151; flex:1; font-weight:600;">جاهز للمسح</span>
                 <span id="scanCooldownBadge" style="display:none; font-size:0.72rem; background:rgba(255,107,107,0.15); color:var(--negative); padding:3px 10px; border-radius:6px; border:1px solid rgba(255,107,107,0.2);">⏳ انتظر...</span>
             </div>
 
             <!-- حقل الإدخال اليدوي -->
-            <div style="position:relative; margin-bottom:12px;">
-                <input type="text" id="barcodeInput" class="input-field" style="margin-bottom:0; padding-left:48px; color:#1e3a5f; font-weight:600;" placeholder="✍️ اكتب باركود أو رقم صنف ثم Enter" autocomplete="off" inputmode="text">
-                <button id="addOneBtn" style="background:linear-gradient(135deg,#0891b2,#06b6d4);color:#fff;border:none;padding:10px 16px;border-radius:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'Cairo',sans-serif;font-size:0.85rem;box-shadow:0 4px 16px rgba(6,182,212,0.4);transition:all 0.2s;">
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+                <input type="text" id="barcodeInput" class="input-field" style="flex:1; margin-bottom:0; color:#1e3a5f; font-weight:600;" placeholder="✍️ اكتب باركود أو رقم صنف ثم Enter" autocomplete="off" inputmode="text">
+                <button id="addOneBtn" style="background:linear-gradient(135deg,#047857,#10b981);color:#fff;border:none;padding:0;width:48px;height:48px;border-radius:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 16px rgba(16,185,129,0.4);transition:all 0.2s;flex-shrink:0;">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -991,7 +1041,7 @@
             </div>
 
             <!-- ضبط التأخير بين المسحات -->
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:10px 14px; background:var(--surface2); border-radius:12px; border:1px solid var(--border);">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:10px 14px; background:var(--surface2); border-radius:12px; border:none;">
                 <i class="fas fa-sliders-h" style="color:var(--text-muted); font-size:0.85rem;"></i>
                 <label style="font-size:0.78rem; color:var(--text-muted); white-space:nowrap;">تأخير المسح:</label>
                 <input type="range" id="delaySlider" min="500" max="5000" step="250" value="1500"
@@ -1043,7 +1093,7 @@
                     background:transparent; font-family:'Cairo',sans-serif; transition:all 0.2s;">
                 <i class="fas fa-upload" style="color:var(--accent); margin-left:6px;"></i> اختر ملف Excel للجرد
             </button>
-            <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
+            <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:none;">
                 <button id="invModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
                     <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
                 </button>
@@ -1070,7 +1120,7 @@
         </div>
 
         <div class="file-label" id="stockUploadArea"><i class="fas fa-upload"></i> اختر ملف Excel <input type="file" id="stockFileInput" style="display:none;"></div>
-        <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
+        <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:none;">
             <button id="stockModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
                 <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
             </button>
@@ -1178,7 +1228,7 @@
             gap: 5px;
             padding: 10px 4px 8px;
             border-radius: 16px;
-            border: 1.5px solid rgba(0,0,0,0.08);
+            border: none;
             background: #f9f9f9;
             color: #9ca3af;
             font-family: 'Cairo', sans-serif;
@@ -1282,7 +1332,7 @@
     <div id="tab-products" class="panel"><div class="card">
 
         <div class="file-label" id="dbUploadArea"><i class="fas fa-upload"></i> رفع ملف المنتجات <input type="file" id="dbFileInput" style="display:none;" multiple></div>
-        <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:1px solid var(--border);">
+        <div style="display:flex; gap:6px; margin-bottom:8px; background:var(--surface2); border-radius:12px; padding:5px; border:none;">
             <button id="dbModeUpdate" style="flex:1; border:none; padding:9px 8px; border-radius:9px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(14,165,233,0.12)); color:var(--accent); border:1px solid rgba(99,102,241,0.3); transition:all 0.18s;">
                 <i class="fas fa-sync-alt" style="margin-left:5px;"></i> تحديث
             </button>
@@ -1316,7 +1366,7 @@
           <input type="checkbox" id="colMapNoHeader" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
         </label>
       </div>
-      <div id="colMapPreview" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);max-height:100px;overflow-y:auto;"></div>
+      <div id="colMapPreview" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px;background:var(--surface2);border-radius:12px;border:none;max-height:100px;overflow-y:auto;"></div>
     </div>
     <div id="colMapFields" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;"></div>
     <div style="display:flex;gap:12px;">
@@ -1330,7 +1380,7 @@
     <div style="background:#13161e; border-radius:20px; padding:24px; width:90%; max-width:380px; border:1px solid rgba(16,185,129,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.6);">
         <h3 style="color:#06b6d4; margin-bottom:16px; font-family:'Tajawal',sans-serif;">➕ إضافة منتج</h3>
         <input type="text" id="modalItemNo" placeholder="رقم الصنف *" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;"><input type="text" id="modalName" placeholder="الاسم *" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;"><input type="text" id="modalBarcode" placeholder="الباركود (اختياري)" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;"><input type="number" id="modalQty" placeholder="كمية مرجعية" value="0" style="display:block;width:100%;padding:11px 14px;margin-bottom:10px;background:#1a1e2a;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#e8edf5;font-family:'Cairo',sans-serif;">
-        <div style="display:flex; gap:12px; margin-top:12px;"><button id="saveProductBtn" style="background:linear-gradient(135deg,#0891b2,#06b6d4); color:#fff; border:none; padding:12px; border-radius:10px; flex:1; font-weight:800; font-family:'Cairo',sans-serif; cursor:pointer;">حفظ</button><button id="closeModalBtn" style="background:var(--surface2); color:var(--text); border:1px solid var(--border); padding:12px; border-radius:10px; flex:1; cursor:pointer; font-family:'Cairo',sans-serif;">إلغاء</button></div>
+        <div style="display:flex; gap:12px; margin-top:12px;"><button id="saveProductBtn" style="background:linear-gradient(135deg,#0891b2,#06b6d4); color:#fff; border:none; padding:12px; border-radius:10px; flex:1; font-weight:800; font-family:'Cairo',sans-serif; cursor:pointer;">حفظ</button><button id="closeModalBtn" style="background:var(--surface2); color:var(--text); border:none; padding:12px; border-radius:10px; flex:1; cursor:pointer; font-family:'Cairo',sans-serif;">إلغاء</button></div>
     </div>
 </div>
 <script>
@@ -1433,9 +1483,9 @@
         const colors = {
             idle:     'var(--text-dim)',
             ready:    'var(--accent)',
-            scanning: '#ffd166',
+            scanning: '#10b981',
             locked:   'var(--negative)',
-            confirm:  '#10b981'   // سيان: انتظار التأكيد
+            confirm:  '#34d399'   // أخضر: انتظار التأكيد
         };
         dot.style.background = colors[state] || colors.idle;
         text.textContent = msg || 'جاهز للمسح';
@@ -1653,12 +1703,12 @@
                     fields.forEach(function(f) {
                         const opts = '<option value="">— اختر —</option>' +
                             hdrs.map(h => '<option value="' + h.idx + '">' + h.label + '</option>').join('');
-                        fieldsDiv.innerHTML += '<div style="background:var(--surface2);border-radius:11px;padding:11px 13px;border:1px solid var(--border);">' +
+                        fieldsDiv.innerHTML += '<div style="background:var(--surface2);border-radius:11px;padding:11px 13px;border:none;">' +
                             '<label style="font-size:0.73rem;font-weight:700;color:' + (f.color||'var(--text-muted)') + ';display:flex;align-items:center;gap:5px;margin-bottom:6px;">' +
                             '<i class="' + f.icon + '"></i>' + f.label +
                             (f.required ? '<span style="color:var(--negative);font-size:0.68rem;margin-right:4px;">*مطلوب</span>' : '') +
                             '</label>' +
-                            '<select id="cmf_' + f.id + '" style="width:100%;padding:8px 11px;border-radius:9px;background:var(--surface3);border:1px solid var(--border);color:var(--text);font-family:Cairo,sans-serif;font-size:0.8rem;">' + opts + '</select>' +
+                            '<select id="cmf_' + f.id + '" style="width:100%;padding:8px 11px;border-radius:9px;background:var(--surface3);border:none;color:var(--text);font-family:Cairo,sans-serif;font-size:0.8rem;">' + opts + '</select>' +
                             '</div>';
                     });
                     if (!noHeader) {
@@ -1944,8 +1994,8 @@
                 { deviceId: { exact: targetId } },
                 {
                     fps: 25,
-                    qrbox: { width: 300, height: 100 },   // عرض أكبر للـ EAN-13
-                    aspectRatio: 1.7778,
+                    qrbox: { width: 200, height: 80 },   // مناسب للمربع الصغير
+                    aspectRatio: 1.0,
                     disableFlip: false,
                     experimentalFeatures: { useBarCodeDetectorIfSupported: true },
                     formatsToSupport: [
@@ -2047,7 +2097,7 @@
             logHtml += `
             <div id="scanrow-${entry.id}" style="
                 border-radius:14px; margin-bottom:9px; overflow:hidden;
-                background:var(--surface2); border:1px solid var(--border);
+                background:var(--surface2); border:none;
                 box-shadow:0 4px 14px rgba(0,0,0,0.22);">
 
                 <!-- الصف العلوي: رقم + اسم + وقت -->
