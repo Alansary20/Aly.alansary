@@ -1124,15 +1124,24 @@
                 <span id="delayLabel" style="font-size:0.8rem; color:var(--accent); font-weight:700; min-width:36px; text-align:center;">1.5s</span>
             </div>
 
+            <!-- زر إغلاق الكاميرا — يظهر فوق الكاميرا حين تكون نشطة -->
             <!-- نافذة الكاميرا -->
             <div id="cameraDiv" class="camera-wrapper hidden" style="position:relative;">
                 <div id="reader2"></div>
                 <!-- خط المسح المتحرك -->
                 <div id="scanLine" style="display:none; position:absolute; left:10%; right:10%; height:2px; background:linear-gradient(90deg,transparent,var(--accent),transparent); border-radius:2px; animation:scanAnim 1.8s ease-in-out infinite; top:50%; z-index:10; box-shadow:0 0 10px var(--accent);"></div>
-                <button id="closeCamBtn" class="btn-secondary" style="margin:8px; border-radius:10px; padding:10px;">
-                    <i class="fas fa-times-circle"></i> إغلاق الكاميرا
-                </button>
             </div>
+
+            <button id="closeCamBtn" style="
+                display:none; width:100%; padding:11px 0; margin-top:8px;
+                border-radius:14px; border:none; cursor:pointer;
+                background:linear-gradient(135deg,#dc2626,#ef4444);
+                color:#fff; font-family:'Cairo',sans-serif; font-size:0.9rem; font-weight:700;
+                box-shadow:0 4px 16px rgba(220,38,38,0.4);
+                gap:8px; align-items:center; justify-content:center;
+                transition:all 0.2s;">
+                <i class="fas fa-times-circle"></i> إغلاق الكاميرا
+            </button>
 
             <!-- أزرار الإجراءات -->
             <div style="display:flex; gap:8px; margin-top:12px;">
@@ -2116,12 +2125,14 @@
             scanningActive = true;
             currentCameraId = targetId;
             if (scanLine) scanLine.style.display = 'block';
+            document.getElementById('closeCamBtn').style.display = 'flex';
             setScanStatus('ready', 'الكاميرا نشطة — وجّه الباركود');
             initAudio();
         } catch (err) {
             showToast("خطأ في الكاميرا: " + err.message, true);
             cameraDiv.classList.add('hidden');
             if (scanLine) scanLine.style.display = 'none';
+            document.getElementById('closeCamBtn').style.display = 'none';
             setScanStatus('idle', 'فشل تشغيل الكاميرا');
             scanningActive = false;
         }
@@ -2131,6 +2142,7 @@
         if (html5QrScanner) { await html5QrScanner.stop().catch(() => {}); html5QrScanner = null; }
         scanningActive = false;
         document.getElementById('cameraDiv').classList.add('hidden');
+        document.getElementById('closeCamBtn').style.display = 'none';
         const scanLine = document.getElementById('scanLine');
         if (scanLine) scanLine.style.display = 'none';
         setScanStatus('idle', 'جاهز للمسح');
@@ -2969,6 +2981,8 @@
             if (scanLine) scanLine.style.display = 'none';
             const cameraDiv = document.getElementById('cameraDiv');
             if (cameraDiv) cameraDiv.classList.add('hidden');
+            const closeCamBtn = document.getElementById('closeCamBtn');
+            if (closeCamBtn) closeCamBtn.style.display = 'none';
             setScanStatus('idle', 'اضغط فتح لبدء المسح');
         }
         document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
