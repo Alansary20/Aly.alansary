@@ -972,9 +972,83 @@
         .flash-red   { border-color:#dc2626!important; box-shadow:0 0 0 6px rgba(220,38,38,0.35),0 0 40px rgba(220,38,38,0.2)!important;  background:rgba(220,38,38,0.1)!important;  animation:flashPulseRed  0.5s ease!important; }
         @keyframes flashPulseGreen { 0%{box-shadow:0 0 0 2px rgba(16,185,129,0.5)} 40%{box-shadow:0 0 0 8px rgba(16,185,129,0.4),0 0 60px rgba(16,185,129,0.3)} 100%{box-shadow:0 0 0 4px rgba(16,185,129,0.2)} }
         @keyframes flashPulseRed   { 0%{box-shadow:0 0 0 2px rgba(220,38,38,0.5)}  40%{box-shadow:0 0 0 8px rgba(220,38,38,0.4),0 0 60px rgba(220,38,38,0.25)} 100%{box-shadow:0 0 0 4px rgba(220,38,38,0.2)} }
+        /* ── CUSTOM CONFIRM MODAL ── */
+        #customConfirmOverlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+            z-index: 9000; align-items: center; justify-content: center;
+        }
+        #customConfirmOverlay.show { display: flex; }
+        #customConfirmBox {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 28px 24px 20px;
+            width: 88%; max-width: 340px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+            text-align: center;
+            font-family: 'Cairo', sans-serif;
+            animation: confirmPop 0.25s cubic-bezier(.34,1.5,.64,1);
+        }
+        body:not(.light-theme) #customConfirmBox {
+            background: #1a2235;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(16,185,129,0.12);
+        }
+        @keyframes confirmPop {
+            from { opacity:0; transform: scale(0.85); }
+            to   { opacity:1; transform: scale(1); }
+        }
+        #customConfirmIcon {
+            width: 52px; height: 52px; border-radius: 16px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            margin: 0 auto 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; color: #fff;
+            box-shadow: 0 6px 20px rgba(251,191,36,0.4);
+        }
+        #customConfirmMsg {
+            font-size: 0.95rem; font-weight: 700;
+            color: #1a1a2e; line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        body:not(.light-theme) #customConfirmMsg { color: #e8edf5; }
+        .confirm-btns {
+            display: flex; gap: 10px;
+        }
+        .confirm-btn-cancel {
+            flex: 1; padding: 11px;
+            border-radius: 12px; border: 1.5px solid #e5e7eb;
+            background: transparent; color: #6b7280;
+            font-family: 'Cairo', sans-serif; font-size: 0.9rem; font-weight: 700;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .confirm-btn-cancel:hover { background: #f3f4f6; }
+        body:not(.light-theme) .confirm-btn-cancel { border-color: rgba(255,255,255,0.12); color: #9ca3af; }
+        body:not(.light-theme) .confirm-btn-cancel:hover { background: rgba(255,255,255,0.06); }
+        .confirm-btn-ok {
+            flex: 1; padding: 11px;
+            border-radius: 12px; border: none;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #fff; font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem; font-weight: 700;
+            cursor: pointer; transition: all 0.15s;
+            box-shadow: 0 4px 14px rgba(220,38,38,0.35);
+        }
+        .confirm-btn-ok:hover { background: linear-gradient(135deg,#b91c1c,#dc2626); transform: translateY(-1px); }
     </style>
 </head>
 <body>
+
+    <!-- Modal تأكيد مخصص -->
+    <div id="customConfirmOverlay">
+        <div id="customConfirmBox">
+            <div id="customConfirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div id="customConfirmMsg"></div>
+            <div class="confirm-btns">
+                <button class="confirm-btn-cancel" id="customConfirmCancel">إلغاء</button>
+                <button class="confirm-btn-ok"     id="customConfirmOk">موافق</button>
+            </div>
+        </div>
+    </div>
 
     <!-- شريط التقدم -->
     <div id="progressOverlay">
@@ -1385,6 +1459,22 @@
     </div>
 </div>
 <script>
+    // ── Modal تأكيد مخصص (بديل عن confirm() ) ──
+    function customConfirm(msg, onOk) {
+        const overlay = document.getElementById('customConfirmOverlay');
+        document.getElementById('customConfirmMsg').textContent = msg;
+        overlay.classList.add('show');
+        const okBtn     = document.getElementById('customConfirmOk');
+        const cancelBtn = document.getElementById('customConfirmCancel');
+        function close(result) {
+            overlay.classList.remove('show');
+            okBtn.onclick = null; cancelBtn.onclick = null;
+            if (result) onOk();
+        }
+        okBtn.onclick     = () => close(true);
+        cancelBtn.onclick = () => close(false);
+    }
+
     let db;
     // اسم قاعدة بيانات فريد لكل ملف بناءً على مساره الكامل
     const _rawPath = (location.href || location.pathname || '').replace(/[^a-zA-Z0-9]/g, '_').slice(-40);
@@ -1622,7 +1712,7 @@
     document.getElementById('dbFileInput').addEventListener('change', (e) => { pendingProductFiles = Array.from(e.target.files); });
     document.getElementById('processDbBtn').onclick = async () => {
         if (!pendingProductFiles.length) { showToast("اختر ملفات أولاً", true); return; }
-        if (dbUploadMode === 'update') { if (!confirm('سيتم حذف جميع المنتجات الحالية واستبدالها. متأكد؟')) return; }
+        function _proceedWithColMap() {
         showColMapModal(
             'تعيين أعمدة المنتجات',
             pendingProductFiles.map(f => f.name).join(', '),
@@ -1674,6 +1764,12 @@
                 pendingProductFiles = []; updateAllUI();
             }
         );
+        } // end _proceedWithColMap
+        if (dbUploadMode === 'update') {
+            customConfirm('سيتم حذف جميع المنتجات الحالية واستبدالها. متأكد؟', _proceedWithColMap);
+        } else {
+            _proceedWithColMap();
+        }
     };
 
     let pendingStockFiles = [];
@@ -1934,14 +2030,14 @@
         document.getElementById('barcodeInput').value = '';
     };
     document.getElementById('resetInventoryBtn').onclick = () => {
-        if (confirm("مسح كل الجرد والسجل التفصيلي؟")) {
+        customConfirm("مسح كل الجرد والسجل التفصيلي؟", () => {
             const tx1 = db.transaction("inventory", "readwrite"); tx1.objectStore("inventory").clear();
             const tx2 = db.transaction("scanLog",   "readwrite"); tx2.objectStore("scanLog").clear();
             Promise.all([
                 new Promise(r => { tx1.oncomplete = r; }),
                 new Promise(r => { tx2.oncomplete = r; })
             ]).then(() => { updateAllUI(); showToast("تم مسح الجرد والسجل"); });
-        }
+        });
     };
 
     // ── كاميرا محسّنة ──
@@ -2266,9 +2362,10 @@
         }
     };
     window.deleteItem = async function(key) {
-        if (!confirm("حذف العنصر؟")) return;
-        const tx = db.transaction("inventory", "readwrite"); tx.objectStore("inventory").delete(key);
-        await new Promise(r => { tx.oncomplete = r; }); updateAllUI();
+        customConfirm("حذف العنصر؟", async () => {
+            const tx = db.transaction("inventory", "readwrite"); tx.objectStore("inventory").delete(key);
+            await new Promise(r => { tx.oncomplete = r; }); updateAllUI();
+        });
     };
 
     // ── أزرار بطاقة السجل التفصيلي ──
@@ -2360,7 +2457,7 @@
 
         // ── حذف: احذف هذا السطر بالذات + انقص 1 من inventory ──
         if (action === 'delete') {
-            if (!confirm('حذف هذه المسحة وطرح 1 من الجرد؟')) return;
+            customConfirm('حذف هذه المسحة وطرح 1 من الجرد؟', async () => {
             await new Promise(r => {
                 const tx = db.transaction("scanLog", "readwrite");
                 tx.objectStore("scanLog").delete(logId);
@@ -2376,7 +2473,8 @@
                 };
             });
             await removeIfZero(itemCode);
-            updateAllUI(); return;
+            updateAllUI();
+            }); return;
         }
 
         // ── تعديل الكمية مباشرة ──
@@ -2426,9 +2524,10 @@
         }
     };
     window.deleteProductById = async function(id) {
-        if (!confirm("حذف المنتج؟")) return;
-        const tx = db.transaction("products", "readwrite"); tx.objectStore("products").delete(id);
-        await new Promise(r => { tx.oncomplete = r; }); updateAllUI();
+        customConfirm("حذف المنتج؟", async () => {
+            const tx = db.transaction("products", "readwrite"); tx.objectStore("products").delete(id);
+            await new Promise(r => { tx.oncomplete = r; }); updateAllUI();
+        });
     };
 
     document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', function() {
@@ -2657,14 +2756,14 @@
     };
 
     document.getElementById('globalResetBtn').onclick = () => {
-        if (confirm("⚠️ سيتم حذف جميع البيانات نهائياً. متابعة؟")) {
+        customConfirm("⚠️ سيتم حذف جميع البيانات نهائياً. متابعة؟", () => {
             if (html5QrScanner) { html5QrScanner.stop().catch(() => {}); html5QrScanner = null; }
             if (db) { db.close(); db = null; }
             const deleteRequest = indexedDB.deleteDatabase(DB_NAME);
             deleteRequest.onsuccess = () => window.location.reload();
             deleteRequest.onerror = () => window.location.reload();
             deleteRequest.onblocked = () => window.location.reload();
-        }
+        });
     };
     document.getElementById('globalManualBtn').onclick = () => document.getElementById('productModal').style.display = 'flex';
     document.getElementById('closeModalBtn').onclick = () => document.getElementById('productModal').style.display = 'none';
@@ -2705,8 +2804,9 @@
         if (btn && e.target.files[0]) btn.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent); margin-left:6px;"></i> ${e.target.files[0].name}`;
     });
     document.getElementById('invImportRunBtn').onclick = () => {
-        if (invUploadMode === 'replace') { if (confirm('سيُمسح الجرد الحالي بالكامل ويُستبدل. متأكد؟')) importInventory('replace'); }
-        else importInventory('merge');
+        if (invUploadMode === 'replace') {
+            customConfirm('سيُمسح الجرد الحالي بالكامل ويُستبدل. متأكد؟', () => importInventory('replace'));
+        } else { importInventory('merge'); }
     };
 
     // ── وضع رفع المرجع ──
@@ -2755,11 +2855,11 @@
         if (btn && e.target.files[0]) btn.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent); margin-left:6px;"></i> ${e.target.files[0].name}`;
     });
     document.getElementById('clearProductsBtn').onclick = () => {
-        if(confirm("مسح كل المنتجات؟")){
+        customConfirm("مسح كل المنتجات؟", () => {
             const tx1=db.transaction("products","readwrite"); tx1.objectStore("products").clear();
             const tx2=db.transaction("uploadedFiles","readwrite"); tx2.objectStore("uploadedFiles").clear();
             Promise.all([new Promise(r=>{ tx1.oncomplete=r; }), new Promise(r=>{ tx2.oncomplete=r; })]).then(()=>{ updateAllUI(); showToast("تم مسح المنتجات"); });
-        }
+        });
     };
     // ── شريط التقدم ──
     function showProgress(title, sub, pct) {
