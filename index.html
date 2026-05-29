@@ -1647,7 +1647,8 @@
         setTimeout(() => { toast.style.opacity='0'; toast.style.transition='opacity 0.3s'; setTimeout(()=>toast.remove(),300); }, duration);
     }
     function escapeHtml(str) { return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
-    function generateUniqueId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 9) + '-' + performance.now(); }
+    let _uidCounter = 0;
+    function generateUniqueId() { return Date.now() + '-' + (++_uidCounter) + '-' + Math.random().toString(36).substr(2, 5); }
 
     // دوال الملفات كما هي
     function readExcelFile(file) {
@@ -1747,7 +1748,7 @@
                         const rows = await readExcelFile(file);
                         if (!rows || rows.length < 1) throw new Error("لا توجد بيانات");
                         const dataRows = colMap.noHeader ? rows : rows.slice(1);
-                        const BATCH_SIZE = 150;
+                        const BATCH_SIZE = 500;
                         for (let start = 0; start < dataRows.length; start += BATCH_SIZE) {
                             const pct = 30 + ((fi / pendingProductFiles.length) + ((start / dataRows.length) / pendingProductFiles.length)) * 65;
                             updateProgress(pct, `معالجة ${Math.min(start + BATCH_SIZE, dataRows.length)} / ${dataRows.length}`);
@@ -1762,7 +1763,6 @@
                                 store.add({ id: generateUniqueId(), barcode, item_no: itemno, name: name || 'بدون اسم', sourceId }); totalAdded++;
                             }
                             await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); });
-                            await new Promise(r => setTimeout(r, 10));
                         }
                     } catch (err) { hideProgress(); showToast(`خطأ في ${file.name}: ${err.message}`, true); return; }
                 }
@@ -1770,7 +1770,7 @@
                 ftx.objectStore("uploadedFiles").add({ names: pendingProductFiles.map(f=>f.name).join(', '), count: totalAdded, sourceId });
                 await new Promise(r=>{ ftx.oncomplete=r; });
                 hideProgress(); showToast(`✅ تم ${dbUploadMode==='update'?'تحديث':'دمج'} ${totalAdded} منتج`);
-                pendingProductFiles = []; updateAllUI();
+                pendingProductFiles = []; updateAllUI(["prods"]);
             }
         );
         } // end _proceedWithColMap
@@ -1878,34 +1878,55 @@
                     updateProgress(15 + (fi / pendingStockFiles.length) * 15, `قراءة: ${file.name}`);
                     const rows = await readExcelFile(file);
                     const dataRows = colMap.noHeader ? rows : rows.slice(1);
-                    const totalBatches = Math.ceil(dataRows.length / 200);
-                    for (let bi = 0, start = 0; start < dataRows.length; start += 200, bi++) {
+                    const totalBatches = Math.ceil(dataRows.length / 500);
+                    for (let bi = 0, start = 0; start < dataRows.length; start += 500, bi++) {
                         const pct = 30 + ((fi / pendingStockFiles.length) + (bi / totalBatches / pendingStockFiles.length)) * 65;
-                        updateProgress(pct, `معالجة ${Math.min(start + 200, dataRows.length)} / ${dataRows.length}`);
-                        const batch = dataRows.slice(start, start + 200);
+                        updateProgress(pct, `معالجة ${Math.min(start + 500, dataRows.length)} / ${dataRows.length}`);
+                        const batch = dataRows.slice(start, start + 500);
                         const tx = db.transaction("stock", "readwrite");
                         const store = tx.objectStore("stock");
-                        for (const row of batch) {
-                            if (!Array.isArray(row)) continue;
-                            const itemNo = String(row[colMap.itemno] ?? '').trim().replace(/\.0+$/, '');
-                            if (!itemNo) continue;
-                            const name = colMap.name !== null ? String(row[colMap.name] ?? '').trim() : '';
-                            const qty  = parseInt(row[colMap.qty]) || 0;
-                            if (mode === 'merge') {
-                                const existing = await new Promise(r => store.get(itemNo).onsuccess = e => r(e.target.result));
+                        if (mode === 'merge') {
+                            // في وضع الدمج: اقرأ الموجود مسبقاً في batch واحد
+                            const keys = batch.map(row => Array.isArray(row) ? String(row[colMap.itemno] ?? '').trim().replace(/\.0+$/, '') : '').filter(Boolean);
+                            const existingMap = await new Promise(r => {
+                                const rtx = db.transaction("stock", "readonly");
+                                const rstore = rtx.objectStore("stock");
+                                const results = {};
+                                let pending = keys.length;
+                                if (!pending) { r(results); return; }
+                                keys.forEach(k => {
+                                    rstore.get(k).onsuccess = e => {
+                                        if (e.target.result) results[k] = e.target.result;
+                                        if (--pending === 0) r(results);
+                                    };
+                                });
+                            });
+                            for (const row of batch) {
+                                if (!Array.isArray(row)) continue;
+                                const itemNo = String(row[colMap.itemno] ?? '').trim().replace(/\.0+$/, '');
+                                if (!itemNo) continue;
+                                const name = colMap.name !== null ? String(row[colMap.name] ?? '').trim() : '';
+                                const qty  = parseInt(row[colMap.qty]) || 0;
+                                const existing = existingMap[itemNo];
                                 store.put({ key: itemNo, name: name || existing?.name || '', qty: (existing ? existing.qty : 0) + qty });
-                            } else {
+                            }
+                        } else {
+                            for (const row of batch) {
+                                if (!Array.isArray(row)) continue;
+                                const itemNo = String(row[colMap.itemno] ?? '').trim().replace(/\.0+$/, '');
+                                if (!itemNo) continue;
+                                const name = colMap.name !== null ? String(row[colMap.name] ?? '').trim() : '';
+                                const qty  = parseInt(row[colMap.qty]) || 0;
                                 store.put({ key: itemNo, name, qty });
                             }
                         }
                         await new Promise(r => { tx.oncomplete = r; });
-                        await new Promise(r => setTimeout(r, 10));
                     }
                 }
                 hideProgress();
                 showToast("تم تحديث المرجع");
                 pendingStockFiles = [];
-                updateAllUI();
+                updateAllUI(["stock"]);
             }
         );
     }
@@ -1984,7 +2005,7 @@
                 playBeep(true); flashCard('green');
                 showToast(`✓ ${match.name}`, false, 1200);
                 setScanStatus('ready', `✓ تم جرد: ${match.name}`);
-                updateAllUI(); isScanLocked = false; return;
+                updateAllUI(["inv","scanLog"]); isScanLocked = false; return;
             }
             const stockStore = tx.objectStore("stock");
             // البحث في المرجع — بالباركود أو رقم الصنف
@@ -1999,7 +2020,7 @@
                 playBeep(true); flashCard('green');
                 showToast(`✓ إضافة تلقائية: ${stockItem.name}`, false, 1500);
                 setScanStatus('ready', `✓ ${stockItem.name}`);
-                updateAllUI(); isScanLocked = false; return;
+                updateAllUI(["inv","scanLog"]); isScanLocked = false; return;
             }
             // لم يُعثر عليه
             // تسجيل في الحقل الصحيح حسب النوع
@@ -2010,7 +2031,7 @@
             playBeep(false); flashCard('red');
             showToast(`⚠️ غير مسجل — تم تسجيله: ${cleanVal}`, true, 2000);
             setScanStatus('idle', `⚠️ غير معروف: ${cleanVal}`);
-            updateAllUI();
+            updateAllUI(["inv","scanLog"]);
         } catch (err) {
             console.error(err);
             setScanStatus('idle', 'خطأ في المعالجة');
@@ -2045,7 +2066,7 @@
             Promise.all([
                 new Promise(r => { tx1.oncomplete = r; }),
                 new Promise(r => { tx2.oncomplete = r; })
-            ]).then(() => { updateAllUI(); showToast("تم مسح الجرد والسجل"); });
+            ]).then(() => { updateAllUI(["inv","scanLog"]); showToast("تم مسح الجرد والسجل"); });
         });
     };
 
@@ -2171,28 +2192,58 @@
     document.getElementById('switchCamBtn').onclick = switchCamera;
     document.getElementById('closeCamBtn').onclick = closeCamera;
 
-    async function updateAllUI() {
+    // ── Cache مركزي في الذاكرة — يُحدَّث عند الحاجة فقط ──
+    const _cache = { inv: null, prods: null, stock: null, scanLog: null, dirty: { inv:true, prods:true, stock:true, scanLog:true } };
+
+    const _storeMap = { inv: 'inventory', prods: 'products', stock: 'stock', scanLog: 'scanLog' };
+
+    async function _loadStore(name) {
+        return new Promise(r => {
+            const tx = db.transaction(name, "readonly");
+            tx.objectStore(name).getAll().onsuccess = e => r(e.target.result);
+        });
+    }
+    function _markDirty(...names) { names.forEach(n => { _cache.dirty[n] = true; }); }
+
+    async function _ensureCache(...keys) {
+        const needed = keys.filter(k => _cache.dirty[k]);
+        if (!needed.length) return;
+        await Promise.all(needed.map(async k => {
+            _cache[k] = await _loadStore(_storeMap[k]);
+            _cache.dirty[k] = false;
+        }));
+    }
+
+    function _activeTab() {
+        return document.querySelector('.panel.active-pane')?.id || 'tab-scan';
+    }
+
+    // الإحصائيات العلوية — تُقرأ دائماً من الـ cache
+    async function _updateStats() {
+        await _ensureCache('inventory','scanLog');
+        const invLen  = (_cache.inv  || []).length;
+        const logLen  = (_cache.scanLog || []).length;
+        const prodLen = _cache.prods ? _cache.prods.length : (document.getElementById('totalProductsStat').innerText || 0);
+        document.getElementById('inventoryCount').innerText      = logLen;
+        document.getElementById('totalInventoryStat').innerText  = invLen;
+        document.getElementById('sessionScansStat').innerText    = logLen;
+        if (_cache.prods) document.getElementById('totalProductsStat').innerText = _cache.prods.length;
+    }
+
+    async function _renderTab(tabId) {
         if (!db) return;
-        const stores = ["inventory", "products", "stock", "scanLog"];
-        const tx = db.transaction(stores, "readonly");
-        const invRaw  = await new Promise(r => tx.objectStore("inventory").getAll().onsuccess = e => r(e.target.result));
-        const prods   = await new Promise(r => tx.objectStore("products").getAll().onsuccess  = e => r(e.target.result));
-        const stock   = await new Promise(r => tx.objectStore("stock").getAll().onsuccess     = e => r(e.target.result));
-        const logRaw  = await new Promise(r => tx.objectStore("scanLog").getAll().onsuccess   = e => r(e.target.result));
-
-        inventory = invRaw.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-        // السجل التفصيلي — تنازلي (الأحدث أولاً)
-        const scanLog = logRaw.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-        document.getElementById('inventoryCount').innerText = scanLog.length;
-        document.getElementById('totalProductsStat').innerText = prods.length;
-        document.getElementById('totalInventoryStat').innerText = inventory.length;
-        document.getElementById('sessionScansStat').innerText = scanLog.length;
-
-        // ── تبويب المسح: سجل تفصيلي (كل مسحة = سطر فردي) ──
-        let logHtml = '';
-        scanLog.forEach((entry, idx) => {
-            const rowNum  = scanLog.length - idx;
+        if (tabId === 'tab-scan') {
+            await _ensureCache('inventory','scanLog');
+            inventory = (_cache.inv || []).sort((a,b) => (b.timestamp||0)-(a.timestamp||0));
+            const scanLog = (_cache.scanLog || []).sort((a,b) => (b.timestamp||0)-(a.timestamp||0));
+            const totalScans = scanLog.length;
+            const scanLogDisplay = scanLog.slice(0, 200);
+            document.getElementById('inventoryCount').innerText     = totalScans;
+            document.getElementById('totalInventoryStat').innerText = inventory.length;
+            document.getElementById('sessionScansStat').innerText   = totalScans;
+            let logHtml = '';
+            scanLogDisplay.forEach((entry, idx) => {
+                const rowNum  = totalScans - idx;
             const timeStr = entry.timestamp
                 ? new Date(entry.timestamp).toLocaleTimeString('ar-SA', { hour:'2-digit', minute:'2-digit', second:'2-digit' })
                 : '';
@@ -2280,70 +2331,101 @@
                 </div>
             </div>`;
         });
-        document.getElementById('inventoryListContainer').innerHTML = logHtml ||
+        document.getElementById('inventoryListContainer').innerHTML = logHtml +
+            (totalScans > 200 ? `<div style="text-align:center; padding:10px; color:var(--text-muted); font-size:0.72rem;">يعرض آخر 200 مسحة من أصل ${totalScans}</div>` : '') ||
             `<div style="text-align:center; padding:40px 20px; color:var(--text-dim);">
                 <i class="fas fa-barcode" style="font-size:2rem; margin-bottom:10px; display:block; opacity:0.3;"></i>
                 لا توجد مسحات بعد
             </div>`;
+        }
 
-        // ── تبويب الجرد: مجمّع كما هو ──
-        document.getElementById('inventoryFullTable').innerHTML = `<table class="data-table">
-            <thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th>الكمية</th><th>آخر مسح</th></thead>
-            <tbody>${inventory.map(i => `<tr>
-                <td style="font-size:0.72rem; color:var(--text-muted);">${escapeHtml(i.barcode || '')}</td>
-                <td>${escapeHtml(i.item_no || '')}</td>
-                <td>${escapeHtml(i.name)}</td>
-                <td><strong style="color:var(--accent)">${i.qty}</strong></td>
-                <td style="font-size:0.7rem; color:var(--text-muted)">${i.timestamp ? new Date(i.timestamp).toLocaleTimeString('ar-SA') : '-'}</td>
-            </tr>`).join('')}</tbody></table>`;
+        else if (tabId === 'tab-inv') {
+            await _ensureCache('inventory');
+            inventory = (_cache.inv || []).sort((a,b) => (b.timestamp||0)-(a.timestamp||0));
+            document.getElementById('inventoryFullTable').innerHTML = `<table class="data-table">
+                <thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th>الكمية</th><th>آخر مسح</th></thead>
+                <tbody>${inventory.map(i => `<tr>
+                    <td style="font-size:0.72rem; color:var(--text-muted);">${escapeHtml(i.barcode || '')}</td>
+                    <td>${escapeHtml(i.item_no || '')}</td>
+                    <td>${escapeHtml(i.name)}</td>
+                    <td><strong style="color:var(--accent)">${i.qty}</strong></td>
+                    <td style="font-size:0.7rem; color:var(--text-muted)">${i.timestamp ? new Date(i.timestamp).toLocaleTimeString('ar-SA') : '-'}</td>
+                </tr>`).join('')}</tbody></table>`;
+        }
 
-        document.getElementById('stockTableContainer').innerHTML = `<table class="data-table"><thead><th>رقم الصنف</th><th>الاسم</th><th>الكمية المرجعية</th></thead><tbody>${stock.map(s => `<tr><td>${escapeHtml(s.key)}</td><td>${escapeHtml(s.name)}</td><td>${s.qty}</td></tr>`).join('')}</tbody></table>`;
+        else if (tabId === 'tab-stock') {
+            await _ensureCache('stock');
+            const stock = _cache.stock || [];
+            document.getElementById('stockTableContainer').innerHTML = `<table class="data-table"><thead><th>رقم الصنف</th><th>الاسم</th><th>الكمية المرجعية</th></thead><tbody>${stock.map(s => `<tr><td>${escapeHtml(s.key)}</td><td>${escapeHtml(s.name)}</td><td>${s.qty}</td></tr>`).join('')}</tbody></table>`;
+        }
 
-        const allCodes = new Set([...inventory.map(i => i.key), ...stock.map(s => s.key)]);
-        let cmpRows = [...allCodes].map(k => {
-            let i = inventory.find(x => x.key === k), s = stock.find(x => x.key === k);
-            let qi = i ? i.qty : 0, qs = s ? s.qty : 0, diff = qi - qs;
-            // الباركود: من inventory أو من products (أيهما يجد قيمة مختلفة عن رقم الصنف)
-            // الباركود: من inventory أو من products
-            const fromInv  = i?.barcode || '';
-            const fromProd = prods.find(p => p.item_no === k || p.barcode === k);
-            const bc = fromInv || fromProd?.barcode || '';
-            // رقم الصنف: من inventory أو من products — لا نستخدم k كبديل
-            const itemNo = (i||s)?.item_no || fromProd?.item_no || '';
-            return { itemNo, barcode: bc, name: (i||s)?.name||'', qs, qi, diff };
-        });
-        let filter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-        let filtered = cmpRows;
-        if (filter === 'increase') filtered = filtered.filter(r => r.diff > 0);
-        else if (filter === 'decrease') filtered = filtered.filter(r => r.diff < 0);
-        else if (filter === 'match') filtered = filtered.filter(r => r.diff === 0);
-        else if (filter === 'scanned') filtered = filtered.filter(r => r.qi > 0); // ما تم جرده فقط (له كمية مجرودة)
+        else if (tabId === 'tab-cmp') {
+            await _ensureCache('inventory','stock','prods');
+            const inv   = (_cache.inv   || []);
+            const stock = (_cache.stock || []);
+            const prods = (_cache.prods || []);
+            // استخدم Map لأداء أفضل من find()
+            const invMap   = new Map(inv.map(i => [i.key, i]));
+            const stockMap = new Map(stock.map(s => [s.key, s]));
+            const allCodes = new Set([...inv.map(i => i.key), ...stock.map(s => s.key)]);
+            let cmpRows = [...allCodes].map(k => {
+                let i = invMap.get(k), s = stockMap.get(k);
+                let qi = i ? i.qty : 0, qs = s ? s.qty : 0, diff = qi - qs;
+                const fromInv  = i?.barcode || '';
+                const fromProd = prods.find(p => p.item_no === k || p.barcode === k);
+                const bc = fromInv || fromProd?.barcode || '';
+                const itemNo = (i||s)?.item_no || fromProd?.item_no || '';
+                return { itemNo, barcode: bc, name: (i||s)?.name||'', qs, qi, diff };
+            });
+            let filter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+            let filtered = cmpRows;
+            if (filter === 'increase') filtered = filtered.filter(r => r.diff > 0);
+            else if (filter === 'decrease') filtered = filtered.filter(r => r.diff < 0);
+            else if (filter === 'match') filtered = filtered.filter(r => r.diff === 0);
+            else if (filter === 'scanned') filtered = filtered.filter(r => r.qi > 0);
+            document.getElementById('statsActualItems').innerText     = stock.length;
+            document.getElementById('statsIncreaseCount').innerText   = cmpRows.filter(r => r.diff > 0).length;
+            document.getElementById('statsDecreaseCount').innerText   = cmpRows.filter(r => r.diff < 0).length;
+            document.getElementById('statsMatchCount').innerText      = cmpRows.filter(r => r.diff === 0).length;
+            document.getElementById('statsScannedCount').innerText    = inv.length;
+            document.getElementById('statsTotalDiff').innerText       = filtered.reduce((a,b) => a + b.diff, 0);
+            document.getElementById('comparisonTableDiv').innerHTML = `<table class="data-table"><thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th>الفعلي</th><th>المجرد</th><th>الفرق</th></thead><tbody>${filtered.map(r => {
+                const isPos=r.diff>0, isNeg=r.diff<0, isZero=r.diff===0&&r.qi>0;
+                const rowBg  = isPos?'rgba(0,180,100,0.09)':isNeg?'rgba(220,60,60,0.09)':isZero?'rgba(0,120,220,0.09)':'';
+                const rowBdr = isPos?'rgba(0,200,120,0.18)':isNeg?'rgba(220,60,60,0.18)':isZero?'rgba(0,120,220,0.18)':'transparent';
+                const numClr = isPos?'#10b981':isNeg?'#fb7185':isZero?'#60a5fa':'var(--text)';
+                const icon   = isPos?'⬆':isNeg?'⬇':isZero?'✓':'—';
+                return `<tr style="background:${rowBg};border-bottom:1px solid ${rowBdr};">
+                    <td style="font-size:0.7rem;color:${numClr};opacity:0.8;">${escapeHtml(r.barcode)}</td>
+                    <td style="color:${numClr};font-weight:600;">${escapeHtml(r.itemNo)}</td>
+                    <td style="color:${numClr};font-weight:600;">${escapeHtml(r.name)}</td>
+                    <td style="color:var(--text-muted);">${r.qs}</td>
+                    <td style="color:var(--text-muted);">${r.qi}</td>
+                    <td style="font-weight:800;color:${numClr};font-size:0.9rem;">${icon} ${(r.diff>0?'+':'')+r.diff}</td>
+                </tr>`;
+            }).join('')}</tbody></table>`;
+        }
 
-        document.getElementById('statsActualItems').innerText = stock.length;
-        document.getElementById('statsIncreaseCount').innerText = cmpRows.filter(r => r.diff > 0).length;
-        document.getElementById('statsDecreaseCount').innerText = cmpRows.filter(r => r.diff < 0).length;
-        document.getElementById('statsMatchCount').innerText = cmpRows.filter(r => r.diff === 0).length;
-        document.getElementById('statsScannedCount').innerText = inventory.length;
-        document.getElementById('statsTotalDiff').innerText = filtered.reduce((a, b) => a + b.diff, 0);
+        else if (tabId === 'tab-products') {
+            await _ensureCache('prods');
+            const prods = _cache.prods || [];
+            document.getElementById('totalProductsStat').innerText = prods.length;
+            document.getElementById('productsTableContainer').innerHTML = `<table class="data-table"><thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th></th></thead><tbody>${prods.map(p => `<tr><td style="font-size:0.72rem;color:var(--text-muted);">${escapeHtml(p.barcode||'-')}</td><td>${escapeHtml(p.item_no||'-')}</td><td>${escapeHtml(p.name||'-')}</td><td><button class="icon-btn" onclick="window.deleteProductById('${p.id}')">حذف</button></td></tr>`).join('')}</tbody></table>`;
+        }
+    }
 
-        document.getElementById('comparisonTableDiv').innerHTML = `<table class="data-table"><thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th>الفعلي</th><th>المجرد</th><th>الفرق</th></thead><tbody>${filtered.map(r => {
-            const isPos  = r.diff > 0, isNeg = r.diff < 0, isZero = r.diff === 0 && r.qi > 0;
-            const rowBg  = isPos  ? 'rgba(0,180,100,0.09)'   : isNeg  ? 'rgba(220,60,60,0.09)'  : isZero ? 'rgba(0,120,220,0.09)'  : '';
-            const rowBdr = isPos  ? 'rgba(0,200,120,0.18)'   : isNeg  ? 'rgba(220,60,60,0.18)'  : isZero ? 'rgba(0,120,220,0.18)' : 'transparent';
-            const numClr = isPos  ? '#10b981' : isNeg ? '#fb7185' : isZero ? '#60a5fa' : 'var(--text)';
-            const icon   = isPos  ? '⬆' : isNeg ? '⬇' : isZero ? '✓' : '—';
-            const diffTxt = (r.diff > 0 ? '+' : '') + r.diff;
-            return `<tr style="background:${rowBg}; border-bottom:1px solid ${rowBdr};">
-                <td style="font-size:0.7rem; color:${numClr}; opacity:0.8;">${escapeHtml(r.barcode)}</td>
-                <td style="color:${numClr}; font-weight:600;">${escapeHtml(r.itemNo)}</td>
-                <td style="color:${numClr}; font-weight:600;">${escapeHtml(r.name)}</td>
-                <td style="color:var(--text-muted);">${r.qs}</td>
-                <td style="color:var(--text-muted);">${r.qi}</td>
-                <td style="font-weight:800; color:${numClr}; font-size:0.9rem; letter-spacing:0.5px;">${icon} ${diffTxt}</td>
-            </tr>`;
-        }).join('')}</tbody></table>`;
-
-        document.getElementById('productsTableContainer').innerHTML = `<table class="data-table"><thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th></th></thead><tbody>${prods.map(p => `<tr><td style="font-size:0.72rem; color:var(--text-muted);">${escapeHtml(p.barcode||'-')}</td><td>${escapeHtml(p.item_no||'-')}</td><td>${escapeHtml(p.name||'-')}</td><td><button class="icon-btn" onclick="window.deleteProductById(${p.id})">حذف</button></td></tr>`).join('')}</tbody></table>`;
+    // updateAllUI: يحدد التبويب النشط ويُعيد رسمه فقط
+    // markDirty: يُشير إلى البيانات التي تغيرت ليُعيد قراءتها فقط
+    async function updateAllUI(dirtyStores) {
+        if (!db) return;
+        // حدد ما تغير
+        if (dirtyStores) {
+            dirtyStores.forEach(s => { _cache.dirty[s] = true; });
+        } else {
+            // تحديث شامل: اعتبر كل شيء قديماً
+            Object.keys(_cache.dirty).forEach(k => { _cache.dirty[k] = true; });
+        }
+        await _renderTab(_activeTab());
     }
 
     // دوال التعديل
@@ -2352,10 +2434,10 @@
         const item = await new Promise(r => store.get(key).onsuccess = e => r(e.target.result));
         if (item) {
             item.qty = Math.max(0, item.qty + delta);
-            item.timestamp = Date.now(); // تحديث الوقت
+            item.timestamp = Date.now();
             store.put(item);
             await new Promise(r => { tx.oncomplete = r; });
-            updateAllUI();
+            updateAllUI(['inv']);
         }
     };
     window.editQty = async function(key, currentQty) {
@@ -2370,13 +2452,13 @@
             item.timestamp = Date.now();
             store.put(item);
             await new Promise(r => { tx.oncomplete = r; });
-            updateAllUI();
+            updateAllUI(['inv']);
         }
     };
     window.deleteItem = async function(key) {
         customConfirm("حذف العنصر؟", async () => {
             const tx = db.transaction("inventory", "readwrite"); tx.objectStore("inventory").delete(key);
-            await new Promise(r => { tx.oncomplete = r; }); updateAllUI();
+            await new Promise(r => { tx.oncomplete = r; }); updateAllUI(['inv']);
         });
     };
 
@@ -2433,7 +2515,7 @@
                 };
             });
             playBeep(true);
-            updateAllUI(); return;
+            updateAllUI(["inv","scanLog"]); return;
         }
 
         // ── نقص: احذف آخر سطر لنفس الباركود من scanLog + انقص 1 من inventory ──
@@ -2464,7 +2546,7 @@
             });
             await removeIfZero(itemCode);
             playBeep(false);
-            updateAllUI(); return;
+            updateAllUI(["inv","scanLog"]); return;
         }
 
         // ── حذف: احذف هذا السطر بالذات + انقص 1 من inventory ──
@@ -2485,7 +2567,7 @@
                 };
             });
             await removeIfZero(itemCode);
-            updateAllUI();
+            updateAllUI(["inv","scanLog"]);
             }); return;
         }
 
@@ -2532,13 +2614,13 @@
                 };
             });
             await removeIfZero(itemCode);
-            updateAllUI(); return;
+            updateAllUI(["inv","scanLog"]); return;
         }
     };
     window.deleteProductById = async function(id) {
         customConfirm("حذف المنتج؟", async () => {
             const tx = db.transaction("products", "readwrite"); tx.objectStore("products").delete(id);
-            await new Promise(r => { tx.oncomplete = r; }); updateAllUI();
+            await new Promise(r => { tx.oncomplete = r; }); updateAllUI(["inv","scanLog"]);
         });
     };
 
@@ -2787,7 +2869,7 @@
         if (qty>0) tx.objectStore("stock").put({ key: itemNo||barcode, name, qty });
         await new Promise(r=>{ tx.oncomplete=r; });
         document.getElementById('productModal').style.display='none';
-        updateAllUI(); showToast("تمت الإضافة");
+        updateAllUI(["prods","stock"]); showToast("تمت الإضافة");
     };
     document.getElementById('stockUploadArea').addEventListener('click',()=>document.getElementById('stockFileInput').click());
     document.getElementById('dbUploadArea').addEventListener('click',()=>document.getElementById('dbFileInput').click());
@@ -2870,7 +2952,7 @@
         customConfirm("مسح كل المنتجات؟", () => {
             const tx1=db.transaction("products","readwrite"); tx1.objectStore("products").clear();
             const tx2=db.transaction("uploadedFiles","readwrite"); tx2.objectStore("uploadedFiles").clear();
-            Promise.all([new Promise(r=>{ tx1.oncomplete=r; }), new Promise(r=>{ tx2.oncomplete=r; })]).then(()=>{ updateAllUI(); showToast("تم مسح المنتجات"); });
+            Promise.all([new Promise(r=>{ tx1.oncomplete=r; }), new Promise(r=>{ tx2.oncomplete=r; })]).then(()=>{ updateAllUI(["prods"]); showToast("تم مسح المنتجات"); });
         });
     };
     // ── شريط التقدم ──
@@ -2936,32 +3018,59 @@
                         return key && qty > 0;
                     });
                     const total = validRows.length;
-                    const tx = db.transaction(['inventory','scanLog'], 'readwrite');
-                    const invS = tx.objectStore('inventory');
-                    const logS = tx.objectStore('scanLog');
+                    // معالجة على batches لتجنب تجميد الواجهة
+                    const BATCH = 500;
                     let count = 0;
-                    for (const row of validRows) {
-                        const key  = String(row[colMap.key]||'').trim().replace(/\.0+$/,'');
-                        const name = colMap.name !== null ? String(row[colMap.name]||'').trim() : '';
-                        const qty  = parseInt(row[colMap.qty]) || 0;
-                        count++;
-                        updateProgress(30 + (count / total) * 60, `معالجة ${count} / ${total}`);
+                    for (let start = 0; start < validRows.length; start += BATCH) {
+                        updateProgress(30 + (start / total) * 65, `معالجة ${Math.min(start + BATCH, total)} / ${total}`);
+                        const batch = validRows.slice(start, start + BATCH);
+                        const tx = db.transaction(['inventory','scanLog'], 'readwrite');
+                        const invS = tx.objectStore('inventory');
+                        const logS = tx.objectStore('scanLog');
                         if (mode === 'merge') {
-                            const existing = await new Promise(r => invS.get(key).onsuccess = e => r(e.target.result));
-                            const newQty = (existing ? existing.qty : 0) + qty;
-                            invS.put({ key, name: existing?.name||name, qty: newQty, barcode: existing?.barcode||key, item_no: key, timestamp: now });
-                            for (let i=0;i<qty;i++) logS.add({ itemCode:key, name:existing?.name||name, barcode:key, timestamp: now+count*1000+i });
+                            // في وضع الدمج: اقرأ الموجود أولاً لهذا الـ batch
+                            const batchKeys = batch.map(row => String(row[colMap.key]||'').trim().replace(/\.0+$/,''));
+                            const existingMap = await new Promise(r => {
+                                const rtx = db.transaction('inventory', 'readonly');
+                                const rstore = rtx.objectStore('inventory');
+                                const results = {};
+                                let pending = batchKeys.length;
+                                batchKeys.forEach(k => {
+                                    rstore.get(k).onsuccess = e => {
+                                        if (e.target.result) results[k] = e.target.result;
+                                        if (--pending === 0) r(results);
+                                    };
+                                });
+                            });
+                            for (const row of batch) {
+                                const key  = String(row[colMap.key]||'').trim().replace(/\.0+$/,'');
+                                const name = colMap.name !== null ? String(row[colMap.name]||'').trim() : '';
+                                const qty  = parseInt(row[colMap.qty]) || 0;
+                                count++;
+                                const existing = existingMap[key];
+                                const newQty = (existing ? existing.qty : 0) + qty;
+                                invS.put({ key, name: existing?.name||name, qty: newQty, barcode: existing?.barcode||key, item_no: key, timestamp: now });
+                                // سطر واحد فقط لكل صنف (بدلاً من qty سطر)
+                                logS.add({ itemCode: key, name: existing?.name||name, barcode: key, timestamp: now + count });
+                            }
                         } else {
-                            invS.put({ key, name, qty, barcode:key, item_no:key, timestamp: now });
-                            for (let i=0;i<qty;i++) logS.add({ itemCode:key, name, barcode:key, timestamp: now+count*1000+i });
+                            for (const row of batch) {
+                                const key  = String(row[colMap.key]||'').trim().replace(/\.0+$/,'');
+                                const name = colMap.name !== null ? String(row[colMap.name]||'').trim() : '';
+                                const qty  = parseInt(row[colMap.qty]) || 0;
+                                count++;
+                                invS.put({ key, name, qty, barcode: key, item_no: key, timestamp: now });
+                                // سطر واحد فقط لكل صنف (بدلاً من qty سطر)
+                                logS.add({ itemCode: key, name, barcode: key, timestamp: now + count });
+                            }
                         }
+                        await new Promise(r => { tx.oncomplete = r; });
                     }
-                    await new Promise(r => { tx.oncomplete = r; });
                     updateProgress(100, 'اكتمل!');
                     hideProgress();
                     showToast(`✓ تم استيراد ${count} صنف — ${mode==='replace'?'تحديث':'دمج'}`);
                     document.getElementById('invImportFile').value = '';
-                    updateAllUI();
+                    updateAllUI(["inv","scanLog"]);
                 } catch(e) { console.error(e); hideProgress(); showToast('خطأ في قراءة الملف', true); }
             }
         );
@@ -2989,7 +3098,8 @@
         this.classList.add('active');
         document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active-pane'));
         document.getElementById(target).classList.add('active-pane');
-        updateAllUI();
+        // رسم التبويب المختار فقط — لا نُحدّث كل شيء
+        _renderTab(target);
     }));
 
     function initDB() {
