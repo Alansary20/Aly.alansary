@@ -2340,7 +2340,7 @@
         }
 
         else if (tabId === 'tab-inv') {
-            await _ensureCache('inventory');
+            await _ensureCache('inv');
             inventory = (_cache.inv || []).sort((a,b) => (b.timestamp||0)-(a.timestamp||0));
             document.getElementById('inventoryFullTable').innerHTML = `<table class="data-table">
                 <thead><th>الباركود</th><th>رقم الصنف</th><th>الاسم</th><th>الكمية</th><th>آخر مسح</th></thead>
@@ -2360,7 +2360,7 @@
         }
 
         else if (tabId === 'tab-cmp') {
-            await _ensureCache('inventory','stock','prods');
+            await _ensureCache('inv','stock','prods');
             const inv   = (_cache.inv   || []);
             const stock = (_cache.stock || []);
             const prods = (_cache.prods || []);
