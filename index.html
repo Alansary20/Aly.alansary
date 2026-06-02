@@ -2044,7 +2044,7 @@
                 hideProgress();
                 showToast(t('stockUpdated'));
                 pendingStockFiles = [];
-                updateAllUI(["stock"]);
+                updateAllUI(["stock","cmpRows"]);
             }
         );
     }
@@ -2123,7 +2123,7 @@
                 playBeep(true); flashCard('green');
                 showToast(`✓ ${match.name}`, false, 1200);
                 setScanStatus('ready', `✓ تم جرد: ${match.name}`);
-                updateAllUI(["inv","scanLog"]); isScanLocked = false; return;
+                updateAllUI(["inv","scanLog","cmpRows"]); isScanLocked = false; return;
             }
             const stockStore = tx.objectStore("stock");
             // البحث في المرجع — بالباركود أو رقم الصنف
@@ -2138,7 +2138,7 @@
                 playBeep(true); flashCard('green');
                 showToast(`${t('autoAdded')}${stockItem.name}`, false, 1500);
                 setScanStatus('ready', `✓ ${stockItem.name}`);
-                updateAllUI(["inv","scanLog"]); isScanLocked = false; return;
+                updateAllUI(["inv","scanLog","cmpRows"]); isScanLocked = false; return;
             }
             // لم يُعثر عليه
             // تسجيل في الحقل الصحيح حسب النوع
@@ -2149,7 +2149,7 @@
             playBeep(false); flashCard('red');
             showToast(`${t('notRegistered')}${cleanVal}`, true, 2000);
             setScanStatus('idle', `⚠️ غير معروف: ${cleanVal}`);
-            updateAllUI(["inv","scanLog"]);
+            updateAllUI(["inv","scanLog","cmpRows"]);
         } catch (err) {
             console.error(err);
             setScanStatus('idle', 'خطأ في المعالجة');
@@ -2184,7 +2184,7 @@
             Promise.all([
                 new Promise(r => { tx1.oncomplete = r; }),
                 new Promise(r => { tx2.oncomplete = r; })
-            ]).then(() => { updateAllUI(["inv","scanLog"]); showToast(t('toastCleared')); });
+            ]).then(() => { updateAllUI(["inv","scanLog","cmpRows"]); showToast(t('toastCleared')); });
         });
     };
 
@@ -2311,7 +2311,7 @@
     document.getElementById('closeCamBtn').onclick = closeCamera;
 
     // ── Cache مركزي في الذاكرة — يُحدَّث عند الحاجة فقط ──
-    const _cache = { inv: null, prods: null, stock: null, scanLog: null, dirty: { inv:true, prods:true, stock:true, scanLog:true } };
+    const _cache = { inv: null, prods: null, stock: null, scanLog: null, cmpRows: null, dirty: { inv:true, prods:true, stock:true, scanLog:true, cmpRows:true } };
 
     const _storeMap = { inv: 'inventory', prods: 'products', stock: 'stock', scanLog: 'scanLog' };
 
@@ -2500,18 +2500,20 @@
         else if (tabId === 'tab-inv') {
             await _ensureCache('inv');
             inventory = (_cache.inv || []).sort((a,b) => (b.timestamp||0)-(a.timestamp||0));
-            const hdr = `<table class="data-table" style="width:100%;table-layout:fixed;">
-                <thead style="position:sticky;top:0;z-index:2;background:var(--surface2);">
-                    <tr><th style="width:22%">${t('thBarcode')}</th><th style="width:20%">${t('thItemNo')}</th><th>${t('thName')}</th><th style="width:14%">${t('thQty')}</th><th style="width:18%">${t('thLastScan')}</th></tr>
-                </thead></table>`;
+            const hdr = `<div style="display:grid;grid-template-columns:1fr auto auto;gap:0;padding:8px 12px;background:var(--surface2);border-bottom:2px solid var(--border);font-size:0.75rem;font-weight:700;color:var(--text-muted);position:sticky;top:0;z-index:2;">
+                <span>${t('thItemNo')} · ${t('thName')}</span>
+                <span style="min-width:44px;text-align:center;">${t('thQty')}</span>
+                <span style="min-width:64px;text-align:center;padding-right:4px;">${t('thLastScan')}</span>
+            </div>`;
             const vl = _getOrCreateVL('inventoryFullTable', {
-                rowHeight: 42,
-                renderRow: (i) => `<div style="display:grid;grid-template-columns:22% 20% 1fr 14% 18%;gap:0;padding:8px 10px;border-bottom:1px solid var(--border);font-size:0.78rem;align-items:center;">
-                    <span style="color:var(--text-muted);font-size:0.68rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(i.barcode||'')}</span>
-                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(i.item_no||'')}</span>
-                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(i.name)}</span>
-                    <strong style="color:var(--accent);">${i.qty}</strong>
-                    <span style="font-size:0.68rem;color:var(--text-muted);">${i.timestamp?new Date(i.timestamp).toLocaleTimeString('ar-SA'):'-'}</span>
+                rowHeight: 52,
+                renderRow: (i) => `<div style="display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);gap:8px;min-height:52px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:0.76rem;font-weight:700;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(i.item_no||i.barcode||'')}</div>
+                        <div style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;">${escapeHtml(i.name)}</div>
+                    </div>
+                    <div style="flex-shrink:0;min-width:44px;text-align:center;font-size:0.9rem;font-weight:800;color:var(--accent);">${i.qty}</div>
+                    <div style="flex-shrink:0;min-width:64px;text-align:center;font-size:0.66rem;color:var(--text-dim);">${i.timestamp?new Date(i.timestamp).toLocaleTimeString('ar-SA'):'-'}</div>
                 </div>`
             }, hdr);
             vl.setItems(inventory);
@@ -2521,13 +2523,18 @@
         else if (tabId === 'tab-stock') {
             await _ensureCache('stock');
             const stock = _cache.stock || [];
-            const hdr = `<table class="data-table" style="width:100%;table-layout:fixed;"><thead style="position:sticky;top:0;z-index:2;background:var(--surface2);"><tr><th style="width:35%">${t('thItemNo')}</th><th>${t('thName')}</th><th style="width:22%">${t('thRefQty')}</th></tr></thead></table>`;
+            const hdr = `<div style="display:grid;grid-template-columns:1fr auto;gap:0;padding:8px 12px;background:var(--surface2);border-bottom:2px solid var(--border);font-size:0.75rem;font-weight:700;color:var(--text-muted);position:sticky;top:0;z-index:2;">
+                <span>${t('thItemNo')} · ${t('thName')}</span>
+                <span style="min-width:52px;text-align:center;">${t('thRefQty')}</span>
+            </div>`;
             const vl = _getOrCreateVL('stockTableContainer', {
-                rowHeight: 38,
-                renderRow: (s) => `<div style="display:grid;grid-template-columns:35% 1fr 22%;gap:0;padding:7px 10px;border-bottom:1px solid var(--border);font-size:0.78rem;align-items:center;">
-                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(s.key)}</span>
-                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(s.name)}</span>
-                    <span>${s.qty}</span>
+                rowHeight: 52,
+                renderRow: (s) => `<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);gap:8px;min-height:52px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:0.76rem;font-weight:700;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(s.key)}</div>
+                        <div style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;">${escapeHtml(s.name)}</div>
+                    </div>
+                    <div style="flex-shrink:0;min-width:52px;text-align:center;font-size:0.9rem;font-weight:800;color:var(--text);background:var(--surface2);border-radius:8px;padding:4px 8px;">${s.qty}</div>
                 </div>`
             }, hdr);
             vl.setItems(stock);
@@ -2536,48 +2543,83 @@
         // ── تبويب المقارنة ──
         else if (tabId === 'tab-cmp') {
             await _ensureCache('inv','stock','prods');
-            const inv   = _cache.inv   || [];
-            const stock = _cache.stock || [];
-            const prods = _cache.prods || [];
-            const invMap   = new Map(inv.map(i => [i.key, i]));
-            const stockMap = new Map(stock.map(s => [s.key, s]));
-            const allCodes = new Set([...inv.map(i => i.key), ...stock.map(s => s.key)]);
-            let cmpRows = [...allCodes].map(k => {
-                const i = invMap.get(k), s = stockMap.get(k);
-                const qi = i ? i.qty : 0, qs = s ? s.qty : 0, diff = qi - qs;
-                const fromProd = prods.find(p => p.item_no === k || p.barcode === k);
-                return { itemNo: (i||s)?.item_no || fromProd?.item_no || '', barcode: i?.barcode || fromProd?.barcode || '', name: (i||s)?.name||'', qs, qi, diff };
-            });
+
+            // أعد بناء cmpRows فقط لو تغيرت البيانات
+            if (_cache.dirty['cmpRows'] || !_cache.cmpRows) {
+                const inv   = _cache.inv   || [];
+                const stock = _cache.stock || [];
+                const prods = _cache.prods || [];
+
+                const invMap   = new Map(inv.map(i   => [i.key, i]));
+                const stockMap = new Map(stock.map(s => [s.key, s]));
+                const prodsMap = new Map();
+                for (const p of prods) {
+                    if (p.item_no) prodsMap.set(p.item_no, p);
+                    if (p.barcode && p.barcode !== p.item_no) prodsMap.set(p.barcode, p);
+                }
+
+                const allCodes = new Set([...inv.map(i => i.key), ...stock.map(s => s.key)]);
+                let rows = [], cntInc=0, cntDec=0, cntMatch=0;
+                for (const k of allCodes) {
+                    const i = invMap.get(k), s = stockMap.get(k);
+                    const qi = i ? i.qty : 0, qs = s ? s.qty : 0, diff = qi - qs;
+                    const fp = prodsMap.get(k);
+                    rows.push({ itemNo: (i||s)?.item_no || fp?.item_no || k, barcode: i?.barcode || fp?.barcode || '', name: (i||s)?.name||'', qs, qi, diff });
+                    if (diff > 0) cntInc++; else if (diff < 0) cntDec++; else if (qi > 0) cntMatch++;
+                }
+                _cache.cmpRows = { rows, cntInc, cntDec, cntMatch, invLen: inv.length, stockLen: stock.length };
+                _cache.dirty['cmpRows'] = false;
+            }
+
+            const { rows: cmpRows, cntInc, cntDec, cntMatch, invLen, stockLen } = _cache.cmpRows;
+
             const filter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-            let filtered = cmpRows;
-            if (filter === 'increase') filtered = filtered.filter(r => r.diff > 0);
-            else if (filter === 'decrease') filtered = filtered.filter(r => r.diff < 0);
-            else if (filter === 'match') filtered = filtered.filter(r => r.diff === 0);
-            else if (filter === 'scanned') filtered = filtered.filter(r => r.qi > 0);
-            document.getElementById('statsActualItems').innerText   = stock.length;
-            document.getElementById('statsIncreaseCount').innerText = cmpRows.filter(r => r.diff > 0).length;
-            document.getElementById('statsDecreaseCount').innerText = cmpRows.filter(r => r.diff < 0).length;
-            document.getElementById('statsMatchCount').innerText    = cmpRows.filter(r => r.diff === 0).length;
-            document.getElementById('statsScannedCount').innerText  = inv.length;
-            document.getElementById('statsTotalDiff').innerText     = filtered.reduce((a,b) => a + b.diff, 0);
-            const cmpHdr = `<table class="data-table" style="width:100%;table-layout:fixed;"><thead style="position:sticky;top:0;z-index:2;background:var(--surface2);"><tr><th style="width:18%">${t('thBarcode')}</th><th style="width:20%">${t('thItemNo')}</th><th>${t('thName')}</th><th style="width:13%">${t('thActual')}</th><th style="width:13%">${t('thCounted')}</th><th style="width:13%">${t('thDiff')}</th></tr></thead></table>`;
+            const filtered = filter==='all'      ? cmpRows
+                : filter==='increase' ? cmpRows.filter(r=>r.diff>0)
+                : filter==='decrease' ? cmpRows.filter(r=>r.diff<0)
+                : filter==='match'    ? cmpRows.filter(r=>r.diff===0&&r.qi>0)
+                : cmpRows.filter(r=>r.qi>0);
+
+            document.getElementById('statsActualItems').innerText   = stockLen;
+            document.getElementById('statsIncreaseCount').innerText = cntInc;
+            document.getElementById('statsDecreaseCount').innerText = cntDec;
+            document.getElementById('statsMatchCount').innerText    = cntMatch;
+            document.getElementById('statsScannedCount').innerText  = invLen;
+            document.getElementById('statsTotalDiff').innerText     = filtered.reduce((a,b)=>a+b.diff,0);
+
+            const lblActual  = t('thActual');
+            const lblCounted = t('thCounted');
+
+            const cmpHdr = `<div style="display:flex;padding:8px 12px;background:var(--surface2);border-bottom:2px solid var(--border);font-size:0.72rem;font-weight:700;color:var(--text-muted);position:sticky;top:0;z-index:2;gap:8px;">
+                <span style="flex:1;">${t('thItemNo')} · ${t('thName')}</span>
+                <span style="min-width:36px;text-align:center;">${lblActual}</span>
+                <span style="min-width:36px;text-align:center;">${lblCounted}</span>
+                <span style="min-width:44px;text-align:center;">${t('thDiff')}</span>
+            </div>`;
             const vl = _getOrCreateVL('comparisonTableDiv', {
-                rowHeight: 40,
+                rowHeight: 52,
                 renderRow: (r) => {
                     const isPos=r.diff>0, isNeg=r.diff<0, isZero=r.diff===0&&r.qi>0;
                     const bg  = isPos?'rgba(0,180,100,0.09)':isNeg?'rgba(220,60,60,0.09)':isZero?'rgba(0,120,220,0.09)':'';
                     const clr = isPos?'#10b981':isNeg?'#fb7185':isZero?'#60a5fa':'var(--text)';
                     const icon= isPos?'⬆':isNeg?'⬇':isZero?'✓':'—';
-                    return `<div style="display:grid;grid-template-columns:18% 20% 1fr 13% 13% 13%;gap:0;padding:8px 10px;background:${bg};border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.76rem;align-items:center;">
-                        <span style="color:${clr};opacity:0.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.66rem;">${escapeHtml(r.barcode)}</span>
-                        <span style="color:${clr};font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(r.itemNo)}</span>
-                        <span style="color:${clr};font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(r.name)}</span>
-                        <span style="color:var(--text-muted);">${r.qs}</span>
-                        <span style="color:var(--text-muted);">${r.qi}</span>
-                        <span style="font-weight:800;color:${clr};">${icon} ${(r.diff>0?'+':'')+r.diff}</span>
+                    return `<div style="display:flex;align-items:center;padding:9px 12px;background:${bg};border-bottom:1px solid rgba(255,255,255,0.05);gap:8px;min-height:52px;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:0.76rem;font-weight:700;color:${clr};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(r.itemNo||r.barcode)}</div>
+                            <div style="font-size:0.7rem;color:${clr};opacity:0.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;">${escapeHtml(r.name)}</div>
+                        </div>
+                        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:36px;">
+                            <span style="font-size:0.62rem;color:var(--text-dim);">${lblActual}</span>
+                            <span style="font-size:0.82rem;color:var(--text-muted);font-weight:600;">${r.qs}</span>
+                        </div>
+                        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:36px;">
+                            <span style="font-size:0.62rem;color:var(--text-dim);">${lblCounted}</span>
+                            <span style="font-size:0.82rem;color:var(--text-muted);font-weight:600;">${r.qi}</span>
+                        </div>
+                        <div style="flex-shrink:0;min-width:44px;text-align:center;font-size:0.95rem;font-weight:900;color:${clr};">${icon}${(r.diff>0?'+':'')+r.diff}</div>
                     </div>`;
                 }
-            });
+            }, cmpHdr);
             vl.setItems(filtered);
         }
 
@@ -2586,16 +2628,21 @@
             await _ensureCache('prods');
             const prods = _cache.prods || [];
             document.getElementById('totalProductsStat').innerText = prods.length;
-            const prodsHdr = `<table class="data-table" style="width:100%;table-layout:fixed;"><thead style="position:sticky;top:0;z-index:2;background:var(--surface2);"><tr><th style="width:24%">${t('thBarcode')}</th><th style="width:24%">${t('thItemNo')}</th><th>${t('thName')}</th><th style="width:16%"></th></tr></thead></table>`;
+            const prodsHdr = `<div style="display:flex;padding:8px 12px;background:var(--surface2);border-bottom:2px solid var(--border);font-size:0.75rem;font-weight:700;color:var(--text-muted);position:sticky;top:0;z-index:2;gap:8px;">
+                <span style="flex:1;">${t('thItemNo')} · ${t('thName')}</span>
+                <span style="min-width:52px;text-align:center;">${t('thAction')}</span>
+            </div>`;
             const vl = _getOrCreateVL('productsTableContainer', {
-                rowHeight: 40,
-                renderRow: (p) => `<div style="display:grid;grid-template-columns:24% 24% 1fr 16%;gap:0;padding:8px 10px;border-bottom:1px solid var(--border);font-size:0.76rem;align-items:center;">
-                    <span style="color:var(--text-muted);font-size:0.68rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.barcode||'-')}</span>
-                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.item_no||'-')}</span>
-                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.name||'-')}</span>
-                    <button class="icon-btn" onclick="window.deleteProductById('${p.id}')" style="font-size:0.7rem;padding:4px 8px;">${t('deleteBtn')}</button>
+                rowHeight: 58,
+                renderRow: (p) => `<div style="display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);gap:8px;min-height:58px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:0.76rem;font-weight:700;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(p.item_no||p.barcode||'-')}</div>
+                        <div style="font-size:0.72rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;">${escapeHtml(p.name||'-')}</div>
+                        <div style="font-size:0.64rem;color:var(--text-dim);margin-top:1px;">${escapeHtml(p.barcode||'')}</div>
+                    </div>
+                    <button class="icon-btn" onclick="window.deleteProductById('${p.id}')" style="flex-shrink:0;font-size:0.7rem;padding:5px 10px;">${t('deleteBtn')}</button>
                 </div>`
-            });
+            }, prodsHdr);
             vl.setItems(prods);
         }
     }
@@ -2711,7 +2758,7 @@
                 };
             });
             playBeep(true);
-            updateAllUI(["inv","scanLog"]); return;
+            updateAllUI(["inv","scanLog","cmpRows"]); return;
         }
 
         // ── نقص: احذف آخر سطر لنفس الباركود من scanLog + انقص 1 من inventory ──
@@ -2742,7 +2789,7 @@
             });
             await removeIfZero(itemCode);
             playBeep(false);
-            updateAllUI(["inv","scanLog"]); return;
+            updateAllUI(["inv","scanLog","cmpRows"]); return;
         }
 
         // ── حذف: احذف هذا السطر بالذات + انقص 1 من inventory ──
@@ -2763,7 +2810,7 @@
                 };
             });
             await removeIfZero(itemCode);
-            updateAllUI(["inv","scanLog"]);
+            updateAllUI(["inv","scanLog","cmpRows"]);
             }); return;
         }
 
@@ -2810,7 +2857,7 @@
                         };
                     });
                     await removeIfZero(itemCode);
-                    updateAllUI(["inv","scanLog"]);
+                    updateAllUI(["inv","scanLog","cmpRows"]);
                 }
             ); return;
         }
@@ -2818,7 +2865,7 @@
     window.deleteProductById = async function(id) {
         customConfirm(t('confirmDeleteProduct'), async () => {
             const tx = db.transaction("products", "readwrite"); tx.objectStore("products").delete(id);
-            await new Promise(r => { tx.oncomplete = r; }); updateAllUI(["inv","scanLog"]);
+            await new Promise(r => { tx.oncomplete = r; }); updateAllUI(["inv","scanLog","cmpRows"]);
         });
     };
 
@@ -3067,7 +3114,7 @@
         if (qty>0) tx.objectStore("stock").put({ key: itemNo||barcode, name, qty });
         await new Promise(r=>{ tx.oncomplete=r; });
         document.getElementById('productModal').style.display='none';
-        updateAllUI(["prods","stock"]); showToast(t('productAdded'));
+        updateAllUI(["prods","stock","cmpRows"]); showToast(t('productAdded'));
     };
     document.getElementById('stockUploadArea').addEventListener('click',()=>document.getElementById('stockFileInput').click());
     document.getElementById('dbUploadArea').addEventListener('click',()=>document.getElementById('dbFileInput').click());
@@ -3261,7 +3308,7 @@
                     hideProgress();
                     showToast(`✓ ${t('importedItems')} ${count} — ${mode==='replace'? t('update') : t('merge')}`);
                     document.getElementById('invImportFile').value = '';
-                    updateAllUI(["inv","scanLog"]);
+                    updateAllUI(["inv","scanLog","cmpRows"]);
                 } catch(e) { console.error(e); hideProgress(); showToast(t('fileReadError'), true); }
             }
         );
