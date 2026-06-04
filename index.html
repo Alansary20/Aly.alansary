@@ -1232,8 +1232,8 @@
             </button>
         </div>
 
-        <input type="text" id="searchInventory" class="search-input" placeholder="🔍 بحث في سجل الجرد" data-i18n-placeholder="searchInventory">
         <button id="exportInventoryBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> <span data-i18n="exportExcel">تصدير Excel</span></button>
+        <input type="text" id="searchInventory" class="search-input" placeholder="🔍 بحث..." autocomplete="off">
         <div id="inventoryFullTable" class="data-wrapper"></div>
     </div></div>
     <div id="tab-stock" class="panel"><div class="card">
@@ -1258,7 +1258,7 @@
         <button id="exportStockBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> <span data-i18n="exportStock">تصدير المرجع</span></button>
         <div id="stockTableContainer" class="data-wrapper"></div>
     </div></div>
-    <div id="tab-cmp" class="panel"><div class="card"><input type="text" id="searchCompare" class="search-input" placeholder="🔍 بحث في المقارنة" data-i18n-placeholder="searchCompare">
+    <div id="tab-cmp" class="panel"><div class="card">
 
         <!-- بطاقات الإحصاء — تصميم نظيف -->
         <div class="cmp-stats-grid">
@@ -1450,7 +1450,9 @@
         body.light-theme .filter-btn[data-filter="decrease"].active { background: #fff1f2; color:#e11d48; }
         body.light-theme .filter-btn[data-filter="match"].active    { background: #eff6ff; color:#2563eb; }
         body.light-theme .filter-btn[data-filter="scanned"].active  { background: #fffbeb; color:#b45309; }
-        </style><button id="exportCompareBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> <span data-i18n="exportCompare">تصدير المقارنة</span></button><div id="comparisonTableDiv" class="data-wrapper"></div></div></div>
+        </style><button id="exportCompareBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> <span data-i18n="exportCompare">تصدير المقارنة</span></button>
+        <input type="text" id="searchCompare" class="search-input" placeholder="🔍 بحث..." autocomplete="off">
+        <div id="comparisonTableDiv" class="data-wrapper"></div></div></div>
     <div id="tab-products" class="panel"><div class="card">
 
         <div class="file-label" id="dbUploadArea"><i class="fas fa-upload"></i> <span data-i18n="uploadProducts">رفع ملف المنتجات</span> <input type="file" id="dbFileInput" style="display:none;" multiple></div>
@@ -1470,6 +1472,7 @@
             <button id="processDbBtn" class="btn-primary"><span data-i18n="processProducts">معالجة ورفع المنتجات</span></button>
         </div>
         <button id="exportProductsBtn" class="btn-secondary"><i class="fas fa-file-excel"></i> <span data-i18n="exportProducts">تصدير المنتجات</span></button>
+        <input type="text" id="searchProducts" class="search-input" placeholder="🔍 بحث..." autocomplete="off">
         <div id="productsTableContainer" class="data-wrapper"></div>
         <button id="clearProductsBtn" class="btn-secondary" style="margin-top:12px;"><span data-i18n="clearProducts">مسح كل المنتجات</span></button>
     </div></div>
@@ -1625,11 +1628,8 @@
     // ── تنظيف وتحقق من صحة الباركود ──
     function sanitizeBarcode(raw) {
         if (!raw) return null;
-        let v = String(raw).trim().replace(/[\x00-\x1F\x7F]/g, '').replace(/\.0+$/, '');
-        if (v.length < 3)  return null;  // أقصر من 3 أحرف: مرفوض
-        if (v.length > 50) return null;  // أطول من 50: مرفوض
-        if (/^(.)\1{5,}$/.test(v)) return null; // كله نفس الحرف (000000): مرفوض
-        return v;
+        const v = String(raw).trim().replace(/[\x00-\x1F\x7F]/g, '').replace(/\.0+$/, '');
+        return v.length > 0 ? v : null;
     }
 
     // ── مُعالج الكاميرا بالتأكيد المزدوج ──
@@ -2441,6 +2441,7 @@
     // ══════════════════════════════════════════════
     //  _renderTab — يستخدم VirtualList لكل تبويب
     // ══════════════════════════════════════════════
+
     async function _renderTab(tabId) {
         if (!db) return;
 
@@ -2620,6 +2621,7 @@
                     </div>`;
                 }
             }, cmpHdr);
+            document.getElementById('statsTotalDiff').innerText = filtered.reduce((a,b)=>a+b.diff,0);
             vl.setItems(filtered);
         }
 
@@ -2658,7 +2660,6 @@
             Object.keys(_cache.dirty).forEach(k => { _cache.dirty[k] = true; });
         }
         const tab = _activeTab();
-        // استخدم requestIdleCallback إن توفّر — يُرجّئ الرسم لحين فراغ الـ main thread
         if (typeof requestIdleCallback !== 'undefined') {
             requestIdleCallback(() => _renderTab(tab), { timeout: 300 });
         } else {
@@ -2871,57 +2872,26 @@
 
     document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', function() {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active'); updateAllUI();
+        this.classList.add('active');
+        updateAllUI();
     }));
 
-    // ── دالة تنزيل تعمل في WebView و Android APK ──
-    function downloadFile(blobOrBuffer, fileName, mimeType) {
-        try {
-            const blob = blobOrBuffer instanceof Blob ? blobOrBuffer : new Blob([blobOrBuffer], { type: mimeType });
-            const reader = new FileReader();
-            reader.onload = function() {
-                const dataUrl = reader.result; // base64 data URL
-                // محاولة 1: Android WebView interface
-                if (window.Android && window.Android.downloadFile) {
-                    window.Android.downloadFile(dataUrl, fileName);
-                    return;
-                }
-                // محاولة 2: رابط عادي مع data URL (يعمل في WebView بدون Blob URL)
-                const a = document.createElement('a');
-                a.href = dataUrl;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => document.body.removeChild(a), 500);
-            };
-            reader.readAsDataURL(blob);
-        } catch(e) {
-            console.error('downloadFile error:', e);
-            showToast(t('downloadError'), true);
-        }
-    }
 
-    // ── تصدير Excel منسّق ألوان + رؤوس + RTL ──
-    const DATE_STR = new Date().toLocaleDateString('ar-SA').replace(/\//g,'-');
 
     async function exportStyledExcel({ fileName, sheetName, columns, rows, rowStyle }) {
+        const ExcelJS = window.ExcelJS;
         const wb = new ExcelJS.Workbook();
-        wb.creator = 'نظام الجرد الذكي';
-        const ws = wb.addWorksheet(sheetName, { views:[{ rightToLeft:true, state:'frozen', ySplit:1 }] });
-        ws.columns = columns;
-
-        // رأس الجدول
-        const hRow = ws.getRow(1);
-        hRow.height = 24;
-        columns.forEach((col, ci) => {
-            const cell = hRow.getCell(ci + 1);
-            cell.value     = col.header;
-            cell.font      = { bold:true, color:{ argb:'FFFFFFFF' }, size:11 };
-            cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF1B4F72' } };
+        const ws = wb.addWorksheet(sheetName || 'Sheet1', { views:[{rightToLeft:true}] });
+        ws.columns = columns.map(c => ({ header: c.header, key: c.key, width: c.width || 18 }));
+        // تنسيق الهيدر
+        const hdrRow = ws.getRow(1);
+        hdrRow.height = 22;
+        hdrRow.eachCell(cell => {
+            cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF1A7A5E' } };
+            cell.font      = { color:{ argb:'FFFFFFFF' }, bold:true, size:11 };
             cell.alignment = { horizontal:'center', vertical:'middle', readingOrder:'rtl' };
-            cell.border    = { bottom:{ style:'medium', color:{ argb:'FF00A884' } } };
+            cell.border    = { bottom:{ style:'medium', color:{ argb:'FF0F5C46' } } };
         });
-
         // صفوف البيانات
         rows.forEach((rowData, ri) => {
             const row = ws.addRow(rowData);
@@ -3357,7 +3327,65 @@
         req.onsuccess = (e) => { db = e.target.result; updateAllUI(); listCameras(); };
         req.onerror = (e) => console.error(e);
     }
+    // ══════════════════════════════════════════════
+    //  البحث — منطق نظيف ومباشر
+    // ══════════════════════════════════════════════
+    function q(s) { return String(s||'').toLowerCase(); }
+
+    function setupSearch(inputId, getItems, filterFn, vlId, onResult) {
+        const el = document.getElementById(inputId);
+        if (!el) return;
+        let timer;
+        el.addEventListener('input', function() {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                const term = q(this.value).trim();
+                const vl = _vl[vlId];
+                if (!vl) return;
+                const src = getItems();
+                const result = term ? src.filter(item => filterFn(term, item)) : src;
+                vl.setItems(result);
+                vl.scrollToTop();
+                if (onResult) onResult(result);
+            }, 200);
+        });
+    }
+
+    // يُستدعى بعد كل render لتسجيل البحث
+    function _initSearchHandlers() {
+        // بحث الجرد
+        setupSearch('searchInventory',
+            () => (inventory || []),
+            (term, i) => q(i.item_no).includes(term) || q(i.barcode).includes(term) || q(i.name).includes(term),
+            'inventoryFullTable'
+        );
+        // بحث المقارنة
+        setupSearch('searchCompare',
+            () => {
+                if (!_cache.cmpRows) return [];
+                const filter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+                let base = _cache.cmpRows.rows;
+                if      (filter==='increase') base = base.filter(r=>r.diff>0);
+                else if (filter==='decrease') base = base.filter(r=>r.diff<0);
+                else if (filter==='match')    base = base.filter(r=>r.diff===0&&r.qi>0);
+                else if (filter==='scanned')  base = base.filter(r=>r.qi>0);
+                return base;
+            },
+            (term, r) => q(r.itemNo).includes(term) || q(r.barcode).includes(term) || q(r.name).includes(term),
+            'comparisonTableDiv',
+            (result) => { document.getElementById('statsTotalDiff').innerText = result.reduce((a,b)=>a+b.diff,0); }
+        );
+        // بحث المنتجات
+        setupSearch('searchProducts',
+            () => (_cache.prods || []),
+            (term, p) => q(p.item_no).includes(term) || q(p.barcode).includes(term) || q(p.name).includes(term),
+            'productsTableContainer'
+        );
+    }
+
     initDB();
+    // سجّل handlers بعد تحميل الصفحة
+    window.addEventListener('load', _initSearchHandlers);
 
     // ══════════════════════════════════════════════
     //  نظام الترجمة — i18n (AR / EN)
@@ -3393,6 +3421,7 @@
             mergeDesc: 'دمج: يجمع الكميات مع الجرد الموجود',
             importInventoryBtn: 'استيراد الجرد',
             searchInventory: '🔍 بحث في سجل الجرد',
+            searchProducts: '🔍 بحث في المنتجات',
             exportExcel: 'تصدير Excel',
             uploadStockTitle: 'رفع ملف الرصيد الفعلي (مرجع)',
             chooseExcel: 'اختر ملف Excel',
@@ -3558,6 +3587,7 @@
             mergeDesc: 'Merge: combines quantities with existing inventory',
             importInventoryBtn: 'Import Inventory',
             searchInventory: '🔍 Search inventory log',
+            searchProducts: '🔍 Search products',
             exportExcel: 'Export Excel',
             uploadStockTitle: 'Upload Reference Stock File',
             chooseExcel: 'Choose Excel file',
