@@ -1983,19 +1983,51 @@
                         for (let start = 0; start < dataRows.length; start += BATCH_SIZE) {
                             const pct = 30 + ((fi / pendingProductFiles.length) + ((start / dataRows.length) / pendingProductFiles.length)) * 65;
                             updateProgress(pct, `${t('processing')} ${Math.min(start + BATCH_SIZE, dataRows.length)} / ${dataRows.length}`);
-                            const batch = dataRows.slice(start, Math.min(start + BATCH_SIZE, dataRows.length));
-                            const tx = db.transaction(["products"], "readwrite"); const store = tx.objectStore("products");
+                        const batch = dataRows.slice(start, Math.min(start + BATCH_SIZE, dataRows.length));
+
+                        if (dbUploadMode === 'merge') {
+                            // في الدمج: ابحث عن كل منتج موجود بـ item_no أو barcode وحدّثه، وإلا أضف جديد
+                            const allExisting = await new Promise(r => {
+                                const rtx = db.transaction("products","readonly");
+                                rtx.objectStore("products").getAll().onsuccess = e => r(e.target.result);
+                            });
+                            const byItemNo  = new Map(allExisting.filter(p=>p.item_no).map(p=>[p.item_no, p]));
+                            const byBarcode = new Map(allExisting.filter(p=>p.barcode).map(p=>[p.barcode, p]));
+
+                            const tx = db.transaction(["products"], "readwrite");
+                            const store = tx.objectStore("products");
                             for (const row of batch) {
                                 if (!Array.isArray(row)) continue;
-                                const barcode = colMap.barcode !== null ? String(row[colMap.barcode]||'').trim().replace(/\.0+$/,'') : '';
-                                const itemno  = colMap.itemno  !== null ? String(row[colMap.itemno] ||'').trim().replace(/\.0+$/,'') : '';
-                                const name    = colMap.name    !== null ? String(row[colMap.name]   ||'').trim() : '';
+                                const barcode    = colMap.barcode    !== null ? String(row[colMap.barcode]   ||'').trim().replace(/\.0+$/,'') : '';
+                                const itemno     = colMap.itemno     !== null ? String(row[colMap.itemno]    ||'').trim().replace(/\.0+$/,'') : '';
+                                const name       = colMap.name       !== null ? String(row[colMap.name]      ||'').trim() : '';
                                 const price_orig = colMap.price_orig !== null && colMap.price_orig !== undefined ? (parseFloat(row[colMap.price_orig]) || 0) : 0;
                                 const price_sale = colMap.price_sale !== null && colMap.price_sale !== undefined ? (parseFloat(row[colMap.price_sale]) || price_orig) : price_orig;
                                 if (!barcode && !itemno) continue;
-                                store.add({ id: generateUniqueId(), barcode, item_no: itemno, name: name || t('noName'), price_orig, price_sale, sourceId }); totalAdded++;
+                                // ابحث عن الموجود
+                                const existing = (itemno && byItemNo.get(itemno)) || (barcode && byBarcode.get(barcode));
+                                if (existing) {
+                                    // حدّث الموجود مع الحفاظ على id
+                                    store.put({ ...existing, barcode: barcode||existing.barcode, item_no: itemno||existing.item_no, name: name||existing.name, price_orig: price_orig||existing.price_orig, price_sale: price_sale||existing.price_sale });
+                                } else {
+                                    store.add({ id: generateUniqueId(), barcode, item_no: itemno, name: name||t('noName'), price_orig, price_sale, sourceId }); totalAdded++;
+                                }
                             }
                             await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); });
+                        } else {
+                            const tx = db.transaction(["products"], "readwrite"); const store = tx.objectStore("products");
+                            for (const row of batch) {
+                                if (!Array.isArray(row)) continue;
+                                const barcode    = colMap.barcode    !== null ? String(row[colMap.barcode]   ||'').trim().replace(/\.0+$/,'') : '';
+                                const itemno     = colMap.itemno     !== null ? String(row[colMap.itemno]    ||'').trim().replace(/\.0+$/,'') : '';
+                                const name       = colMap.name       !== null ? String(row[colMap.name]      ||'').trim() : '';
+                                const price_orig = colMap.price_orig !== null && colMap.price_orig !== undefined ? (parseFloat(row[colMap.price_orig]) || 0) : 0;
+                                const price_sale = colMap.price_sale !== null && colMap.price_sale !== undefined ? (parseFloat(row[colMap.price_sale]) || price_orig) : price_orig;
+                                if (!barcode && !itemno) continue;
+                                store.add({ id: generateUniqueId(), barcode, item_no: itemno, name: name||t('noName'), price_orig, price_sale, sourceId }); totalAdded++;
+                            }
+                            await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); });
+                        }
                         }
                     } catch (err) { hideProgress(); showToast(`خطأ في ${file.name}: ${err.message}`, true); return; }
                 }
