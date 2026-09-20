@@ -2411,10 +2411,19 @@
         cameraDiv.classList.remove('hidden');
         setScanStatus('scanning', t('scanStatusStarting'));
         try {
+            if (!window.isSecureContext) {
+                throw new Error('الكاميرا تحتاج اتصال آمن (HTTPS). على iOS لا تعمل الكاميرا عبر فتح الملف مباشرة أو رابط http عادي — افتح التطبيق عبر https:// أو من localhost.');
+            }
             const targetId = cameraId || currentCameraId || (availableCameras[0]?.id);
             if (!targetId) throw new Error("لا توجد كاميرا متاحة");
-            const constraints = { video: { deviceId: { exact: targetId }, width: { ideal: 1280 }, height: { ideal: 720 } } };
-            _scanStream = await navigator.mediaDevices.getUserMedia(constraints);
+            const constraints = { video: { deviceId: { exact: targetId }, width: { ideal: 1280, max: 1280 }, height: { ideal: 720, max: 720 } } };
+            const fallbackConstraints = { video: { facingMode: 'environment', width: { ideal: 1280, max: 1280 }, height: { ideal: 720, max: 720 } } };
+            try {
+                _scanStream = await navigator.mediaDevices.getUserMedia(constraints);
+            } catch (e1) {
+                // بعض أجهزة iOS ترفض تحديد الكاميرا بدقة (deviceId exact) — نجرب facingMode كبديل
+                _scanStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+            }
             video.srcObject = _scanStream;
             await video.play();
 
@@ -2447,6 +2456,9 @@
             }
 
             if (!_scanDetector) {
+                if (!window.ZXing) {
+                    showToast('⚠️ مكتبة قراءة الباركود الاحتياطية (ZXing) لم تُحمَّل — تحقق من مسار الملف libs/zxing.min.js وحالة الأحرف الكبيرة/الصغيرة فيه على GitHub.', true, 8000);
+                }
                 startZxingLoop(video, onDecoded); // fallback لأجهزة ما تدعم BarcodeDetector
             } else {
                 _scanAnimFrame = requestAnimationFrame(scanLoop);
@@ -2476,11 +2488,15 @@
         _scanZxingReader.setHints(hints);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const MAX_DECODE_DIM = 720; // تحديد أقصى أبعاد للمعالجة — كاميرات آيفون ترجع دقة عالية جداً تُبطئ فك التشفير بشدة
         function loop() {
             if (!scanningActive) return;
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-                ctx.drawImage(video, 0, 0);
+            if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth) {
+                const vw = video.videoWidth, vh = video.videoHeight;
+                const scale = Math.min(1, MAX_DECODE_DIM / Math.max(vw, vh));
+                canvas.width = Math.max(1, Math.round(vw * scale));
+                canvas.height = Math.max(1, Math.round(vh * scale));
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 try {
                     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     const luminance = new ZXing.RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
@@ -4794,17 +4810,33 @@ async function psStartScanner() {
     video.style.display = 'block';
     if (line) line.style.display = 'block';
 
+    // iOS/Safari يرفض الوصول للكاميرا كلياً بدون اتصال آمن (HTTPS)
+    if (!window.isSecureContext) {
+        showToast('⚠️ الكاميرا تحتاج اتصال آمن (HTTPS). على iOS لا تعمل عبر فتح الملف مباشرة أو رابط http عادي.', true, 6000);
+        wrap.style.display = 'none';
+        video.style.display = 'none';
+        if (line) line.style.display = 'none';
+        return;
+    }
+
     const camId = _psSelectedCam || (_psCameras.length ? _psCameras[_psCameras.length - 1].id : null);
-    const constraints = camId
-        ? { video: { deviceId: { exact: camId }, width: { ideal: 1280 }, height: { ideal: 720 } } }
-        : { video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } };
+    const exactConstraints = camId
+        ? { video: { deviceId: { exact: camId }, width: { ideal: 1280, max: 1280 }, height: { ideal: 720, max: 720 } } }
+        : { video: { facingMode: 'environment', width: { ideal: 1280, max: 1280 }, height: { ideal: 720, max: 720 } } };
+    const fallbackConstraints = { video: { facingMode: 'environment', width: { ideal: 1280, max: 1280 }, height: { ideal: 720, max: 720 } } };
 
     try {
-        _psStream = await navigator.mediaDevices.getUserMedia(constraints);
+        try {
+            _psStream = await navigator.mediaDevices.getUserMedia(exactConstraints);
+        } catch (e1) {
+            // بعض أجهزة iOS ترفض تحديد الكاميرا بدقة (deviceId exact) — نجرب facingMode كبديل
+            _psStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+        }
         video.srcObject = _psStream;
         await video.play();
     } catch (e) {
         psStopScanner();
+        showToast('⚠️ تعذّر تشغيل الكاميرا: ' + (e.name || '') + ' ' + (e.message || ''), true, 6000);
         return;
     }
 
@@ -4841,6 +4873,9 @@ async function psStartScanner() {
     }
 
     if (!_psDetector) {
+        if (!window.ZXing) {
+            showToast('⚠️ مكتبة قراءة الباركود الاحتياطية (ZXing) لم تُحمَّل — تحقق من مسار الملف libs/zxing.min.js وحالة الأحرف الكبيرة/الصغيرة فيه على GitHub.', true, 8000);
+        }
         psStartZxingLoop(video); // fallback
     } else {
         _psAnimFrame = requestAnimationFrame(psScanLoop);
@@ -4880,13 +4915,16 @@ function psStartZxingLoop(video) {
     _psZxingReader = new ZXing.MultiFormatReader();
     _psZxingReader.setHints(hints);
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const MAX_DECODE_DIM = 720; // تحديد أقصى أبعاد للمعالجة — كاميرات آيفون ترجع دقة عالية جداً تُبطئ فك التشفير بشدة
     function zLoop() {
         if (!_psScanning) return;
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            canvas.width  = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
+        if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth) {
+            const vw = video.videoWidth, vh = video.videoHeight;
+            const scale = Math.min(1, MAX_DECODE_DIM / Math.max(vw, vh));
+            canvas.width  = Math.max(1, Math.round(vw * scale));
+            canvas.height = Math.max(1, Math.round(vh * scale));
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             try {
                 const imgData  = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const luminance = new ZXing.RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
