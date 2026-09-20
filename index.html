@@ -2364,7 +2364,7 @@
     };
 
     // ── كاميرا محسّنة (BarcodeDetector أولاً، وZXing احتياطي — نفس منطق تبويب الأسعار) ──
-    let _scanStream = null, _scanAnimFrame = null, _scanDetector = null, _scanZxingReader = null;
+    let _scanStream = null, _scanAnimFrame = null, _scanZxingAnimFrame = null, _scanDetector = null, _scanZxingReader = null;
     async function listCameras() {
         try {
             await navigator.mediaDevices.getUserMedia({ video: true })
@@ -2444,9 +2444,27 @@
                 if (code) document.getElementById('barcodeInput').value = code;
             };
 
+            // شارة تشخيص مؤقتة: تبيّن هل حلقة المسح تعمل فعلاً وبأي محرك، ومسّاعدة لتشخيص مشاكل iOS
+            let dbg = document.getElementById('scanDebugInfo');
+            if (!dbg) {
+                dbg = document.createElement('div');
+                dbg.id = 'scanDebugInfo';
+                dbg.style.cssText = 'position:absolute;bottom:6px;left:6px;right:6px;z-index:5;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;padding:4px 8px;border-radius:8px;text-align:center;pointer-events:none;direction:ltr;';
+                if (getComputedStyle(cameraDiv).position === 'static') cameraDiv.style.position = 'relative';
+                cameraDiv.appendChild(dbg);
+            }
+            let _dbgNative = 0, _dbgZx = 0, _dbgPaint = 0;
+            function paintDbg() {
+                const now = performance.now();
+                if (now - _dbgPaint < 400) return;
+                _dbgPaint = now;
+                dbg.textContent = `native:${_dbgNative} zxing:${_dbgZx} res:${video.videoWidth}x${video.videoHeight}`;
+            }
+
             async function scanLoop() {
                 if (!scanningActive) return;
                 if (_scanDetector && video.readyState === video.HAVE_ENOUGH_DATA) {
+                    _dbgNative++; paintDbg();
                     try {
                         const codes = await _scanDetector.detect(video);
                         if (codes.length > 0) onDecoded(codes[0].rawValue);
@@ -2455,12 +2473,14 @@
                 _scanAnimFrame = requestAnimationFrame(scanLoop);
             }
 
-            if (!_scanDetector) {
-                if (!window.ZXing) {
-                    showToast('⚠️ مكتبة قراءة الباركود الاحتياطية (ZXing) لم تُحمَّل — تحقق من مسار الملف libs/zxing.min.js وحالة الأحرف الكبيرة/الصغيرة فيه على GitHub.', true, 8000);
-                }
-                startZxingLoop(video, onDecoded); // fallback لأجهزة ما تدعم BarcodeDetector
-            } else {
+            // نشغّل ZXing دائماً بالتوازي (وليس فقط كبديل)، لأن بعض إصدارات iOS
+            // تُظهر BarcodeDetector كموجود في window لكنه لا يعمل فعلياً (يرجع نتائج فارغة دائماً)
+            if (window.ZXing) {
+                startZxingLoop(video, onDecoded, () => { _dbgZx++; paintDbg(); });
+            } else if (!_scanDetector) {
+                showToast('⚠️ مكتبة قراءة الباركود الاحتياطية (ZXing) لم تُحمَّل — تحقق من مسار الملف libs/zxing.min.js وحالة الأحرف الكبيرة/الصغيرة فيه على GitHub.', true, 8000);
+            }
+            if (_scanDetector) {
                 _scanAnimFrame = requestAnimationFrame(scanLoop);
             }
         } catch (err) {
@@ -2473,8 +2493,8 @@
         }
     }
 
-    // ZXing احتياطي — لأجهزة/متصفحات ما تدعم BarcodeDetector الأصلي
-    function startZxingLoop(video, onDecoded) {
+    // ZXing احتياطي — لأجهزة/متصفحات ما تدعم BarcodeDetector الأصلي (ويعمل الآن بالتوازي معه أيضاً)
+    function startZxingLoop(video, onDecoded, onFrame) {
         if (!window.ZXing) return;
         const hints = new Map();
         const formats = [
@@ -2492,6 +2512,7 @@
         function loop() {
             if (!scanningActive) return;
             if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth) {
+                if (onFrame) onFrame();
                 const vw = video.videoWidth, vh = video.videoHeight;
                 const scale = Math.min(1, MAX_DECODE_DIM / Math.max(vw, vh));
                 canvas.width = Math.max(1, Math.round(vw * scale));
@@ -2505,14 +2526,15 @@
                     if (result) onDecoded(result.getText());
                 } catch (e) {}
             }
-            _scanAnimFrame = requestAnimationFrame(loop);
+            _scanZxingAnimFrame = requestAnimationFrame(loop);
         }
-        _scanAnimFrame = requestAnimationFrame(loop);
+        _scanZxingAnimFrame = requestAnimationFrame(loop);
     }
 
     async function stopScanEngine() {
         scanningActive = false;
-        if (_scanAnimFrame) { cancelAnimationFrame(_scanAnimFrame); _scanAnimFrame = null; }
+        if (_scanAnimFrame)       { cancelAnimationFrame(_scanAnimFrame); _scanAnimFrame = null; }
+        if (_scanZxingAnimFrame)  { cancelAnimationFrame(_scanZxingAnimFrame); _scanZxingAnimFrame = null; }
         if (_scanStream)    { _scanStream.getTracks().forEach(t => t.stop()); _scanStream = null; }
         const video = document.getElementById('reader2');
         if (video) video.srcObject = null;
@@ -4747,6 +4769,7 @@ let _psCameras     = [];
 let _psSelectedCam = null;
 let _psStream      = null;
 let _psAnimFrame   = null;
+let _psZxingAnimFrame = null;
 let _psDetector    = null;
 let _psCooldown    = false;
 let _psZxingReader = null;
@@ -4860,6 +4883,7 @@ async function psStartScanner() {
     async function psScanLoop() {
         if (!_psScanning) return;
         if (_psDetector && video.readyState === video.HAVE_ENOUGH_DATA) {
+            _dbgNative++; paintPsDbg();
             try {
                 const barcodes = await _psDetector.detect(video);
                 if (barcodes.length > 0 && !_psCooldown) {
@@ -4872,12 +4896,31 @@ async function psStartScanner() {
         _psAnimFrame = requestAnimationFrame(psScanLoop);
     }
 
-    if (!_psDetector) {
-        if (!window.ZXing) {
-            showToast('⚠️ مكتبة قراءة الباركود الاحتياطية (ZXing) لم تُحمَّل — تحقق من مسار الملف libs/zxing.min.js وحالة الأحرف الكبيرة/الصغيرة فيه على GitHub.', true, 8000);
-        }
-        psStartZxingLoop(video); // fallback
-    } else {
+    // شارة تشخيص مؤقتة: تبيّن هل حلقة المسح تعمل فعلاً وبأي محرك
+    let psDbg = document.getElementById('psScanDebugInfo');
+    if (!psDbg) {
+        psDbg = document.createElement('div');
+        psDbg.id = 'psScanDebugInfo';
+        psDbg.style.cssText = 'position:absolute;bottom:6px;left:6px;right:6px;z-index:5;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;padding:4px 8px;border-radius:8px;text-align:center;pointer-events:none;direction:ltr;';
+        if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+        wrap.appendChild(psDbg);
+    }
+    let _dbgNative = 0, _dbgZx = 0, _dbgPaintT = 0;
+    function paintPsDbg() {
+        const now = performance.now();
+        if (now - _dbgPaintT < 400) return;
+        _dbgPaintT = now;
+        psDbg.textContent = `native:${_dbgNative} zxing:${_dbgZx} res:${video.videoWidth}x${video.videoHeight}`;
+    }
+
+    // نشغّل ZXing دائماً بالتوازي (وليس فقط كبديل)، لأن بعض إصدارات iOS
+    // تُظهر BarcodeDetector كموجود في window لكنه لا يعمل فعلياً (يرجع نتائج فارغة دائماً)
+    if (window.ZXing) {
+        psStartZxingLoop(video, () => { _dbgZx++; paintPsDbg(); });
+    } else if (!_psDetector) {
+        showToast('⚠️ مكتبة قراءة الباركود الاحتياطية (ZXing) لم تُحمَّل — تحقق من مسار الملف libs/zxing.min.js وحالة الأحرف الكبيرة/الصغيرة فيه على GitHub.', true, 8000);
+    }
+    if (_psDetector) {
         _psAnimFrame = requestAnimationFrame(psScanLoop);
     }
 }
@@ -4885,7 +4928,8 @@ async function psStartScanner() {
 async function psStopScanner() {
     _psScanning = false;
     _psCooldown = false;
-    if (_psAnimFrame) { cancelAnimationFrame(_psAnimFrame); _psAnimFrame = null; }
+    if (_psAnimFrame)      { cancelAnimationFrame(_psAnimFrame); _psAnimFrame = null; }
+    if (_psZxingAnimFrame) { cancelAnimationFrame(_psZxingAnimFrame); _psZxingAnimFrame = null; }
     if (_psStream)    { _psStream.getTracks().forEach(t => t.stop()); _psStream = null; }
     const video = document.getElementById('ps-scanner-video');
     const wrap  = document.getElementById('ps-scanner-wrap');
@@ -4902,7 +4946,7 @@ async function psStopScanner() {
 }
 
 // ZXing fallback
-function psStartZxingLoop(video) {
+function psStartZxingLoop(video, onFrame) {
     if (!window.ZXing) return;
     const hints = new Map();
     const formats = [
@@ -4920,6 +4964,7 @@ function psStartZxingLoop(video) {
     function zLoop() {
         if (!_psScanning) return;
         if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth) {
+            if (onFrame) onFrame();
             const vw = video.videoWidth, vh = video.videoHeight;
             const scale = Math.min(1, MAX_DECODE_DIM / Math.max(vw, vh));
             canvas.width  = Math.max(1, Math.round(vw * scale));
@@ -4937,9 +4982,9 @@ function psStartZxingLoop(video) {
                 }
             } catch (e) {}
         }
-        _psAnimFrame = requestAnimationFrame(zLoop);
+        _psZxingAnimFrame = requestAnimationFrame(zLoop);
     }
-    _psAnimFrame = requestAnimationFrame(zLoop);
+    _psZxingAnimFrame = requestAnimationFrame(zLoop);
 }
 
 // عند قراءة الباركود
