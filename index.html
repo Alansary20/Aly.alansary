@@ -2508,23 +2508,41 @@
         _scanZxingReader.setHints(hints);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const MAX_DECODE_DIM = 720; // تحديد أقصى أبعاد للمعالجة — كاميرات آيفون ترجع دقة عالية جداً تُبطئ فك التشفير بشدة
+        const MAX_DECODE_DIM = 850; // تحديد أقصى أبعاد للمعالجة — كاميرات آيفون ترجع دقة عالية جداً تُبطئ فك التشفير بشدة
+        function tryDecode(w, h) {
+            try {
+                const imgData  = ctx.getImageData(0, 0, w, h);
+                const luminance = new ZXing.RGBLuminanceSource(imgData.data, w, h);
+                const bitmap    = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(luminance));
+                return _scanZxingReader.decode(bitmap);
+            } catch (e) { return null; }
+        }
         function loop() {
             if (!scanningActive) return;
             if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth) {
                 if (onFrame) onFrame();
                 const vw = video.videoWidth, vh = video.videoHeight;
-                const scale = Math.min(1, MAX_DECODE_DIM / Math.max(vw, vh));
-                canvas.width = Math.max(1, Math.round(vw * scale));
-                canvas.height = Math.max(1, Math.round(vh * scale));
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                try {
-                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const luminance = new ZXing.RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
-                    const bitmap    = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(luminance));
-                    const result    = _scanZxingReader.decode(bitmap);
-                    if (result) onDecoded(result.getText());
-                } catch (e) {}
+
+                // محاولة أولى: قص منطقة وسط الصورة بدقة أعلى نسبياً — يحسّن قراءة الباركود الصغير/البعيد
+                // (المستخدم عادة يوسّط الباركود بمجال الرؤية حتى بدون إطار إرشادي)
+                const cropW = Math.round(vw * 0.6), cropH = Math.round(vh * 0.6);
+                const cropX = Math.round((vw - cropW) / 2), cropY = Math.round((vh - cropH) / 2);
+                const cScale = Math.min(1, MAX_DECODE_DIM / Math.max(cropW, cropH));
+                canvas.width  = Math.max(1, Math.round(cropW * cScale));
+                canvas.height = Math.max(1, Math.round(cropH * cScale));
+                ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, canvas.width, canvas.height);
+                let result = tryDecode(canvas.width, canvas.height);
+
+                // محاولة ثانية: الإطار كامل (لو الباركود مو بمنتصف الشاشة)
+                if (!result) {
+                    const fScale = Math.min(1, MAX_DECODE_DIM / Math.max(vw, vh));
+                    canvas.width  = Math.max(1, Math.round(vw * fScale));
+                    canvas.height = Math.max(1, Math.round(vh * fScale));
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    result = tryDecode(canvas.width, canvas.height);
+                }
+
+                if (result) onDecoded(result.getText());
             }
             _scanZxingAnimFrame = requestAnimationFrame(loop);
         }
@@ -4960,27 +4978,44 @@ function psStartZxingLoop(video, onFrame) {
     _psZxingReader.setHints(hints);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    const MAX_DECODE_DIM = 720; // تحديد أقصى أبعاد للمعالجة — كاميرات آيفون ترجع دقة عالية جداً تُبطئ فك التشفير بشدة
+    const MAX_DECODE_DIM = 850; // تحديد أقصى أبعاد للمعالجة — كاميرات آيفون ترجع دقة عالية جداً تُبطئ فك التشفير بشدة
+    function tryDecode(w, h) {
+        try {
+            const imgData  = ctx.getImageData(0, 0, w, h);
+            const luminance = new ZXing.RGBLuminanceSource(imgData.data, w, h);
+            const bitmap    = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(luminance));
+            return _psZxingReader.decode(bitmap);
+        } catch (e) { return null; }
+    }
     function zLoop() {
         if (!_psScanning) return;
         if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth) {
             if (onFrame) onFrame();
             const vw = video.videoWidth, vh = video.videoHeight;
-            const scale = Math.min(1, MAX_DECODE_DIM / Math.max(vw, vh));
-            canvas.width  = Math.max(1, Math.round(vw * scale));
-            canvas.height = Math.max(1, Math.round(vh * scale));
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            try {
-                const imgData  = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const luminance = new ZXing.RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
-                const bitmap    = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(luminance));
-                const result    = _psZxingReader.decode(bitmap);
-                if (result && !_psCooldown) {
-                    _psCooldown = true;
-                    psOnBarcodeFound(result.getText());
-                    setTimeout(() => { _psCooldown = false; }, 1500);
-                }
-            } catch (e) {}
+
+            // محاولة أولى: قص منطقة وسط الصورة بدقة أعلى نسبياً — يحسّن قراءة الباركود الصغير/البعيد
+            const cropW = Math.round(vw * 0.6), cropH = Math.round(vh * 0.6);
+            const cropX = Math.round((vw - cropW) / 2), cropY = Math.round((vh - cropH) / 2);
+            const cScale = Math.min(1, MAX_DECODE_DIM / Math.max(cropW, cropH));
+            canvas.width  = Math.max(1, Math.round(cropW * cScale));
+            canvas.height = Math.max(1, Math.round(cropH * cScale));
+            ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, canvas.width, canvas.height);
+            let result = tryDecode(canvas.width, canvas.height);
+
+            // محاولة ثانية: الإطار كامل (لو الباركود مو بمنتصف الشاشة)
+            if (!result) {
+                const fScale = Math.min(1, MAX_DECODE_DIM / Math.max(vw, vh));
+                canvas.width  = Math.max(1, Math.round(vw * fScale));
+                canvas.height = Math.max(1, Math.round(vh * fScale));
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                result = tryDecode(canvas.width, canvas.height);
+            }
+
+            if (result && !_psCooldown) {
+                _psCooldown = true;
+                psOnBarcodeFound(result.getText());
+                setTimeout(() => { _psCooldown = false; }, 1500);
+            }
         }
         _psZxingAnimFrame = requestAnimationFrame(zLoop);
     }
